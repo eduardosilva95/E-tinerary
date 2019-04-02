@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Nome da aplicação">
+    <meta name="author" content="Eduardo Silva">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Simple Map</title>
+
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/v4-shims.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="js/places.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpKgqxjCAowTT9qWEaYm-7ALBc7MwVyz4&libraries=places"></script>
+    
+  </head>
+  <body onload="loadPage();">
+        <!-- header navbar -->
+        <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
+            <a class="navbar-brand" href="./">HomePage</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#dropdown-menu" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-search" style="padding-right: 5px;"></i>Plan a trip
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="./search">Get a Aplicação plan</a>
+                        <a class="dropdown-item" href="./create-plan">Create your plan manually</a>
+                    </div>
+                    </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="./search-restaurants"><i class="fas fa-utensils" style="padding-right: 5px;"></i>Restaurants</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
+                        <a class="dropdown-item" href="./about-us">Aplicacao</a>
+                        <a class="dropdown-item" href="./help">Help</a>
+                    </div>
+                </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                <li>
+                    <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control form-control-sm mr-sm-2" type="email " placeholder="Email" aria-label="Email">
+                    <input class="form-control form-control-sm mr-sm-2" type="password" placeholder="Password" aria-label="Password">
+                    <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="submit">Login</button>
+                    </form>
+                </li>
+                </ul>
+            </div>
+        </nav>
+
+
+        <div class="container-fluid" id="places-header" style=" height: 200px; width: 100%; background-size: cover; background-position: center;">
+            
+            <br><br>
+
+            <img id="imagem">
+
+            <div class="row">
+                <div class="col-md-4 col-sm-3"></div>
+                <div class="col-md-4 col-sm-6 places-title">
+                    <h2 class="text-center" style="color: white; font-weight: bold;"><%= city %></h2>
+                    <h3 class="text-center" style="color: white;"><%= country %></h3>
+                </div>
+                <div class="col-md-4 col-sm-3"></div>
+            </div>
+            
+        </div>
+        <script>
+            var city = "<%= city %>";
+            getCityImage(city);
+        </script>
+
+        <div class="container-fluid" style="background-color: #343a40; padding-top: 20px; padding-bottom: 20px;">
+            <form class="form-inline row">
+                <div class="col-md-1"></div>
+                <div class="col-md-5 cont">
+                  <div class="form-group has-search">
+                    <span class="fa fa-search form-control-feedback"></span>
+                    <input type="text" class="form-control float-left" placeholder="Search for a restaurant in <%= city %>" id="search-place-input" name="query">
+                  </div>
+                </div>
+                <div class="col-md-1 cont">
+                  <div class="form-group float-right">
+                    <button type="button" onclick="queryRestaurant()" class="btn btn-outline-warning" id="btn-search-place" >Search</button>
+                  </div>
+                </div>
+                <div class="col-md-1 cont">
+                    <div class="dropdown row float-right">
+                        <button class="btn btn-outline-warning dropdown-toggle" type="button" id="sortDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Sort
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="sortDropdownMenu">
+                            <a class="dropdown-item" href="#">Number of reviews</a>
+                            <a class="dropdown-item" href="#">Rating</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4"></div>
+            </form>
+                    
+        </div>
+
+
+
+        <div class="container" style="padding-top: 30px;">
+
+            <div class="text-center">
+                <h3><b>The top restaurants in <span></span><%= city %></b></h3>
+            </div>
+
+
+            <div class="row cont">
+                <div class="col-md-9">
+                    <% places.forEach(function(place) { %>
+                    
+                    <div class="card" id="<%= place.name %>">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="panel-title"><%= place.name %></h6>  
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-right"><i id="<%= place.name %>_icon" class="fas fa-monument" style="padding-right: 10px;"></i><h8 class="panel-title"><%= place.type %></h8></div>
+                                </div>
+                                <script>
+                                    loadIcon('<%= place.name %>', '<%= place.type %>');
+                                </script>
+                            </div>                           
+                        </div>
+
+
+                        <div class="card-body">
+                            <div class="row no-gutters">
+                                <div class="col-md-4">
+                                    <img class="list-places-img" id="<%= place.id %> Image">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <p><i class="fas fa-map-marker-alt"></i><span style="font-weight: bold; padding-left: 10px;">Address: </span><%= place.address %><span id="poi-address"></span></p>
+                                        <!--<p><i class="fas fa-clock"></i><span style="font-weight: bold; padding-left: 10px;">Opening hours: </span><span id="poi-address"></span></p>
+                                        -->
+                                        <div class="row" style="padding-top: 20px;">
+                                            <div class="col-md-8">
+                                                <p><i class="fas fa-star"></i><span style="font-weight: bold; padding-left: 10px;">Rating: </span><span id="rating"> <%= place.rating %> / 5.0</span></p>                  
+                                            </div>   
+                                        </div>        
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6"></div>
+                                <div class="col-md-3">
+                                    <!-- botão para adicionar ao plano 
+                                    <div class="float-right">
+                                        <button type="button" class="btn btn-primary" onclick="loadPlace('<%= place.id %>')">Find out more</button>
+                                    </div>-->
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="float-right">
+                                        <button type="button" class="btn btn-primary" onclick="loadPlace('<%= place.id %>')">Find out more</button>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                        <script>
+                            var place_place_id = "<%= place.place_id %>";
+                            var place_id = "<%= place.id %>";
+                            getPlaceDetails(place_place_id, place_id);
+                        </script>
+
+                    </div>
+
+                    <br>
+
+                    <% }); %>
+
+
+                </div>
+
+                <!-- Filter div -->
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><b>Filter</b></h5>
+                            <p><b>Type of place</b></p>
+                            <div class="form-group">
+                                <input type="checkbox" name="hotels-filter" value="Hotels" id="hotels-filter" disabled><i style="padding-left: 10px;" class="fas fa-bed"></i> Hotels
+                                <br>
+                                <input type="checkbox" name="restaurants-filter" value="Restaurants" id="restaurants-filter" checked><i style="padding-left: 10px;" class="fas fa-utensils"></i> Restaurants
+                                <br>
+                                <input type="checkbox" name="museums-filter" value="Museums" id="museums-filter" disabled><i style="padding-left: 10px;" class="fas fa-archway"></i> Museums
+                                <br>
+                                <input type="checkbox" name="churchs-filter" value="Museums" id="churchs-filter" disabled><i style="padding-left: 10px;" class="fas fa-church"></i> Churchs
+                                <br>
+                                <input type="checkbox" name="pois-filter" value="Museums" id="pois-filter" disabled><i style="padding-left: 10px;" class="fas fa-monument"></i> Points of Interest
+                                <br>
+                                <input type="checkbox" name="parks-filter" value="Museums" id="parks-filter" disabled><i style="padding-left: 10px;" class="fas fa-tree"></i> Parks
+                            </div>
+                            
+                            <div id="rating-filter">
+                                <p><b>Rating</b></p>
+                                <input type="number" name="min-rating" min="0" max="5" step="0.1" value="0"> to <input type="number" name="max-rating" min="0" max="5" step="0.1" value="5.0">
+                                <br>
+                                <br>
+                            </div>
+
+                            <div class="float-right">
+                                <button type="button" class="btn btn-warning" onclick="filterSearch();"><b>Search</b></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <br>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><b>Classify <%= city %></b></h5>
+                            
+                            <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
+                                <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 star">5</label>
+                                <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 star">4</label>
+                                <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 star">3</label>
+                                <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 star">2</label>
+                                <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">1</label>
+                            </div>
+
+                            <div class="float-right">
+                                <button type="button" class="btn btn-warning" onclick="classify();" ><b>Submit</b></button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <br>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center" id="change-pages">
+                <li class="page-item" id="button-first-page">
+                    <button class="page-link" onclick="changePage('first');" aria-label="First">
+                        <span aria-hidden="true">&laquo;</span>
+                    </button>
+                </li>
+                <li class="page-item" id="button-previous-page">
+                    <button class="page-link" onclick="changePage('previous');" aria-label="Previous">
+                        <span aria-hidden="true">&lsaquo;</span>
+                    </button>
+                </li>
+                
+                <li class="page-item" id="button-page-1"><button class="page-link" onclick="changePage(this.value);" value="1">1</button></li>
+                <li class="page-item" id="button-page-2"><button class="page-link" onclick="changePage(this.value);" value="2">2</button></li>
+                <li class="page-item" id="button-page-3"><button class="page-link" onclick="changePage(this.value);" value="3">3</button></li>
+
+                <li class="page-item" id="button-next-page">
+                    <button class="page-link" onclick="changePage('next');" aria-label="Next">
+                        <span aria-hidden="true">&rsaquo;</span>
+                    </button>
+                </li>
+                <li class="page-item" id="button-last-page">
+                    <button class="page-link" onclick="changePage('last');" aria-label="Last">
+                        <span aria-hidden="true">&raquo;</span>
+                    </button>
+                </li>
+            </ul>
+
+        </nav>
+
+        <script>
+            filterPage('<%= number_results %>');    
+        </script>
+
+        <br><br><br><br>
+
+
+        <!-- Footer -->
+        <footer class="footer">
+          <!-- Footer Elements -->
+
+          <div id="social">
+              <a class="facebookBtn smGlobalBtn" href="#" ></a>
+              <a class="twitterBtn smGlobalBtn" href="#" ></a>
+              <a class="googleplusBtn smGlobalBtn" href="#" ></a>
+              <a class="linkedinBtn smGlobalBtn" href="#" ></a>
+              <a class="instagramBtn smGlobalBtn" href="#" ></a>
+            </div>
+            <!-- Footer Elements -->
+        
+            <!-- Copyright -->
+            <div class="footer-copyright"> 2019 Copyright:
+              <a href="">&copy; Aplicacao, todos os direitos reservados</a>
+            </div>
+
+        </footer>
+        <!-- Footer -->
+        
+
+  
+    <!-- Scripts -->
+
+    
+
+  </body>
+</html>

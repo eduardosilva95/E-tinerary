@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="description" content="Nome da aplicação">
+      <meta name="author" content="Eduardo Silva">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+      <title>Simple Map</title>
+  
+      <!-- Custom styles -->
+      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/v4-shims.css">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+      <link rel="stylesheet" type="text/css" href="css/style.css">
+  
+      
+      <!-- Scripts -->
+      <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    
+  </head>
+  <body>
+      <!-- header navbar -->
+      <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
+          <a class="navbar-brand" href="./">HomePage</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ml-auto">
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#dropdown-menu" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fa fa-search" style="padding-right: 5px;"></i>Plan a trip
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                      <a class="dropdown-item" href="./search">Get a Aplicação plan</a>
+                      <a class="dropdown-item" href="./create-plan">Create your plan manually</a>
+                  </div>
+                  </li>
+
+              <li class="nav-item">
+                  <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="./search-restaurants"><i class="fas fa-utensils" style="padding-right: 5px;"></i>Restaurants</a>
+              </li>
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
+                      <a class="dropdown-item" href="./about-us">Aplicacao</a>
+                      <a class="dropdown-item" href="./help">Help</a>
+                  </div>
+              </li>
+              </ul>
+              <ul class="navbar-nav ml-auto">
+              <li>
+                  <form class="form-inline my-2 my-lg-0">
+                  <input class="form-control form-control-sm mr-sm-2" type="email " placeholder="Email" aria-label="Email">
+                  <input class="form-control form-control-sm mr-sm-2" type="password" placeholder="Password" aria-label="Password">
+                  <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="submit">Login</button>
+                  </form>
+              </li>
+              </ul>
+          </div>
+      </nav>
+
+
+      <div class="container-fluid">
+          <div class="row no-gutters" id="half-map"  style="height: 600px;">
+            <div id="sidebar" class="col-md-3 col-xs-12">
+              <div class="d-flex justify-content-end">
+                  <button class="close-button" onclick="closeInfo()"><i class="fa fa-close"></i></button>
+              </div>
+
+              <div class="row" style="width: 98%; margin: auto auto auto auto;">
+                <div class="card card-body" style="height: 400px;">
+                    <span><h3 id="poi-name" style="font-weight: bold; color: black; text-align: center;"></h3></span>
+                    <img style="width: 100%; height: 300px;" id="image_poi">
+                </div>
+              </div>
+
+              
+              <div class="cont text-center" id="add-remove-btn">
+                <button class="btn btn-success"><i class="far fa-calendar-alt"></i><span style="padding-left: 10px;">Add to the trip</span></button>
+              </div>
+  
+
+              <div class="row cont" style="width: 98%; margin: auto auto;">
+                <div class="card card-body" id="poi-info">
+                  <h6 class="card-title">General Information</h6>
+                  <span ><i class="fas fa-map-marker-alt"></i><span id="poi-address" style="padding-left: 10px;"></span></span>
+                  <span style="padding-top: 10px;"><i class="fas fa-globe-europe"></i><span id="poi-website" style="padding-left: 10px;"></span></span>
+                  <span style="padding-top: 10px;"><i class="fas fa-phone"></i><span id="poi-phone-number" style="padding-left: 10px;"></span></span>
+                  <span style="padding-top: 10px;"><i class="fas fa-star"></i><span id="poi-rating" style="padding-left: 10px;"></span></span>
+                </div>
+              </div>
+
+              <div class="row cont" style="width: 98%; margin: auto auto;">
+                <div class="card card-body" id="poi-opening-hours">
+                    <h6 class="card-title">Opening hours</h6>
+                    <table class="table table-striped display" id="table-opening-hours" cellspacing="0" width="100%">
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+              </div>
+
+            </div>
+  
+            <div id="map" class="col-md-9 col-xs-12"></div>
+            
+          </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer">
+          <!-- Footer Elements -->
+
+          <div id="social">
+              <a class="facebookBtn smGlobalBtn" href="#" ></a>
+              <a class="twitterBtn smGlobalBtn" href="#" ></a>
+              <a class="googleplusBtn smGlobalBtn" href="#" ></a>
+              <a class="linkedinBtn smGlobalBtn" href="#" ></a>
+              <a class="instagramBtn smGlobalBtn" href="#" ></a>
+            </div>
+            <!-- Footer Elements -->
+        
+            <!-- Copyright -->
+            <div class="footer-copyright"> 2019 Copyright:
+              <a href="">&copy; Aplicacao, todos os direitos reservados</a>
+            </div>
+
+        </footer>
+        <!-- Footer -->
+          
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script type="text/javascript" src="js/myscript.js"></script>
+    
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpKgqxjCAowTT9qWEaYm-7ALBc7MwVyz4&callback=initMap&libraries=places"></script>
+    
+    <script type="text/javascript" src="js/map-font-icons.js"></script>
+
+  </body>
+</html>
