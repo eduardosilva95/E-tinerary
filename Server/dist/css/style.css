@@ -15,6 +15,42 @@ html, body {
 	padding-top: 25px;
 }
 
+hr {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  border-width: 2px;
+}
+
+/* SCROLLBAR */
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+  border-radius: 10px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #dddddd; 
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #cccccc; 
+  border-radius: 10px;
+}
+
+/* ----------------------------------- */
+
 .home-image {
   background-repeat: no-repeat; 
   height: 550px;
@@ -60,6 +96,137 @@ html, body {
   color: gold;
   padding-left: 1rem;
 }
+
+#features-list{
+  color: white;
+  font-size: 20px;
+  list-style-type: none;
+  font-weight: bold;
+}
+
+#profile-btn {
+    display: block;
+    height: 40px;
+    padding: 0;
+    margin: 0;
+    width: 40px;
+    border-radius: 50%;
+}
+
+#profile-btn img{
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+  border-color: gold;
+}
+
+#profile-btn::before {
+  display:none;
+}
+
+
+/* ----------------- LOGIN MODAL ---------------- */
+
+.profile-img-card {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 10px;
+  display: block;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+}
+
+.form-signin #inputEmail,
+.form-signin #inputPassword {
+    direction: ltr;
+    height: 44px;
+    font-size: 16px;
+}
+
+.form-signin input[type=email],
+.form-signin input[type=password],
+.form-signin input[type=text],
+.form-signin button {
+    width: 100%;
+    display: block;
+    margin-bottom: 10px;
+    z-index: 1;
+    position: relative;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.forgot-password {
+  color: rgb(104, 145, 162);
+}
+
+.forgot-password:hover,
+.forgot-password:active,
+.forgot-password:focus{
+  color: rgb(12, 97, 33);
+}
+
+.login-or {
+  position: relative;
+  font-size: 18px;
+  color: #aaa;
+  margin-top: 10px;
+          margin-bottom: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.span-or {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  margin-left: -25px;
+  background-color: #fff;
+  width: 50px;
+  text-align: center;
+}
+.hr-or {
+  background-color: #cdcdcd;
+  height: 1px;
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+}
+
+.btn-facebook {  
+  background-color:#3C589C; 
+  color: white;
+  width: 100%;
+}
+
+.btn-facebook:hover {
+  background-color: white; 
+  color: #3C589C;
+}
+
+
+.btn-google{ 
+  background-color: #4486F6; 
+  color: white;
+  width: 100%;
+}
+
+.btn-google:hover {
+  background-color: white;
+  color: #4486F6;
+  border-color: #4486F6;
+}
+
+#google-signin-icon{
+  height: 1.33em;
+  width: 1.33em;
+}
+
+
+
+/* ---------------------------------------- */
+
 
 
 .interests-box-left {
@@ -262,8 +429,19 @@ html, body {
 	color: #333;
   list-style-type: none;
   font-size: 16px;
+  word-wrap: break-word;
 }
 
+.text-bottom {
+  position: absolute;
+  bottom: 0;
+}
+
+.plan-table-icons {
+  position: absolute;
+  bottom: 0;
+  right: 15px;
+}
 
 .plan-table-btn-icons{
   background-color: transparent;
@@ -277,6 +455,20 @@ html, body {
 .plan-table-btn-icons:hover{
   color: #f4a029;
 }
+
+.change-plan-day-btn {
+  background-color: transparent; /* Blue background */
+  border: none; /* Remove borders */
+  color: #ffc107; /* White text */
+  font-size: 20px; /* Set a font size */
+  cursor: pointer; /* Mouse pointer on hover */
+}
+
+/* Darker background on mouse-over */
+.change-plan-day-btn:hover {
+  color: #f4a029;
+}
+
 
 
 .starrating > input {display: none;}  /* Remove radio buttons */

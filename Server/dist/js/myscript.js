@@ -559,3 +559,72 @@ function submitRestaurantDestination(){
     alert("Must select a valid destination !");
   }
 }
+
+function login(){
+  
+}
+
+function logout(){
+}
+
+
+function loadNavbar(){
+  var username = sessionStorage.getItem("username");
+
+  if(username == "null"){
+    document.getElementById("profile").style.display = 'none';
+    document.getElementById("login").style.display = 'block';
+  }
+
+  else{
+    document.getElementById("user-profile-pic").src = sessionStorage.getItem("user-pic");
+    document.getElementById("profile").style.display = 'block';
+    document.getElementById("login").style.display = 'none';
+  }
+
+
+}
+
+var googleUser = {};
+var startGoogleSignIn = function() {
+  gapi.load('auth2', function(){
+    // Retrieve the singleton for the GoogleAuth library and set up the client.
+    auth2 = gapi.auth2.init({
+      client_id: '947355014175-rts1345qm9jq3ohmbqhr9dl7ujt297sc.apps.googleusercontent.com',
+      cookiepolicy: 'single_host_origin',
+      // Request scopes in addition to 'profile' and 'email'
+      //scope: 'additional_scope'
+    });
+    attachSignin(document.getElementById('customBtn'));
+  });
+};
+
+function attachSignin(element) {
+  console.log(element.id);
+  auth2.attachClickHandler(element, {},
+      function(googleUser) {
+        var profile = googleUser.getBasicProfile();
+        console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+        console.log('Name: ' + profile.getName());
+        console.log('Image URL: ' + profile.getImageUrl());
+        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+        
+        sessionStorage.setItem("username", profile.getEmail());
+        sessionStorage.setItem("user-pic", profile.getImageUrl());
+        window.location.href = "/";
+
+      }, function(error) {
+      });
+}
+
+
+function signOut() {
+  var auth2 = gapi.auth2.getAuthInstance();
+  auth2.signOut().then(function () {
+    sessionStorage.setItem("username", null);
+    window.location.href = "/";
+  });
+}
+
+

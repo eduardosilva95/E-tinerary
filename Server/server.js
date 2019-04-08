@@ -7,6 +7,10 @@ var mysql = require('mysql');
 var http = require('http');
 var url = require('url');
 
+var promise = require('promise-mysql');
+ 
+
+
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -569,11 +573,75 @@ app.post('/create-plan', function(req, res){
 
 	departure = req.body.departure;
 
-	plan_id = createRandomPlan(destination, arrival, departure);
+    promise.createConnection({
+	    host: 'localhost',
+	    user: 'root',
+	    password: 'password',
+	    database: 'placesdb'
 
-	console.log(plan_id);
+	}).then(function(conn){
+		var sql = "insert into Plan (start_date, end_date) VALUES ?";
+		var values = [
+	    	[arrival.split('/')[2] + "-" + (arrival.split('/')[1]<10?'0':'') + arrival.split('/')[1] + "-" + (arrival.split('/')[0]<10?'0':'') + arrival.split('/')[0], 
+	    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0]],
+	  	];
+	    var result = conn.query(sql, [values]);
+	    conn.end();
 
-    res.render(path.join(__dirname+'/templates/see-plan.html'), {plan: plan_id});
+	    return result;
+	}).then(function(result){
+		var num_days = diffBetweenDays(arrival, departure);
+
+		arrival = arrival.split('/')[0] + "-" + arrival.split('/')[1] + "-" + arrival.split('/')[2];
+
+  		var days = getPlanDays(arrival, parseInt(num_days), false);
+
+  		var start_hours = ["10:00", "13:00", "15:00", "16:15", "18:00"];
+  		var end_hours = ["12:00", "14:30", "16:00", "18:00", "20:00"];
+
+  		var start_time_list = [];
+  		var end_time_list = [];
+
+  		for(var i=0 ; i < days.length ; i++){
+  			day = days[i].split('-')[2] + "-" + (days[i].split('-')[1]<10?'0':'') + days[i].split('-')[1] + "-" + (days[i].split('-')[0]<10?'0':'') + days[i].split('-')[0]
+  			for(var j=0 ; j < start_hours.length; j++){
+  				start_time_list.push(day + " " + start_hours[j]);
+  				end_time_list.push(day + " " + end_hours[j]);
+  			}
+  		}
+
+  		var i=0;
+
+  		var plan_id = result.insertId;
+
+  		var sql = "select poi.id as poi from poi join city on poi.city = city.id where city.name = ? and poi.num_reviews > 100 and poi.poi_type != 'Hotel' and poi.poi_type != 'Restaurant'"
+		var parameters = [destination]
+
+  		con.query(sql, parameters, function (err, result, fields) {
+	        if (err) throw err;
+
+	        while(i < start_time_list.length){
+	        	
+	        	var poi = result[parseInt(Math.floor((Math.random() * result.length-1) + 1))].poi;
+
+		        sql2= "insert into Visit VALUES ?";
+				values2 = [
+			    	[plan_id, poi, start_time_list[i], end_time_list[i], 'Sunny'],
+			  	];
+
+			  	con.query(sql2, [values2], function (err, result) {
+			    	if (err) throw err;
+			    	console.log("Number of records inserted: " + result.affectedRows);
+			  	});
+
+			  	i++;
+		  	}
+
+	    });
+
+
+    	res.render(path.join(__dirname+'/templates/see-plan.html'), {plan: plan_id});
+	});
 
 });
 
@@ -651,18 +719,28 @@ app.get('/plan', function(req,res){
 	        	visit["website"] = result[i].website;
 	        	visit["phone_number"] = result[i].phone_number;
 	        	visit["poi_type"] = result[i].poi_type;
+	        	visit["city"] = result[i].city; 
 
 	        	plan.push(visit);
 	        }
 
 
-	        res.render(path.join(__dirname+'/templates/plan.html'), {plan: plan, start_date: start_date, end_date: end_date, city: city, days: days});
+	        res.render(path.join(__dirname+'/templates/plan-2.html'), {plan: plan, start_date: start_date, end_date: end_date, city: city, days: days});
 	    });
 
 	}
 
 	
 });
+
+app.get('/register', function(req, res){
+	res.render(path.join(__dirname+'/templates/register.html'),);
+});
+
+app.get('/recover', function(req, res){
+	res.render(path.join(__dirname+'/templates/recover-password.html'),);
+});
+
 
 app.get('/calendar', function(req, res){
 	res.render(path.join(__dirname+'/templates/under-construction.html'), );
@@ -680,6 +758,7 @@ app.get('/help', function(req, res){
 
 
 
+
 app.get('*', function(req, res){
 	res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
 });
@@ -690,6 +769,10 @@ app.listen(8080);
 
 
 console.log("Running at Port 8080");
+
+
+
+
 
 
 /* Auxiliar Functions */
@@ -807,71 +890,3 @@ function diffBetweenDays(day1, day2){
 
 	return diffDays;
 }
-
-function wait(ms){
-   var start = new Date().getTime();
-   var end = start;
-   while(end < start + ms) {
-     end = new Date().getTime();
-  }
-}
-
-function createRandomPlan(destination, arrival, departure){
-	var sql = "insert into Plan (start_date, end_date) VALUES ?";
-	var values = [
-    	[arrival.split('/')[2] + "-" + (arrival.split('/')[1]<10?'0':'') + arrival.split('/')[1] + "-" + (arrival.split('/')[0]<10?'0':'') + arrival.split('/')[0], 
-    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0]],
-  	];
-
-  	var plan_id;
-
-  	con.query(sql, [values], function (err, result) {
-    	if (err) throw err;
-    	console.log("Number of records inserted: " + result.affectedRows);
-    	plan_id = result.insertId;
-  	});
-
-	var num_days = diffBetweenDays(arrival, departure);
-
-	arrival = arrival.split('/')[0] + "-" + arrival.split('/')[1] + "-" + arrival.split('/')[2];
-
-  	var days = getPlanDays(arrival, parseInt(num_days), false);
-
-  	var start_hours = ["10:00", "13:00", "15:00", "16:15", "18:00"];
-  	var end_hours = ["12:00", "14:30", "16:00", "18:00", "20:00"];
-  	
-  	for(var i=0 ; i < days.length ; i++){
-  		day = days[i].split('-')[2] + "-" + (days[i].split('-')[1]<10?'0':'') + days[i].split('-')[1] + "-" + (days[i].split('-')[0]<10?'0':'') + days[i].split('-')[0]
-
-  		for(var j=0 ; j < start_hours.length; j++){
-  			sql = "select poi.id as poi from poi join city on poi.city = city.id where city.name = ? and poi.num_reviews > 100 and poi.poi_type != 'Hotel' and poi.poi_type != 'Restaurant'"
-			parameters = [destination]
-
-			var start_time = day + " " + start_hours[j];
-			var end_time = day + " " + end_hours[j];
-
-			con.query(sql, parameters, function (err, result, fields) {
-		        if (err) throw err;
-
-
-		        var poi = result[parseInt(Math.floor((Math.random() * result.length-1) + 1))].poi;
-
-		        sql2= "insert into Visit VALUES ?";
-				values2 = [
-			    	[plan_id, poi, start_time, end_time, 'Sunny'],
-			  	];
-
-			  	con.query(sql2, [values2], function (err, result) {
-			    	if (err) throw err;
-			    	console.log("Number of records inserted: " + result.affectedRows);
-			  	});
-
-		    });
-  		}
-  	}
-
-
-  	return plan_id;
- 
-}
-

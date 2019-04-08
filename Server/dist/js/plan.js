@@ -80,7 +80,8 @@ $(function () {
             //console.log(place.opening_hours);
         }
         });
-
+        
+        $('#modal-info-city').text($(this).data('city'));
         $('#modal-info-addr').text($(this).data('addr'));
         $('#modal-info-coord').text($(this).data('coord'));
         $('#modal-info-phone').text($(this).data('phone'));

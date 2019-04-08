@@ -83,21 +83,23 @@
               <div class="col-md-1 col-sm-1"></div>
               <div class="col-md-10 col-sm-10  home-search" >
                 <br>
-                <h3 align="center" style="color:white;"><b>Let us plan your trip</b></h3>
+                <div class="text-center">
+                    <h3 style="color:white;"><b>Let us plan your trip</b></h3>
+                </div>
                 <br><br>
                 <form>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="inputDestination" style="color: white;">Add up to 3 cities</label>
+                                <label for="inputDestination" style="color: white; font-weight: bold;">Destination</label>
                                 <input type="text" class="form-control" id="inputDestination" placeholder="Enter your destination">
                             </div>
 
-                            <br>
+                            <br><br>
                             
                             <div class="row">
                                 <div class='col-sm-6'>
-                                    <div class="input-group date">
+                                    <div class="input-group date ">
                                     <input type="text" class="form-control" placeholder="Arrival" id="arrival-date" required>
                                     <script>
                                         $('#arrival-date').datepicker({
@@ -125,26 +127,23 @@
 
                             <br>
 
-                            <fieldset class="form-group">
-                                <div class="row">
-                                    <legend class="col-form-label col-sm-3 pt-0" style="color: white; font-size: 20px;">Budget: </legend>
-                                    <div class="col-sm-5">
-                                        <div class="form-check-inline">
-                                            <input class="form-check-input" type="radio" name="radioBudget" id="radioBudgetNo" value="option1" onclick="disableBudgetBox()" checked>
-                                            <label class="form-check-label" for="radioBudgetNo" style="color: white; font-size: 20px;">No</label>
-                                        </div>
-                                        <div class="form-check-inline">
-                                            <input class="form-check-input" type="radio" name="radioBudget" id="radioBudgetYes" value="option2" onclick="enableBudgetBox()">
-                                            <label class="form-check-label" for="radioBudgetYes" style="color: white; font-size: 20px;">Yes</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <input type="text" class="form-control" id="inputBudget" placeholder="Budget" disabled>
-                                    </div>
+                            <div class="form-group">
+                                <legend style="color: white; font-size: 1rem; font-weight: bold;">Budget: </legend>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" name="radioBudget" class="custom-control-input" id="radioBudgetNo"  value="option1" onclick="disableBudgetBox()" checked>
+                                    <label class="custom-control-label" for="radioBudgetNo" style="color: white; font-size: 1rem;">No</label>
                                 </div>
-                            </fieldset>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" name="radioBudget" class="custom-control-input" id="radioBudgetYes" value="option2" onclick="enableBudgetBox()">
+                                    <label class="custom-control-label" for="radioBudgetYes" style="color: white; font-size: 1rem;">Yes</label>
+                                </div>
+                                <div class="custom-control custom-control-inline float-right mr-sm-2">
+                                    <input type="text" class="form-control" id="inputBudget" placeholder="Budget (€)" disabled>
+                                </div>
+                            </div>
 
-                            <label class="my-1 mr-2" for="moveSelect" style="color: white; ">How to move</label>
+
+                            <label class="my-1 mr-2" for="moveSelect" style="color: white; font-weight: bold;">How to move</label>
                             <select class="custom-select my-1 mr-sm-2" id="moveSelect">
                                 <option selected value="car">Car</option>
                                 <option value="foot">On foot</option>
@@ -155,10 +154,14 @@
 
                             <br><br>
 
+                            
+                            
+                        </div>
+                        <div class="col-md-6">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <label class="my-1 mr-2" for="inlineFormCustomSelectPref" style="color: white; ">Adults</label>
-                                    <select class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref">
+                                    <label class="mr-2" for="inlineFormCustomSelectPref" style="color: white; font-weight: bold;">Adults</label>
+                                    <select class="custom-select mr-sm-2" id="inlineFormCustomSelectPref">
                                     <option selected value="1">1</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
@@ -170,8 +173,8 @@
                                     </select>
                                 </div>
                                 <div class="col-sm-6">
-                                    <label class="my-1 mr-2" for="inlineFormCustomSelectPref" style="color: white; ">Children (< 12 years)</label>
-                                    <select class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref">
+                                    <label class="my-1 mr-2" for="inlineFormCustomSelectPref" style="color: white; font-weight: bold;">Children (< 12 years)</label>
+                                    <select class="custom-select mr-sm-2" id="inlineFormCustomSelectPref">
                                     <option selected value="0">Zero</optsion>
                                     <option value="1">One</option>
                                     <option value="2">Two</option>
@@ -184,71 +187,65 @@
 
                             <br>
 
-                            <label class="my-1 mr-2" for="ageGroupSelect" style="color: white; ">Age group</label>
+                            <label class="my-1 mr-2" for="ageGroupSelect" style="color: white; font-weight: bold;">Age group</label>
                             <select class="custom-select my-1 mr-sm-2" id="ageGroupSelect">
                                 <option value="youth">Youth (18-25 years)</option>
                                 <option selected value="adult">Adult (25 - 60 years)</option>
                                 <option value="senior">Senior (+60 years)</option>
                             </select>
 
+
                             <br><br>
 
-                            
-                        </div>
-                        <div class="col-md-6">
-                            <h5 align="center" style="color:white;"><b>Interests</b></h5>
-                            <br><br>
+                            <div class="text-center">
+                                <h5 style="color:white; text-decoration: underline;"><b>Interests</b></h5>
+                            </div>
+
+                            <br>
+
                             <div class="row">
                                 <div class="col-1"></div>
-                                <div class="col-5  interests-box-left" >
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                                        <label class="form-check-label" for="defaultCheck1" style="color:white;">
-                                            Default checkbox
-                                        </label>
+                                <div class="col-5">
+                                    <div class="custom-control custom-checkbox" style="color: white;">
+                                        <input type="checkbox" class="custom-control-input" id="checkbox-interests-museums">
+                                        <label class="custom-control-label" for="checkbox-interests-museums">Museums</label>
                                     </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck2" >
-                                        <label class="form-check-label" for="defaultCheck2" style="color:white;">
-                                            Disabled checkbox
-                                        </label>
+                                    <br>
+                                    <div class="custom-control custom-checkbox" style="color: white;">
+                                        <input type="checkbox" class="custom-control-input" id="checkbox-interests-theaters">
+                                        <label class="custom-control-label" for="checkbox-interests-theaters">Theaters</label>
                                     </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck2" >
-                                        <label class="form-check-label" for="defaultCheck2" style="color:white;">
-                                            Disabled checkbox
-                                        </label>
+                                    <br>
+                                    <div class="custom-control custom-checkbox" style="color: white;">
+                                        <input type="checkbox" class="custom-control-input" id="checkbox-interests-shopping">
+                                        <label class="custom-control-label" for="checkbox-interests-shopping">Shopping</label>
                                     </div>
                                 </div>
-                                <div class="col-5 interests-box-right">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                                        <label class="form-check-label" for="defaultCheck1" style="color:white;">
-                                            Default checkbox
-                                        </label>
+                                <div class="col-5">
+                                    <div class="custom-control custom-checkbox" style="color: white;">
+                                        <input type="checkbox" class="custom-control-input" id="checkbox-interests-recreation">
+                                        <label class="custom-control-label" for="checkbox-interests-recreation">Recreation</label>
                                     </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck2" >
-                                        <label class="form-check-label" for="defaultCheck2" style="color:white;">
-                                            Disabled checkbox
-                                        </label>
+                                    <br>
+                                    <div class="custom-control custom-checkbox" style="color: white;">
+                                        <input type="checkbox" class="custom-control-input" id="checkbox-interests-nature">
+                                        <label class="custom-control-label" for="checkbox-interests-nature">Nature Places</label>
                                     </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck2" >
-                                        <label class="form-check-label" for="defaultCheck2" style="color:white;">
-                                            Disabled checkbox
-                                        </label>
+                                    <br>
+                                    <div class="custom-control custom-checkbox" style="color: white;">
+                                        <input type="checkbox" class="custom-control-input" id="checkbox-interests-history">
+                                        <label class="custom-control-label" for="checkbox-interests-history">Historic Places</label>
                                     </div>
                                 </div>
                                 <div class="col-1"></div>
                             </div>
                         </div>
                     </div>
-
                     
+                    <br>
 
                     <div class="float-right">
-                        <button type="reset" class="btn btn-outline-warning" onclick="processDestination()" >Generate your plan</button>
+                        <button type="reset" class="btn btn-warning" onclick="processDestination()" >See your plan</button>
                     </div>
 
                 </form>
@@ -285,11 +282,12 @@
 
           <br>
 
+        
+          <br><br><br><br>
           
 
         </div>
 
-        <br><br><br><br>
 
 
 

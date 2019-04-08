@@ -118,7 +118,7 @@
                                                     </td>
                                                     <td>
                                                         <div class="plan-table-icons text-right">
-                                                            <button type="button" class="plan-table-btn-icons btn-info-modal" data-toggle="modal" data-target="#info-modal" data-title="<%= visit.name %>" data-place_id="<%= visit.place_id %>" data-addr="<%= visit.address %>" data-coord="<%= visit.coordinates %>" data-website="<%= visit.website %>" data-phone="<%= visit.phone_number %>"><i title="Get info" class="fas fa-info-circle fa-lg"></i></button>
+                                                            <button type="button" class="plan-table-btn-icons btn-info-modal" data-toggle="modal" data-target="#info-modal" data-title="<%= visit.name %>" data-city="<%= visit.city %>" data-place_id="<%= visit.place_id %>" data-addr="<%= visit.address %>" data-coord="<%= visit.coordinates %>" data-website="<%= visit.website %>" data-phone="<%= visit.phone_number %>"><i title="Get info" class="fas fa-info-circle fa-lg"></i></button>
                                                             <button type="button" class="plan-table-btn-icons" id="btn-remove-modal" data-toggle="modal" data-target="#remove-modal"><i title="Remove visit" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
                                                             <button type="button" class="plan-table-btn-icons" id="btn-edit-modal" data-toggle="modal" data-target="#edit-modal"><i title="Edit visit" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
                                                         </div>
@@ -203,7 +203,7 @@
                         <br><br>
                         <div id="place-info"> 
                             <ul>
-                                <li><strong>City: </strong><p id="modal-info-city">Aveiro</p></li>
+                                <li><strong>City: </strong><p id="modal-info-city"></p></li>
                                 <li><strong>Address: </strong><p id="modal-info-addr"></p></li>
                                 <li><strong>Coordinates: </strong><p id="modal-info-coord"></p></li>
                                 <li><strong>Phone number: </strong><p id="modal-info-phone"></p></li>
