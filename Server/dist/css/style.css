@@ -24,6 +24,11 @@ hr {
   border-width: 2px;
 }
 
+.hr-home {
+	border-top: 3px solid #ffd700;
+  width: 300px;
+}
+
 /* SCROLLBAR */
 
 /* width */
@@ -243,6 +248,7 @@ hr {
   height: 200px;
 }
 
+
 .cities {
   position: relative;
 }
@@ -250,7 +256,6 @@ hr {
 .cities-imgs {
   height: 200px;
   width: 100%;
-  border: 5px solid white;
 }
 
 .cities-imgs-label 

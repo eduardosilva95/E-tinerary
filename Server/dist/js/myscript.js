@@ -247,6 +247,7 @@
 
     if(marker_list.includes(name))
       return;
+
     
     marker = new Marker({
       position: local,
@@ -267,6 +268,9 @@
       document.getElementById('map').className  = 'col-md-9 col-xs-12';
       viewPOI(this);
     });
+
+    
+    console.log(marker);
 
     marker_list.push(marker.title);
 

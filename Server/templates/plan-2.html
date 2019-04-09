@@ -19,8 +19,10 @@
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
     <script type="text/javascript" src="js/plan-2.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcM_AepOJRN1QIx96d2n0FOfOcGfZYfck&libraries=places"></script>
+    <script type="text/javascript" src="js/map-font-icons.js"></script>
 
     
   </head>
@@ -139,9 +141,9 @@
                                                     <span id="place-<%= count %>-weather" style="padding-left: 10px; color: #767676;"><i class="far fa-sun fa-lg"></i></span>
                                                 </div>
                                                 <div class="plan-table-icons text-right"> 
-                                                    <button type="button" class="plan-table-btn-icons btn-info-modal" data-toggle="modal" data-target="#info-modal" data-title="<%= visit.name %>" data-city="<%= visit.city %>" data-place_id="<%= visit.place_id %>" data-addr="<%= visit.address %>" data-coord="<%= visit.coordinates %>" data-website="<%= visit.website %>" data-phone="<%= visit.phone_number %>"><i title="Get info" class="fas fa-info-circle fa-lg"></i></button>
-                                                    <button type="button" class="plan-table-btn-icons" id="btn-remove-modal" data-toggle="modal" data-target="#remove-modal"><i title="Remove visit" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
-                                                    <button type="button" class="plan-table-btn-icons" id="btn-edit-modal" data-toggle="modal" data-target="#edit-modal"><i title="Edit visit" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
+                                                    <button type="button" class="plan-table-btn-icons btn-info-modal" id="place-<%= count %>-info" data-toggle="modal" data-target="#info-modal" ><i title="Get info" class="fas fa-info-circle fa-lg"></i></button>
+                                                    <button type="button" class="plan-table-btn-icons btn-remove-modal" id="place-<%= count %>-remove" data-toggle="modal" data-target="#remove-modal"><i title="Remove visit" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
+                                                    <button type="button" class="plan-table-btn-icons btn-edit-modal" id="place-<%= count %>-edit" data-toggle="modal" data-target="#edit-modal"><i title="Edit visit" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
                                                 </div>
                                             </div>
                                         </div>
@@ -193,8 +195,8 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group text-right">
-                            <a id="view_map_btn" href="#"><button type="button" class="btn btn-warning" >View Map</button></a>
-                            <a id="view_calendar_btn" href="#"><button type="button" class="btn btn-warning" >View Calendar</button></a>
+                            <!--<a id="view_map_btn" href="#"><button type="button" class="btn btn-warning" >View Map</button></a>
+                            <a id="view_calendar_btn" href="#"><button type="button" class="btn btn-warning" >View Calendar</button></a>-->
                             <a id="save_plan_btn" href="#"><button type="button" class="btn btn-success" >Save Plan</button></a>
                         </div>
                     </div>
@@ -235,7 +237,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Find out more</button>
+                        <button type="button" class="btn btn-warning" data-dismiss="modal">Find out more</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -243,8 +245,8 @@
         </div>
 
         <!-- Remove Modal -->
-        <div class="modal fade" id="remove-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+        <div class="modal fade" id="remove-modal" role="dialog">
+            <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Delete visit</h5>
@@ -253,7 +255,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        Are you sure that you want to delete this visit from the plan ?
+                        Are you sure that you want to delete <span id="modal-delete-visit-name" style="font-weight: bold;"></span> from the plan ?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-success" data-dismiss="modal">Yes</button>
@@ -264,25 +266,64 @@
         </div>
 
         <!-- Edit Modal -->
-        <div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Edit visit</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+        <div class="modal fade" id="edit-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Edit visit : <span id="modal-title" style="font-weight: bold;"></span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p><b>Edit visit schedule: </b></p>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <select class="form-control" id="visit-start-hour">
+                                        <option>Begin at</option>
+                                        <option>10:00</option>
+                                        <option>11:00</option>
+                                        <option>12:00</option>
+                                        <option>13:00</option>
+                                        <option>14:00</option>
+                                        <option>15:00</option>
+                                        <option>16:00</option>
+                                        <option>17:00</option>
+                                        <option>18:00</option>
+                                        <option>19:00</option>
+                                        <option>20:00</option>
+                                        <option>21:00</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <select class="form-control" id="visit-end-hour">
+                                        <option>End at</option>
+                                        <option>10:00</option>
+                                        <option>11:00</option>
+                                        <option>12:00</option>
+                                        <option>13:00</option>
+                                        <option>14:00</option>
+                                        <option>15:00</option>
+                                        <option>16:00</option>
+                                        <option>17:00</option>
+                                        <option>18:00</option>
+                                        <option>19:00</option>
+                                        <option>20:00</option>
+                                        <option>21:00</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="modal-body">
-                            ...
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-success" data-dismiss="modal">Confirm</button>
-                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-success" data-dismiss="modal">Edit</button>
                     </div>
                 </div>
             </div>
+        </div>
         
 
         <!-- Footer -->
