@@ -224,7 +224,7 @@ function queryPlace(city_id){
 }
 
 function queryHotel(city_id){
-  var destination = /dest=([^&]+)/.exec(location.search)[1]
+  var destination = /dest=([^&]+)/.exec(location.search)[1];
 
   var query = document.getElementById("search-place-input").value;
   var queryString = "?dest=" + destination + "&query=" + query;

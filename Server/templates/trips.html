@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Nome da aplicação">
+    <meta name="author" content="Eduardo Silva">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Simple Map</title>
+
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/v4-shims.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/myscript.js"></script>
+    
+    <script src="https://unpkg.com/gijgo@1.9.11/js/gijgo.min.js" type="text/javascript"></script>
+    <link href="https://unpkg.com/gijgo@1.9.11/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    
+  
+  </head>
+  <body>
+        <!-- header navbar -->
+        <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
+            <a class="navbar-brand" href="./index.html">HomePage</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#dropdown-menu" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-search" style="padding-right: 5px;"></i>Plan a trip
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                      <a class="dropdown-item" href="./search">Get a Aplicação plan</a>
+                      <a class="dropdown-item" href="./create-plan">Create your plan manually</a>
+                    </div>
+                  </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="./search-restaurants"><i class="fas fa-utensils" style="padding-right: 5px;"></i>Restaurants</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
+                      <a class="dropdown-item" href="./about-us">Aplicacao</a>
+                      <a class="dropdown-item" href="./help">Help</a>
+                    </div>
+                </li>
+              </ul>
+              <ul class="navbar-nav ml-auto">
+                <li>
+                  <div id="login-user">
+                    <div id="login">
+                      <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                    </div>
+                    <div id="profile" class="dropleft">
+                      <!--div class="float-left">
+                        <span id="message-user">Hello <span id="user">Eduardo</span></span>
+                      </div>-->
+                      <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <img id="user-profile-pic" >
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="profile-btn">
+                        <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                        <a class="dropdown-item" href="#"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                      </div>   
+                    </div>        
+                  </div>
+                </li>
+              </ul>
+            </div>
+        </nav>
+        <script>
+          loadNavbar();
+        </script>
+
+
+        <div class="container">
+            <div class="cont">
+                <div class="card card-body bg-light">
+                    <div class="text-left">
+                        <h3><b>My Trips</b></h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cont">
+                <div class="card card-body">
+                    <h5 style="font-weight: bold;">Scheduled Trips</h5>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="card" style="height: 150px;">
+                <div class="row">
+                    <div class="col-md-3">
+                        <img src="img/cities/porto.jpg" class="img-fluid" alt="" style="height: 150px; width: 100%;">
+                    </div>
+                    <div class="col-md-9">
+                        <div class="card-body row">
+                            <div class="col-md-8">
+                                <div class="text-left">
+                                    <h5  class="card-title"><b>Porto</b></h5>
+                                    <span class="text-bottom">11 May 2019 - 13 May 2019</span> 
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="plan-table-icons text-right"> 
+                                    <button type="button" class="plan-table-btn-icons"><i title="See plan" class="fas fa-search-location"></i></i></button>
+                                    <button type="button" class="plan-table-btn-icons"><i title="See calendar" class="fas fa-calendar-alt fa-lg" style="padding-left: 10px;"></i></button>
+                                    <button type="button" class="plan-table-btn-icons"><i title="Download plan" class="fas fa-file-download fa-lg" style="padding-left: 10px;"></i></button>
+                                    <button type="button" class="plan-table-btn-icons"><i title="Share plan" class="fas fa-share-alt fa-lg" style="padding-left: 10px;"></i></button>
+                                    <button type="button" class="plan-table-btn-icons"><i title="Delete plan" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="card" style="height: 150px;">
+                <div class="row">
+                    <div class="col-md-3">
+                        <img src="img/cities/aveiro.jpg" class="img-fluid" alt="" style="height: 150px; width: 100%;">
+                    </div>
+                    <div class="col-md-9">
+                        <div class="card-body row">
+                            <div class="col-md-8">
+                                <div class="text-left">
+                                    <h5  class="card-title"><b>Aveiro</b></h5>
+                                    <span class="text-bottom">25 June 2019 - 27 June 2019</span> 
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="plan-table-icons text-right"> 
+                                    <button type="button" class="plan-table-btn-icons"><i title="See plan" class="fas fa-search-location"></i></i></button>
+                                    <button type="button" class="plan-table-btn-icons"><i title="See calendar" class="fas fa-calendar-alt fa-lg" style="padding-left: 10px;"></i></button>
+                                    <button type="button" class="plan-table-btn-icons"><i title="Download plan" class="fas fa-file-download fa-lg" style="padding-left: 10px;"></i></button>
+                                    <button type="button" class="plan-table-btn-icons"><i title="Share plan" class="fas fa-share-alt fa-lg" style="padding-left: 10px;"></i></button>
+                                    <button type="button" class="plan-table-btn-icons"><i title="Delete plan" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cont">
+                <div class="card card-body">
+                    <h5 style="font-weight: bold;">Past Trips</h5>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="card" style="height: 150px;">
+                <div class="row">
+                    <div class="col-md-3">
+                        <img src="img/cities/lisboa.jpg" class="img-fluid" alt="" style="height: 150px; width: 100%;">
+                    </div>
+                    <div class="col-md-9">
+                        <div class="card-body row">
+                            <div class="col-md-8">
+                                <div class="text-left">
+                                    <h5  class="card-title"><b>Lisbon</b></h5>
+                                    <span class="text-bottom">14 February 2019 - 15 February 2019</span> 
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="plan-table-icons text-right"> 
+                                    <button type="button" class="plan-table-btn-icons"><i title="See plan" class="fas fa-search-location"></i></i></button>
+                                    <button type="button" class="plan-table-btn-icons"><i title="See calendar" class="fas fa-calendar-alt fa-lg" style="padding-left: 10px;"></i></button>
+                                    <button type="button" class="plan-table-btn-icons"><i title="Download plan" class="fas fa-file-download fa-lg" style="padding-left: 10px;"></i></button>
+                                    <button type="button" class="plan-table-btn-icons"><i title="Share plan" class="fas fa-share-alt fa-lg" style="padding-left: 10px;"></i></button>
+                                    <button type="button" class="plan-table-btn-icons"><i title="Rating plan" class="fas fa-star fa-lg" style="padding-left: 10px;"></i></button>
+                                    <button type="button" class="plan-table-btn-icons"><i title="Make a review of the plan" class="fas fa-comment-alt fa-lg" style="padding-left: 10px;"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <br><br><br>
+
+        <!-- Login Modal -->
+        <div class="modal fade" id="login-modal" role="dialog">
+          <div class="modal-dialog">
+              <div class="modal-content" style="width: 400px;">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                    <img id="profile-img" class="profile-img-card" src="img/login.png" />
+                    <form class="form-signin">
+                      <span id="reauth-email"></span>
+                      <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                      <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                      <div class="row">
+                          <div class="col-md-6">
+                            <div class="custom-control custom-checkbox" id="remember">
+                                <input type="checkbox" class="custom-control-input" id="remember-me">
+                                <label class="custom-control-label" for="remember-me">Remember me</label>
+                            </div>
+                          </div>
+                          <div class="col-md-6 text-right">
+                              <a href="/recover" class="forgot-password">
+                                  Forgot the password?
+                              </a>
+                          </div>
+                      </div>
+                      <br>
+                      <button class="btn btn-success" type="button" onclick="login();"><i class="fas fa-sign-in-alt"></i><span style="padding-left: 10px">Sign in</span></button>
+                          <!--<button class="btn btn-primary" type="submit"><i class="fas fa-user-plus"></i><span style="padding-left: 10px">Register</span></button>-->
+                      <span>Don't have an account yet? <a href="/register" class="forgot-password">Register now</a></span>
+                  
+                    </form>
+                    
+
+                    <div class="login-or">
+                      <hr class="hr-or">
+                      <span class="span-or">or</span>
+                    </div>
+
+                    <button class="btn btn-primary btn-facebook" type="submit"><i class="fab fa-facebook-f fa-lg"></i><span style="padding-left: 10px">Log in using Facebook</span></button>
+                    <br><br>
+                                
+                    <div id="customBtn">
+                        <button class="btn btn-google" type="submit" ><img id="google-signin-icon" src="img/google-icon.png"><span style="padding-left: 10px">Log in using Google</span></button>
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                  </div>
+              </div>
+          </div>
+      </div>
+
+
+        <!-- Footer -->
+        <footer class="footer">
+          <!-- Footer Elements -->
+
+          <div id="social">
+              <a class="facebookBtn smGlobalBtn" href="#" ></a>
+              <a class="twitterBtn smGlobalBtn" href="#" ></a>
+              <a class="googleplusBtn smGlobalBtn" href="#" ></a>
+              <a class="linkedinBtn smGlobalBtn" href="#" ></a>
+              <a class="instagramBtn smGlobalBtn" href="#" ></a>
+            </div>
+            <!-- Footer Elements -->
+        
+            <!-- Copyright -->
+            <div class="footer-copyright"> 2019 Copyright:
+              <a href="">&copy; Aplicacao, todos os direitos reservados</a>
+            </div>
+
+        </footer>
+        <!-- Footer -->
+
+
+  
+    <!-- Scripts -->
+    <script>startGoogleSignIn();</script>
+    
+
+  </body>
+</html>

@@ -13,6 +13,8 @@ var places = {};
 var markers = [];
 var marker_list = [];
 
+var colors = ['#ac48db', '#74bb82', '#f7c12e', '#ea7419']
+
 
 /* load map */
 function initMap(city) {
@@ -171,7 +173,21 @@ function loadVisits(visits, day){
         document.getElementById('place-' + i + '-name').innerText = visits[i].name;
         document.getElementById('place-' + i + '-type').innerText = visits[i].poi_type;
         document.getElementById('place-' + i + '-hours').innerText = visits[i].start_time + ' - ' + visits[i].end_time;
-        document.getElementById('place-' + i + '-weather').innerText = visits[i].weather;
+
+        if(visits[i].weather == 'Sunny'){
+            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-sun" aria-hidden="true"></i>' + visits[i].weather;
+        }
+
+        else if(visits[i].weather == 'Rainy'){
+            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-cloud-rain" aria-hidden="true"></i>' + visits[i].weather;
+        }
+
+        else if(visits[i].weather == 'Cloudy'){
+            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-cloud" aria-hidden="true"></i>' + visits[i].weather;
+        }
+
+
+        
         loadImage(visits[i].place_id, 'place-' + i + '-img');
 
         place_info[i] = {'name': visits[i].name, 'city': visits[i].city, 'place_id': visits[i].place_id, 'address': visits[i].address, 'coordinates': visits[i].coordinates, 'website': visits[i].website, 'phone_number': visits[i].phone_number}
@@ -283,3 +299,11 @@ $(function () {
         
     });
 });
+
+
+function addVisit(city){
+    var plan_id = /id=([^&]+)/.exec(location.search)[1]
+
+    var queryString = "?dest=" + city + "&plan=" + plan_id;
+    window.location.href = "./places" + queryString;
+}

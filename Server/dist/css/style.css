@@ -29,6 +29,12 @@ hr {
   width: 300px;
 }
 
+.hr-suggest {
+	border-top: 3px solid #ffd700;
+  width: 80%;
+}
+
+
 /* SCROLLBAR */
 
 /* width */
@@ -82,6 +88,11 @@ hr {
   color: white;
   font-weight: bold;
 }
+
+#input-children-info:hover{
+  color: #ffc107;
+}
+
 
 .howto-image {
 	margin-left: auto;
@@ -256,6 +267,12 @@ hr {
 .cities-imgs {
   height: 200px;
   width: 100%;
+}
+
+.cities-imgs-2 {
+  height: 200px;
+  width: 100%;
+  border: 5px solid white;
 }
 
 .cities-imgs-label 
@@ -475,6 +492,60 @@ hr {
 }
 
 
+/*image gallery*/
+.image-checkbox {
+  position: relative;
+  height: 70px;
+  width: 100px;
+	cursor: pointer;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	border: 4px solid transparent;
+	margin-bottom: 0;
+	outline: 0;
+}
+.image-checkbox input[type="checkbox"] {
+	display: none;
+}
+
+.image-checkbox-checked {
+	border-color: #ffc107;
+}
+.image-checkbox .fa {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #ffc107;;
+}
+.image-checkbox-checked .fa {
+  display: block !important;
+}
+
+.image-checkbox span {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  color: #ffc107;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.suggestions-title {
+  font-weight: bold;
+  color: black;
+  text-decoration: none;
+}
+
+.suggestions-title:hover {
+  font-weight: bold;
+  color: #ffc107;
+  text-decoration: none;
+}
+
+.suggestions-img:hover{
+  border: 3px solid #ffc107;
+}
 
 .starrating > input {display: none;}  /* Remove radio buttons */
 
@@ -574,6 +645,21 @@ table tr td a{
   color: white;
 }
 
+/* ---------------------------------- CALENDAR ------------------------- */
+
+#calendar-table {
+
+
+}
+
+
+#calendar-table tr{
+  text-align: center;
+}
+
+
+
+/* ---------------------------------- FOOTER ------------------------------ */
 
 .footer {
   bottom: 0;

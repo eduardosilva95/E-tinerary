@@ -19,7 +19,7 @@
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="js/places.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpKgqxjCAowTT9qWEaYm-7ALBc7MwVyz4&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcM_AepOJRN1QIx96d2n0FOfOcGfZYfck&libraries=places"></script>
     
   </head>
   <body onload="loadPage();">
@@ -174,18 +174,22 @@
                             
                             <div class="row">
                                 <div class="col-md-6"></div>
-                                <div class="col-md-3">
-                                    <!-- botão para adicionar ao plano 
-                                    <div class="float-right">
-                                        <button type="button" class="btn btn-primary" onclick="loadPlace('<%= place.id %>')">Find out more</button>
-                                    </div>-->
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="float-right">
-                                        <button type="button" class="btn btn-primary" onclick="loadPlace('<%= place.id %>')">Find out more</button>
+                                <div class="col-md-6">
+                                    <!-- botão para adicionar ao plano -->
+                                    <div class="form-group text-right">
+                                        <button type="button" class="btn btn-warning" onclick="loadPlace('<%= place.id %>')">Find out more</button>
+                                        <% if(fromPlan == true) { %>
+                                            <% if(visits.includes(place.id)){ %>
+                                                <button type="button" style="background-color: #dcf2e2; color: black;" class="btn btn-success" disabled>Already in trip</button>
+                                            <% } else{ %>
+                                                <button type="button" class="btn btn-success">Add to your trip</button>
+                                            <% } %>
+                                        <% } %>
                                     </div>
                                 </div> 
                             </div>
+
+                            
                         </div>
                         <script>
                             var place_place_id = "<%= place.place_id %>";

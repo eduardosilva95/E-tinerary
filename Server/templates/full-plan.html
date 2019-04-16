@@ -26,7 +26,7 @@
 
     
   </head>
-  <body onload="initMap('<%= city %>')">
+  <body>
         <!-- header navbar -->
         <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
             <a class="navbar-brand" href="./">HomePage</a>
@@ -78,103 +78,169 @@
 
 
 
-        <div class="container-fluid">
+        <div class="container">
             <div class="cont">
                 <div class="card card-body bg-light">
-                    <div class="text-left">
-                        <h3 id="place_name"><b>Your visit to <%= city %></b></h3><h8 id="place_name"><%= start_date %>  - <%= end_date %></h8>
-                        
-                    </div>
-                </div>
-            </div>  
-            
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="text-left">
+                                <h3 id="place_name"><b>Your visit to <%= city %></b></h3><h8 id="place_name"><%= start_date %>  - <%= end_date %></h8>                      
+                            </div>
+                        </div>
 
-            <div class="row cont" style="height: 600px;">
-                <div class="col-md-6" id="sidebar">
-                    <% if (!locals.day_no) { %>
-                        <% day_no = 0 %>
-                    <% } %>
-                    <% day = days[day_no] %>
-                    <div class="card card-body" style="height: 70px;">
-                        <div class="row" id="plan-day-<%= day_no %>">
-                            <div class="col-md-2">
-                                <div class="text-center">
-                                    <button class="change-plan-day-btn" onclick="previousDay();"><i class="fas fa-arrow-alt-circle-left fa-lg"></i></button>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="text-center">
-                                    <h5 id="visit-day" style="font-weight: bold;"><%= day %></h5>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="text-center">
-                                    <button class="change-plan-day-btn" onclick="nextDay();"><i class="fas fa-arrow-alt-circle-right fa-lg"></i></button>
-                                </div>
+                        <div class="col-md-2">
+                            <div class="text-right">
+                                <label class="image-checkbox">
+                                    <img class="img-responsive" src="img/view-normal.jpg" style="height: 100%; width: 100%" />
+                                    <span>MAP</span>
+                                    <input id="view-checkbox" type="checkbox" name="image[]"/>
+                                </label>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            
+            
+            <div class="cont row">
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body text-center">
+                        <h6 style="font-weight: normal;">Choose your destination <span class="fas fa-chevron-right" aria-hidden="true"></span> Pick your dates <span class="fas fa-chevron-right" aria-hidden="true"></span> <b>Personalize your plan</b> <span class="fas fa-chevron-right" aria-hidden="true"></span> Save your plan </h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                </div>
+            </div>
+            
 
-                    
+            <div class="cont">
+                <% if (!locals.day_no) { %>
+                    <% day_no = 0 %>
+                <% } %>
+                <% day = days[day_no] %>
+                <div class="card card-body" style="height: 70px;">
+                    <div class="row" id="plan-day-<%= day_no %>">
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <button class="change-plan-day-btn" onclick="previousDay();"><i class="fas fa-arrow-alt-circle-left fa-lg"></i></button>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="text-center">
+                                <h5 id="visit-day" style="font-weight: bold;"><%= day %></h5>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <button class="change-plan-day-btn" onclick="nextDay();"><i class="fas fa-arrow-alt-circle-right fa-lg"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                    <br>
-                    <% count = 0 %>
-                    <% plan.forEach(function(visit) { %>
-                        <% if (visit.day == day.split(', ')[1]) { %>    
-                            <div class="card" style="height: 150px;">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <img id="place-<%= count %>-img" class="img-fluid" alt="" style="height: 150px; width: 100%;">
-                                    </div>
-                                    <div class="col-md-8 ">
-                                        <div class="card-body row">
-                                            <div class="col-md-8">
-                                                <div class="text-left">
-                                                    <h6 id="place-<%= count %>-name" class="card-title"><b></b></h6>
-                                                    <h6 id="place-<%= count %>-type" style="color: #767676;"></h6>
-                                                    <span id="place-<%= count %>-hours" class="text-bottom"></span>
+                <div class="cont row">
+                    <div class="col-md-9">
+                        <% count = 0 %>
+                        <% plan.forEach(function(visit) { %>
+                            <% if (visit.day == day.split(', ')[1]) { %>    
+                                <div class="card" style="height: 150px;">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <img id="place-<%= count %>-img" class="img-fluid" alt="" style="height: 150px; width: 100%;">
+                                        </div>
+                                        <div class="col-md-8 ">
+                                            <div class="card-body row">
+                                                <div class="col-md-8">
+                                                    <div class="text-left">
+                                                        <h6 id="place-<%= count %>-name" class="card-title"><b></b></h6>
+                                                        <h6 id="place-<%= count %>-type" style="color: #767676;"></h6>
+                                                        <span id="place-<%= count %>-hours" class="text-bottom"></span>
 
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="text-right">
-                                                    <span id="place-<%= count %>-weather" style="padding-left: 10px; color: #767676;"><i class="far fa-sun fa-lg"></i></span>
-                                                </div>
-                                                <div class="plan-table-icons text-right"> 
-                                                    <button type="button" class="plan-table-btn-icons btn-info-modal" id="place-<%= count %>-info" data-toggle="modal" data-target="#info-modal" ><i title="Get info" class="fas fa-info-circle fa-lg"></i></button>
-                                                    <button type="button" class="plan-table-btn-icons btn-remove-modal" id="place-<%= count %>-remove" data-toggle="modal" data-target="#remove-modal"><i title="Remove visit" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
-                                                    <button type="button" class="plan-table-btn-icons btn-edit-modal" id="place-<%= count %>-edit" data-toggle="modal" data-target="#edit-modal"><i title="Edit visit" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
+                                                <div class="col-md-4">
+                                                    <div class="text-right">
+                                                        <span id="place-<%= count %>-weather" style="padding-left: 10px; color: #767676;"><i class="far fa-sun fa-lg"></i></span>
+                                                    </div>
+                                                    <div class="plan-table-icons text-right"> 
+                                                        <button type="button" class="plan-table-btn-icons btn-info-modal" id="place-<%= count %>-info" data-toggle="modal" data-target="#info-modal" ><i title="Get info" class="fas fa-info-circle fa-lg"></i></button>
+                                                        <button type="button" class="plan-table-btn-icons btn-remove-modal" id="place-<%= count %>-remove" data-toggle="modal" data-target="#remove-modal"><i title="Remove visit" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
+                                                        <button type="button" class="plan-table-btn-icons btn-edit-modal" id="place-<%= count %>-edit" data-toggle="modal" data-target="#edit-modal"><i title="Edit visit" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="vl" style="border-left: 2px solid #dddddd; height: 70px; margin-left: 50px;">
-                                <br>
-                                <span id="desloc" style="padding-left: 10px; color: #767676; font-size: 12px;"><i class="fas fa-bus"></i><span style="padding-left: 10px;">10 minutes</span></span>
-                            </div>
-                            <% count = count + 1 %>
-                        <% } %>
-                    <% }); %>
-                    <hr>
-                </div>
-
-                <div class="col-md-6" id="map">
-                </div>
-
-                
-
-
-
-                <!-- Sugestions div 
-                <div class="col-md-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title"><b>Visit also in <%= city %></b></h5>
-                        </div>
+                                <div class="vl" style="border-left: 2px solid #dddddd; height: 70px; margin-left: 50px;">
+                                    <br>
+                                    <span id="desloc" style="padding-left: 10px; color: #767676; font-size: 12px;"><i class="fas fa-bus"></i><span style="padding-left: 10px;">10 minutes</span></span>
+                                </div>
+                                <% count = count + 1 %>
+                            <% } %>
+                        <% }); %>
+                        <hr>
                     </div>
-                </div>-->
+                    <div class="col-md-3">
+                        <!-- Sugestions div -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><b>Visit also in <%= city %></b></h5>
+                                <% count = 0 %>
+                                <% suggested_visits.forEach(function(visit) { %>
+                                    <br>
+                                    <img id="suggested-visit-<%= count %>" class="card-img suggestions-img">
+
+                                    <div class="text-center">
+                                        <a href="#" class="suggestions-title"><%= visit.name %></a>
+                                    </div>
+
+                                    <br>
+
+                                    <hr class="hr-suggest">
+
+
+                                    <script>
+                                        loadImage("<%= visit.place_id %>", "suggested-visit-<%= count %>");
+                                    </script>
+
+                                    <% count = count + 1 %>
+                                <% }); %>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><b>Hotels and accomodations in <%= city %></b></h5>
+                                <% count = 0 %>
+                                <% suggested_hotels.forEach(function(visit) { %>
+                                    <br>
+                                    <img id="suggested-hotel-<%= count %>" class="card-img suggestions-img">
+
+                                    <div class="text-center">
+                                        <a href="#" class="suggestions-title"><%= visit.name %></a>
+                                    </div>
+
+                                    <br>
+
+                                    <hr class="hr-suggest">
+
+
+                                    <script>
+                                        loadImage("<%= visit.place_id %>", "suggested-hotel-<%= count %>");
+                                    </script>
+
+                                    <% count = count + 1 %>
+                                <% }); %>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
 
             <br><br>
@@ -187,8 +253,7 @@
                                 <i class="fas fa-plus"></i><span style="padding-left: 10px;">Add visit</span>
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item" href="#">Add new visit or activity</a>
-                                <a class="dropdown-item" href="#">Add a place to eat</a>
+                                <button class="dropdown-item" onclick="addVisit('<%= city %>');" style="cursor: pointer;">Add new visit or activity</button>
                                 <a class="dropdown-item" href="#">Book an hotel</a>
                             </div>
                         </div>
@@ -358,6 +423,36 @@
 
         loadPlan(plan, '<%= days %>');
     
+    </script>
+
+    <script type="text/javascript">
+        jQuery(function ($) {
+            // init the state from the input
+            $(".image-checkbox").each(function () {
+                if ($(this).find('input[type="checkbox"]').first().attr("checked")) {
+                    $(this).addClass('image-checkbox-checked');
+                }
+                else {
+                    $(this).removeClass('image-checkbox-checked');
+                }
+            });
+
+            // sync the state to the input
+            $(".image-checkbox").on("click", function (e) {
+                if ($(this).hasClass('image-checkbox-checked')) {
+                    $(this).removeClass('image-checkbox-checked');
+                    $(this).find('input[type="checkbox"]').first().removeAttr("checked");
+                    window.location.href = window.location.href + "&v=full";
+                }
+                else {
+                    $(this).addClass('image-checkbox-checked');
+                    $(this).find('input[type="checkbox"]').first().attr("checked", "checked");
+                    window.location.href = window.location.href.split("&v")[0];
+                }
+
+                e.preventDefault();
+            });
+        });
     </script>
 
   </body>
