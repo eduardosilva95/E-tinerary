@@ -119,7 +119,7 @@ function loadPlan(plan_array, days){
     for(var j=0 ; j < plan.length ; j++){
         p = JSON.parse(plan[j]);
 
-        places[p.name] = {'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number};
+        places[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number};
 
         if(p.day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
             visits.push(p);
@@ -190,7 +190,7 @@ function loadVisits(visits, day){
         
         loadImage(visits[i].place_id, 'place-' + i + '-img');
 
-        place_info[i] = {'name': visits[i].name, 'city': visits[i].city, 'place_id': visits[i].place_id, 'address': visits[i].address, 'coordinates': visits[i].coordinates, 'website': visits[i].website, 'phone_number': visits[i].phone_number}
+        place_info[i] = {'id': visits[i].id, 'name': visits[i].name, 'city': visits[i].city, 'place_id': visits[i].place_id, 'address': visits[i].address, 'coordinates': visits[i].coordinates, 'website': visits[i].website, 'phone_number': visits[i].phone_number}
     }
 }
 
@@ -242,6 +242,9 @@ function loadModalInMap(place_dict){
     $('#modal-info-phone').text(place_dict['phone_number']);
     $('#modal-info-website').text(place_dict['website']);
     $('#modal-info-website').attr("href", place_dict['website']);
+
+    var dest =  '/place?id=' + place_dict['id'] + '&plan=' + /id=([^&]+)/.exec(location.search)[1];
+    $('#modal-find-more-btn').attr("onclick", "window.location.href = " + "'" + dest + "'");
 }
 
 
@@ -274,6 +277,9 @@ $(function () {
         $('#modal-info-phone').text(place_info[id]['phone_number']);
         $('#modal-info-website').text(place_info[id]['website']);
         $('#modal-info-website').attr("href", place_info[id]['website']);
+
+        var dest =  '/place?id=' + place_info[id]['id'] + '&plan=' + /id=([^&]+)/.exec(location.search)[1];
+        $('#modal-find-more-btn').attr("onclick", "window.location.href = " + "'" + dest + "'");
     });
 });
 

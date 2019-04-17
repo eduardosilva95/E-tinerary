@@ -105,8 +105,40 @@
                     <div class="card">
                         <img id="place-image" class="card-img-top">
                     </div>
+
+                    <br>
+                    
+                    <div class="card" >
+                        <div class="card-body" id="place-description">
+                            <p class="card-text"><%= description %></p>
+                            <div class="text-right">
+                                <p><i class="fab fa-wikipedia-w" style="padding-left: 10px;"></i></p>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="col-md-4">
+                    <% if(fromPlan == true) { %>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="text-left">
+                                <button class="btn btn-primary" onclick="window.history.back();"><i class="fas fa-undo"></i><span style="padding-left: 10px;">Back to the plan</span></button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-right">
+                                <% if(inPlan == false) { %>
+                                    <button class="btn btn-success btn-add-visit-modal" data-toggle="modal" data-target="#add-visit-modal" data-title="<%= place %>"><i class="far fa-calendar-alt"></i><span style="padding-left: 10px;">Add to your trip</span></button>
+                                <% } else { %>
+                                    <button type="button" style="background-color: #dcf2e2; color: black;" class="btn btn-success" disabled><i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Already in trip</span></button>
+                                <% } %>                    
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <% } %>
+
                     <div class="card">
                         <div class="card-body">
                             <h6 class="card-title">Opening hours</h6>
@@ -116,6 +148,7 @@
                             </table>
                         </div>
                     </div>
+                    <br>
                     <div class="card">
                         <div class="card-body">
                             <p class="card-text"><i class="fas fa-phone"></i><span id="place-phone-number" style="padding-left: 10px;"><%= phone_number %></span></p>
@@ -123,30 +156,106 @@
                             <p class="card-text"><span style="font-weight: bold;" >Coordinates: </span><span id="place-coordinates"><%= lat %>, <%= lon %></span></p>
                         </div>
                     </div>
-                </div>
-            </div>
 
+                    <br>
 
-            <div class="row cont">
-                <div class="col-md-8">
-                    <div class="card" >
-                        <div class="card-body" id="place-description">
-                            <p class="card-text"><%= description %></p>
-                            <div class="text-right">
-                                <p><i class="fab fa-wikipedia-w" style="padding-left: 10px;"></i></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
                     <div class="card">
                         <div id="place-map" class="map">
                         </div>
                     </div>
+
                 </div>
             </div>
 
 
+        </div>
+
+
+        <!-- Add Visit Modal -->
+        <div class="modal fade" id="add-visit-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add <span id="modal-title" style="font-weight: bold;"></span> to the plan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="radio-choose-schedule-auto" name="customRadio" class="custom-control-input" checked>
+                            <label class="custom-control-label" for="radio-choose-schedule-auto">Let us choose the schedule</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="radio-choose-schedule-man" name="customRadio" class="custom-control-input">
+                            <label class="custom-control-label" for="radio-choose-schedule-man">Choose the schedule</label>
+                        </div>
+
+                        <br>
+
+                        <div class="dr" id="choose-schedule-man">
+
+                            <p><b>Choose visit schedule: </b></p>
+                            
+
+                            <div class="form-group">
+                                <select class="form-control" id="visit-day">
+                                    <option>Day</option>
+                                    
+                                    <% days.forEach(function(day) { %>
+                                        <option><%= day %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <select class="form-control" id="visit-start-hour">
+                                            <option>Begin at</option>
+                                            <option>10:00</option>
+                                            <option>11:00</option>
+                                            <option>12:00</option>
+                                            <option>13:00</option>
+                                            <option>14:00</option>
+                                            <option>15:00</option>
+                                            <option>16:00</option>
+                                            <option>17:00</option>
+                                            <option>18:00</option>
+                                            <option>19:00</option>
+                                            <option>20:00</option>
+                                            <option>21:00</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select class="form-control" id="visit-end-hour">
+                                            <option>End at</option>
+                                            <option>10:00</option>
+                                            <option>11:00</option>
+                                            <option>12:00</option>
+                                            <option>13:00</option>
+                                            <option>14:00</option>
+                                            <option>15:00</option>
+                                            <option>16:00</option>
+                                            <option>17:00</option>
+                                            <option>18:00</option>
+                                            <option>19:00</option>
+                                            <option>20:00</option>
+                                            <option>21:00</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
+                        <button type="button" class="btn btn-success" data-dismiss="modal"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Add</span></button>
+                    </div>
+                </div>
+            </div>
         </div>
 
 

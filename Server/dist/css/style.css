@@ -35,6 +35,10 @@ hr {
 }
 
 
+.dr {
+  display: none;
+}
+
 /* SCROLLBAR */
 
 /* width */
@@ -436,7 +440,6 @@ hr {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-height: 280px /* fallback */
 }
 
 #place-map {

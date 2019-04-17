@@ -244,13 +244,13 @@
                                 <li><strong>Address: </strong><p id="modal-info-addr"></p></li>
                                 <li><strong>Coordinates: </strong><p id="modal-info-coord"></p></li>
                                 <li><strong>Phone number: </strong><p id="modal-info-phone"></p></li>
-                                <li><strong>Website: </strong><br><a id="modal-info-website"></a></li>
+                                <li><strong>Website: </strong><br><a id="modal-info-website" target="_blank"></a></li>
                             </ul>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-warning" data-dismiss="modal">Find out more</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button id="modal-find-more-btn" type="submit" class="btn btn-warning" style="color: white;" data-dismiss="modal"><i class="fas fa-search"></i><span style="padding-left: 10px;">Find out more</span></button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Close</span></button>
                     </div>
                 </div>
             </div>
@@ -270,8 +270,8 @@
                         Are you sure that you want to delete <span id="modal-delete-visit-name" style="font-weight: bold;"></span> from the plan ?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-dismiss="modal">Yes</button>
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                        <button type="button" class="btn btn-success" data-dismiss="modal"><i class="fas fa-trash-alt"></i><span style="padding-left: 10px;">Yes</span></button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">No</span></button>
                     </div>
                 </div>
             </div>
@@ -330,8 +330,8 @@
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-success" data-dismiss="modal">Edit</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Close</span></button>
+                        <button type="button" class="btn btn-success" data-dismiss="modal"><i class="fas fa-check"></i><span style="padding-left: 10px;">Edit</span></button>
                     </div>
                 </div>
             </div>

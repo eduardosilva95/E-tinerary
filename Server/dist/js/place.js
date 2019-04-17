@@ -129,3 +129,33 @@ function getPlaceDetails(place_id){
   
   
   }
+
+  $(function () {
+    $('.btn-add-visit-modal').on('click', function () {
+
+        $('#modal-title').text($(this).data('title'));
+    });
+  });
+
+
+
+  $(function () {
+    $("#radio-choose-schedule-man").change(function() {
+      $('.dr').slideUp();
+      if ($(this).is(':checked')) {
+          console.log($(this).parent().next());
+          $("#choose-schedule-man").slideToggle();
+      }
+    });
+  
+  
+    $("#radio-choose-schedule-auto").change(function() {
+      if ($(this).is(':checked')) {
+          $("#choose-schedule-man").slideToggle();
+      }
+    });
+  
+  
+  });
+  
+  
