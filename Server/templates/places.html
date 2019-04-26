@@ -114,8 +114,9 @@
                         Sort
                         </button>
                         <div class="dropdown-menu" aria-labelledby="sortDropdownMenu">
-                            <a class="dropdown-item" href="#">Number of reviews</a>
-                            <a class="dropdown-item" href="#">Rating</a>
+                            <a class="dropdown-item" href="#"><i class="fab fa-amilia"></i><span style="padding-left: 10px;">Alphabetically (A-Z)</span></a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-eye"></i><span style="padding-left: 10px;">Number of reviews</span></a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-star"></i><span style="padding-left: 10px;">Rating</span></a>
                         </div>
                     </div>
                 </div>
@@ -208,6 +209,14 @@
 
                 <!-- Filter div -->
                 <div class="col-md-3">
+
+                    <% if(fromPlan == true) { %>
+                        <div class="text-center">
+                            <button class="btn btn-primary" onclick="window.history.back();"><i class="fas fa-undo"></i><span style="padding-left: 10px;">Back to the plan</span></button>
+                        </div>
+                        <br>
+                    <% } %>
+
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title"><b>Filter</b></h5>
@@ -235,7 +244,7 @@
                             </div>
 
                             <div class="float-right">
-                                <button type="button" class="btn btn-warning" onclick="filterSearch();"><b>Search</b></button>
+                                <button type="button" class="btn btn-warning" onclick="filterSearch();" style="color: white;"><i class="fas fa-search"></i><span style="padding-left: 10px; "><b>Search</b></span></button>
                             </div>
                         </div>
                     </div>
@@ -255,7 +264,7 @@
                             </div>
 
                             <div class="float-right">
-                                <button type="button" class="btn btn-warning" onclick="classify();" ><b>Submit</b></button>
+                                <button type="button" class="btn btn-success" onclick="classify();"><i class="fas fa-check"></i><span style="padding-left: 10px;"><b>Submit</b></span></button>
                             </div>
 
                         </div>
@@ -328,16 +337,17 @@
 
                             <p><b>Choose visit schedule: </b></p>
                             
+                            <% if(fromPlan) { %>
+                                <div class="form-group">
+                                    <select class="form-control" id="visit-day">
+                                        <option>Day</option>
 
-                            <div class="form-group">
-                                <select class="form-control" id="visit-day">
-                                    <option>Day</option>
-
-                                    <% days.forEach(function(day) { %>
-                                        <option><%= day %></option>
-                                    <% }); %>
-                                </select>
-                            </div>
+                                        <% days.forEach(function(day) { %>
+                                            <option><%= day %></option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            <% } %>
 
 
                             <div class="form-group">

@@ -82,19 +82,24 @@
             <div class="cont">
                 <div class="card card-body bg-light">
                     <div class="row">
-                        <div class="col-md-10">
+                        <div class="col-md-9">
                             <div class="text-left">
                                 <h3 id="place_name"><b>Your visit to <%= city %></b></h3><h8 id="place_name"><%= start_date %>  - <%= end_date %></h8>                      
                             </div>
                         </div>
 
-                        <div class="col-md-2">
-                            <div class="text-right">
-                                <label class="image-checkbox">
-                                    <img class="img-responsive" src="img/map.jpg" style="height: 100%; width: 100%" />
-                                    <input id="view-checkbox" type="checkbox" name="image[]" checked/>
-                                    <i class="fa fa-check hidden"></i>
-                                </label>
+                        <div class="col-md-3">
+                            <div class="row">
+                                <div class="col-md-6 text-center">
+                                    <button class="change-view" onclick="changeView('full');"><img class="img-responsive change-view-img" src="img/view-full.jpg" /></button>
+                                    <br>
+                                    <button class="change-view" onclick="changeView('full');">View only plan</button>
+                                </div>
+                                <div class="col-md-6 text-center">
+                                    <button class="change-view" onclick="changeView('map');"><img class="img-responsive change-view-img" src="img/view-map.jpg" /></button>
+                                    <br>
+                                    <button class="change-view" onclick="changeView('map');">View full map</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -103,7 +108,7 @@
             
 
             <div class="row cont" style="height: 600px;">
-                <div class="col-md-6" id="sidebar">
+                <div class="col-md-6" id="sideb">
                     <% if (!locals.day_no) { %>
                         <% day_no = 0 %>
                     <% } %>
@@ -128,9 +133,8 @@
                         </div>
                     </div>
 
-                    
+                    <div class="vl" style="border-left: 2px solid #dddddd; height: 40px; margin-left: 50px;"></div>
 
-                    <br>
                     <% count = 0 %>
                     <% plan.forEach(function(visit) { %>
                         <% if (visit.day == day.split(', ')[1]) { %>    
@@ -144,14 +148,13 @@
                                             <div class="col-md-8">
                                                 <div class="text-left">
                                                     <h6 id="place-<%= count %>-name" class="card-title"><b></b></h6>
-                                                    <h6 id="place-<%= count %>-type" style="color: #767676;"></h6>
+                                                    <span id="place-<%= count %>-type" style="color: #767676;"></span>
                                                     <span id="place-<%= count %>-hours" class="text-bottom"></span>
-
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="text-right">
-                                                    <span id="place-<%= count %>-weather" style="padding-left: 10px; color: #767676;"><i class="far fa-sun fa-lg"></i></span>
+                                                    <span id="place-<%= count %>-weather" style="padding-left: 10px; color: #767676;"></span>
                                                 </div>
                                                 <div class="plan-table-icons text-right"> 
                                                     <button type="button" class="plan-table-btn-icons btn-info-modal" id="place-<%= count %>-info" data-toggle="modal" data-target="#info-modal" ><i title="Get info" class="fas fa-info-circle fa-lg"></i></button>
@@ -174,7 +177,7 @@
                 </div>
 
                 <div class="col-md-6" id="map">
-                </div>
+            </div>
 
                 
 
@@ -370,36 +373,6 @@
 
         loadPlan(plan, '<%= days %>');
     
-    </script>
-
-    <script type="text/javascript">
-        jQuery(function ($) {
-            // init the state from the input
-            $(".image-checkbox").each(function () {
-                if ($(this).find('input[type="checkbox"]').first().attr("checked")) {
-                    $(this).addClass('image-checkbox-checked');
-                }
-                else {
-                    $(this).removeClass('image-checkbox-checked');
-                }
-            });
-
-            // sync the state to the input
-            $(".image-checkbox").on("click", function (e) {
-                if ($(this).hasClass('image-checkbox-checked')) {
-                    $(this).removeClass('image-checkbox-checked');
-                    $(this).find('input[type="checkbox"]').first().removeAttr("checked");
-                    window.location.href = window.location.href + "&v=full";
-                }
-                else {
-                    $(this).addClass('image-checkbox-checked');
-                    $(this).find('input[type="checkbox"]').first().attr("checked", "checked");
-                    window.location.href = window.location.href.split("&v")[0];
-                }
-
-                e.preventDefault();
-            });
-        });
     </script>
 
   </body>

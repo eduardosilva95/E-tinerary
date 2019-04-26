@@ -175,19 +175,69 @@ function loadVisits(visits, day){
         document.getElementById('place-' + i + '-hours').innerText = visits[i].start_time + ' - ' + visits[i].end_time;
 
         if(visits[i].weather == 'Sunny'){
-            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-sun" aria-hidden="true"></i>' + visits[i].weather;
+            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-sun" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].weather;
         }
 
         else if(visits[i].weather == 'Rainy'){
-            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-cloud-rain" aria-hidden="true"></i>' + visits[i].weather;
+            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-cloud-rain" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].weather;
         }
 
         else if(visits[i].weather == 'Cloudy'){
-            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-cloud" aria-hidden="true"></i>' + visits[i].weather;
+            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-cloud" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].weather;
         }
 
+        if(visits[i].poi_type == 'Park'){
+            document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-tree" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
+        }
+    
+        else if(visits[i].poi_type == 'Castle'){
+            document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-chess-rook" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
+        }
+    
+        else if (visits[i].poi_type == 'Tower' || visits[i].poi_type == 'Museum'){
+            document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-archway" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
+        }
+    
+        else if (visits[i].poi_type == 'Church'){
+            document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-church" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
+        }
+    
+        else if (visits[i].poi_type == 'Restaurant'){
+            document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-utensils" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
+        }
+    
+        else if (visits[i].poi_type == 'Hotel'){
+            document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-bed" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
+        }
+    
+        else if (visits[i].poi_type == 'Natural Feature'){
+            document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-umbrella-beach" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
+        }
+    
+        else if (visits[i].poi_type == 'Aquarium'){
+            document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-fish" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
+        }
+    
+        else if (visits[i].poi_type == 'Zoo'){
+            document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-hippo" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
+        }
+    
+        else if (visits[i].poi_type == 'Place of Worship'){
+            document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-place-of-worship" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
+        }
+    
+        else if (visits[i].poi_type == 'Amusement Park'){
+            document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-child" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
+        }
+    
+        else if (visits[i].poi_type == 'Stadium'){
+            document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-futbol" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
+        }
+    
+        else if (visits[i].poi_type == 'Train Station'){
+            document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-train" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
+        }
 
-        
         loadImage(visits[i].place_id, 'place-' + i + '-img');
 
         place_info[i] = {'id': visits[i].id, 'name': visits[i].name, 'city': visits[i].city, 'place_id': visits[i].place_id, 'address': visits[i].address, 'coordinates': visits[i].coordinates, 'website': visits[i].website, 'phone_number': visits[i].phone_number}
@@ -219,22 +269,8 @@ function loadImage(place_id, dest){
 function loadModalInMap(place_dict){
     $('.modal-title').text(place_dict['name']);
 
-    var request = { 
-        placeId: place_dict['place_id'],
-    };
-    
-    var service = new google.maps.places.PlacesService(document.createElement('places-map'));
+    loadImage(place_dict['place_id'], "info-modal-img");
 
-    service.getDetails(request, function(place, status) {
-    if (status === google.maps.places.PlacesServiceStatus.OK) {
-
-        if(place.photos != undefined)
-        document.getElementById("info-modal-img").src = place.photos[0].getUrl();
-        else
-        document.getElementById("info-modal-img").src = "";
-
-    }
-    });
     
     $('#modal-info-city').text(place_dict['city']);
     $('#modal-info-addr').text(place_dict['address']);
@@ -312,4 +348,26 @@ function addVisit(city){
 
     var queryString = "?dest=" + city + "&plan=" + plan_id;
     window.location.href = "./places" + queryString;
+}
+
+function changeView(view){
+
+    var url = window.location.href;
+
+    if(/v=([^&]+)/.exec(window.location.search) != null){
+        url = window.location.href.split('&v')[0];
+    }
+
+    if(view == 'normal'){
+        window.location.href = url;
+    }
+
+    else if(view == 'full'){
+        window.location.href = url + "&v=full";
+    }
+
+    else if(view == 'map'){
+        window.location.href = url + "&v=map";
+    }
+
 }

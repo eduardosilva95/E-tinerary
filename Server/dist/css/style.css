@@ -145,6 +145,67 @@ hr {
 }
 
 
+.card-home-link:hover{
+  text-decoration: none;
+}
+
+.card-home {
+  color: black;
+  border: none;
+}
+
+.card-home h5{
+  white-space:nowrap;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-home p{
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  max-height: 3.6em;
+  line-height: 1.8em;
+}
+
+.card-home:hover{
+  border: 2px solid #ffc107;
+}
+
+.cities {
+  position: relative;
+}
+
+.cities-imgs {
+  height: 200px;
+  width: 100%;
+}
+
+.cities-imgs-2 {
+  height: 200px;
+  width: 100%;
+  border: 5px solid white;
+}
+
+.cities-imgs-label 
+{ 
+  position: absolute; /* To place the text on the image*/
+  bottom: 0px; /* The exact location of the text from the top of the image*/
+  right: -150px; /* Other beautification stuff */
+  width: 100%; 
+}
+/* Coloring time */
+.cities-imgs-label span /* decorating the text within the span tag */
+{ 
+  color: white; 
+  font: bold 24px/45px Helvetica, Sans-Serif; 
+  letter-spacing: -1px; 
+  background: rgb(0, 0, 0); /* fallback color */ 
+  background: rgba(0, 0, 0, 0.7); padding: 10px; 
+}
+
 /* ----------------- LOGIN MODAL ---------------- */
 
 .profile-img-card {
@@ -264,37 +325,6 @@ hr {
 }
 
 
-.cities {
-  position: relative;
-}
-
-.cities-imgs {
-  height: 200px;
-  width: 100%;
-}
-
-.cities-imgs-2 {
-  height: 200px;
-  width: 100%;
-  border: 5px solid white;
-}
-
-.cities-imgs-label 
-{ 
-  position: absolute; /* To place the text on the image*/
-  bottom: 0px; /* The exact location of the text from the top of the image*/
-  right: -150px; /* Other beautification stuff */
-  width: 100%; 
-}
-/* Coloring time */
-.cities-imgs-label span /* decorating the text within the span tag */
-{ 
-  color: white; 
-  font: bold 24px/45px Helvetica, Sans-Serif; 
-  letter-spacing: -1px; 
-  background: rgb(0, 0, 0); /* fallback color */ 
-  background: rgba(0, 0, 0, 0.7); padding: 10px; 
-}
 
 .btn-search-place {
   margin-bottom: 10px;
@@ -494,45 +524,37 @@ hr {
   color: #f4a029;
 }
 
+/* Change views of plan */
+.change-view{
+  font-weight: bold;
+  color: black;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+}
 
-/*image gallery*/
-.image-checkbox {
-  position: relative;
+.change-view:hover{
+  font-weight: bold;
+  color: #ffc107;
+  text-decoration: none;
+
+}
+
+.change-view-img {
   height: 70px;
-  width: 100px;
+  width: 120px;
 	cursor: pointer;
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-	border: 4px solid transparent;
-	margin-bottom: 0;
-	outline: 0;
-}
-.image-checkbox input[type="checkbox"] {
-	display: none;
+	border: 1px solid #dddddd;
 }
 
-.image-checkbox-checked {
-	border-color: #ffc107;
-}
-.image-checkbox .fa {
-  position: absolute;
-  top: 0;
-  right: 0;
-  color: #ffc107;;
-}
-.image-checkbox-checked .fa {
-  display: block !important;
+.change-view-img:hover {
+	border: 3px solid #ffc107;
 }
 
-.image-checkbox span {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  color: #ffc107;
-  font-weight: bold;
-  font-size: 20px;
-}
+
 
 .suggestions-title {
   font-weight: bold;
@@ -572,13 +594,12 @@ hr {
 { color: #ffca08 ;  } /* Set yellow color when star hover */
 
 
-
-#sidebar, #map {
+#sideb, #map {
   display:table-cell;
   bottom:0;
 }
 
-#sidebar {
+#sideb {
   left:0;
   overflow-y: scroll;
   height: 100%;
@@ -593,11 +614,9 @@ hr {
 }
 
 
-
 #map {
   right:0;
 }
-
 
 
 .map-icon-label i {

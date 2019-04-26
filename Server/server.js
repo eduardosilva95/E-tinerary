@@ -42,7 +42,56 @@ app.get('/', urlencodedParser, function(req, res){
         for(var i =0 ; i < result.length; i++){
         	list_cities.push(result[i].name);
         }
-        res.render(path.join(__dirname+'/templates/index.html'), {cities: list_cities});
+
+        var sql = "select name, count(name) as plans from ( select city.name from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id group by plan.id) t group by name order by plans desc limit 4"
+
+        con.query(sql, function (err, result, fields) {
+        	if (err) throw err;
+
+        	var top_dest = [];
+        	for(var i=0; i<result.length;i++){
+        		var dest = new Object();
+        		dest.name = result[i].name;
+        		dest.plans = result[i].plans;
+        		top_dest.push(dest);
+        	}
+
+        	var sql2 = "select id, name, place_id, count(name) as plans from ( select poi.id, poi.name, poi.place_id from plan join (visit join poi on visit.poi_id = poi.id) on plan.id = visit.plan_id) t group by name order by plans desc limit 4"
+
+        	con.query(sql2, function (err, result, fields) {
+	        	if (err) throw err;
+
+	        	var top_places = [];
+	        	for(var i=0; i<result.length;i++){
+	        		var place = new Object();
+	        		place.id = result[i].id;
+	        		place.place_id = result[i].place_id;
+	        		place.name = result[i].name;
+	        		place.plans = result[i].plans;
+	        		top_places.push(place);
+	        	}
+
+	        	var sql3 = "select name, count(name) as plans from ( select city.name from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id group by plan.id) t group by name order by rand() limit 4"
+
+	        	con.query(sql3, function (err, result, fields) {
+		        	if (err) throw err;
+
+		        	var recommended_dest = [];
+		        	for(var i=0; i<result.length;i++){
+		        		var dest = new Object();
+		        		dest.name = result[i].name;
+		        		dest.plans = result[i].plans;
+		        		recommended_dest.push(dest);
+		        	}
+
+        			res.render(path.join(__dirname+'/templates/index.html'), {cities: list_cities, top_dest: top_dest, top_places: top_places, recommended_dest: recommended_dest});
+
+        		});
+
+        	});
+
+        });
+        
     });
 
 });
@@ -718,11 +767,11 @@ app.get('/restaurants', function(req,res){
 	}
 });
 
-
+/*
 app.get('/create-plan',function(req,res){  
   res.render(path.join(__dirname+'/templates/create-plan-manual.html'), );
 });
-
+*/
 
 app.post('/create-plan', function(req, res){
 	destination = req.body.destination;
@@ -731,6 +780,8 @@ app.post('/create-plan', function(req, res){
 
 	departure = req.body.departure;
 
+	user_id = parseInt(req.body.user);
+
     promise.createConnection({
 	    host: 'localhost',
 	    user: 'root',
@@ -738,10 +789,11 @@ app.post('/create-plan', function(req, res){
 	    database: 'placesdb'
 
 	}).then(function(conn){
-		var sql = "insert into Plan (start_date, end_date) VALUES ?";
+		var sql = "insert into Plan (start_date, end_date, user) VALUES ?";
 		var values = [
 	    	[arrival.split('/')[2] + "-" + (arrival.split('/')[1]<10?'0':'') + arrival.split('/')[1] + "-" + (arrival.split('/')[0]<10?'0':'') + arrival.split('/')[0], 
-	    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0]],
+	    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0],
+	    	user_id], 
 	  	];
 	    var result = conn.query(sql, [values]);
 	    conn.end();
@@ -952,6 +1004,142 @@ app.get('/plan', function(req,res){
 	    	});
 		}
 
+		else if(view_method == 'map'){
+			con.query(sql, parameters, function (err, result, fields) {
+		        if (err) throw err;
+
+		        var start_date = "n/a";
+		        var end_date = "n/a";
+		        var city = ""; 
+		        var date_diff = 0;
+
+		        var dates = [];
+		        if(result.length > 0){
+		        	var month = new Array();
+					month[0] = "January";
+					month[1] = "February";
+					month[2] = "March";
+					month[3] = "April";
+					month[4] = "May";
+					month[5] = "June";
+					month[6] = "July";
+					month[7] = "August";
+					month[8] = "September";
+					month[9] = "October";
+					month[10] = "November";
+					month[11] = "December";
+
+
+		        	start_date = new Date(result[0].start_date);
+		        	end_date = new Date(result[0].end_date);
+
+		        	start_date_aux = start_date.getDate() + "-" + (start_date.getMonth()+1) + "-" + start_date.getFullYear();
+
+		        	start_date = start_date.getDate() + " " + month[start_date.getMonth()] + " " + start_date.getFullYear();
+		        	end_date = end_date.getDate() + " " + month[end_date.getMonth()] + " " + end_date.getFullYear();
+
+		        	date_diff = result[0].date_diff;
+
+		        	city = result[0].city;
+
+		        	days = getPlanDays(start_date_aux, parseInt(date_diff));
+
+		        }
+
+		        var plan = []
+		        for(var i=0; i < result.length; i++){
+		        	var visit = new Object();
+		        	visit["id"] = result[i].id;
+		        	visit["name"] = result[i].name;
+		        	visit["place_id"] = result[i].place_id;
+
+		        	var start_time = new Date(result[i].start_time);
+		        	var end_time = new Date(result[i].end_time);
+
+		        	visit["day"] = (start_time.getDate()<10?'0':'') + start_time.getDate() + " " + month[start_time.getMonth()] + " " + start_time.getFullYear();
+
+		        	visit["start_time"] = start_time.getHours() + ":" + (start_time.getMinutes()<10?'0':'') + start_time.getMinutes();
+		        	visit["end_time"] = end_time.getHours() + ":" + (end_time.getMinutes()<10?'0':'') + end_time.getMinutes();
+		        	visit["weather"] = result[i].weather;
+		        	visit["address"] = result[i].address;
+		        	visit["coordinates"] = result[i].latitude + ", " + result[i].longitude;
+		        	visit["website"] = result[i].website;
+		        	visit["phone_number"] = result[i].phone_number;
+		        	visit["poi_type"] = result[i].poi_type;
+		        	visit["city"] = result[i].city; 
+
+		        	plan.push(visit);
+		        }
+
+
+        	 	promise.createConnection({
+	    			host: 'localhost',
+				    user: 'root',
+				    password: 'password',
+				    database: 'placesdb'
+
+				}).then(function(conn){
+					var sql = "select distinct poi.city from visit join poi on visit.poi_id = poi.id where visit.plan_id = ?";
+					var values = [plan_id];
+				    var result = conn.query(sql, [values]);
+				    conn.end();
+
+			    	return result;
+				}).then(function(result){
+					var city_id = result[0].city;
+
+					var sql2 = "select id, place_id, name from poi where city = ? and id not in (select poi_id from visit where plan_id = ?) order by num_reviews desc";
+		        	var parameters2 = [city_id, plan_id];
+
+			        con.query(sql2, parameters2, function (err, result, fields) {
+			        	if (err) throw err;
+
+			        	var suggested_visits = [];
+
+			        	var length = 3;
+			        	if(result.length < length)
+			        		length = result.length;
+
+			        	for(var i=0; i < length; i++){
+				        	var visit = new Object();
+				        	visit["id"] = result[i].id;
+				        	visit["name"] = result[i].name;
+				        	visit["place_id"] = result[i].place_id;
+				        	suggested_visits.push(visit);
+				        }
+
+				        var sql3 = "select id, place_id, name from poi where city = ? and poi_type = 'Hotel' and id not in (select poi_id from visit where plan_id = ?)  order by num_reviews desc";
+				        var parameters3 = [city_id, plan_id];
+
+				        con.query(sql3, parameters3, function (err, result, fields) {
+				        	if (err) throw err;
+
+				        	var suggested_hotels = [];
+
+				        	var length = 3;
+				        	if(result.length < length)
+				        		length = result.length;
+
+				        	for(var i=0; i < length; i++){
+					        	var visit = new Object();
+				        		visit["id"] = result[i].id;
+					        	visit["name"] = result[i].name;
+					        	visit["place_id"] = result[i].place_id;
+					        	suggested_hotels.push(visit);
+					        }
+
+					        res.render(path.join(__dirname+'/templates/map.html'), {plan_id: plan_id, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels});
+
+				        });
+
+	        		});
+				});
+
+
+       	
+	    	});
+		}
+
 		else{
 
 			con.query(sql, parameters, function (err, result, fields) {
@@ -1096,14 +1284,169 @@ app.get('/calendar', function(req, res){
 	res.render(path.join(__dirname+'/templates/calendar.html'),);
 });
 
+
+
+
+
 app.get('/trips', function(req, res){
-	res.render(path.join(__dirname+'/templates/trips.html'),);
+
+	if(req.query['id'] != undefined){
+
+		var user_id = req.query['id'];
+
+		var sql = "select distinct city.name as city, plan.start_date as start, plan.end_date as end, plan.id as plan_id from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id where plan.user = ?";
+		var parameters = [user_id];
+
+		con.query(sql, parameters, function (err, result, fields) {
+	        if (err) throw err;
+
+	        var scheduled_trips = [];
+	        var past_trips = [];
+
+	        for(var i=0 ; i < result.length; i++){
+	        	var plan = new Object();
+	        	plan["id"] = result[i].plan_id;
+	        	plan["city"] = result[i].city;
+
+	        	var month = new Array();
+				month[0] = "January";
+				month[1] = "February";
+				month[2] = "March";
+				month[3] = "April";
+				month[4] = "May";
+				month[5] = "June";
+				month[6] = "July";
+				month[7] = "August";
+				month[8] = "September";
+				month[9] = "October";
+				month[10] = "November";
+				month[11] = "December";
+
+	        	start_date = new Date(result[i].start);
+	        	end_date = new Date(result[i].end);
+	        	now = new Date();
+
+	        	plan["start"] = start_date.getDate() + " " + month[start_date.getMonth()] + " " + start_date.getFullYear();
+	        	plan["end"] = end_date.getDate() + " " + month[end_date.getMonth()] + " " + end_date.getFullYear();
+
+	        	if(end_date < now){
+	        		past_trips.push(plan);
+	        	}
+
+	        	else{
+	        		scheduled_trips.push(plan);
+	        	}
+	        }
+
+			res.render(path.join(__dirname+'/templates/trips.html'),  {past_trips: past_trips, scheduled_trips: scheduled_trips});
+	    });
+	}
+
+	else{
+
+		// mensagem a dizer que tem estar logado
+	}
+
+
 });
+
+
+app.post('/login-g', function(req, res){
+
+	var connection;
+
+	promise.createConnection({
+		host: 'localhost',
+	    user: 'root',
+	    password: 'password',
+	    database: 'placesdb'
+
+	}).then(function(conn){
+		connection = conn;
+
+		var sql = "select count(*) as count from user_g where google_id = ?";
+		var values = [req.body.google_id];
+	    var result = connection.query(sql, [values]);
+
+    	return result;
+	}).then(function(result){
+
+		if(parseInt(result[0].count) == 0){
+			var sql = "insert into user (username, name, picture) values (?)";
+			var values = [req.body.username, req.body.name, req.body.picture];
+			var result = connection.query(sql, [values]);	
+
+			return result;
+		}
+
+		else{
+
+			var sql = "select id, picture from user join user_g on user.id = user_g.user_id where google_id = ?";
+			var values = [req.body.google_id];
+
+			con.query(sql, values, function (err, result, fields) {
+	        	if (err) throw err;
+
+	    	 	var user_id = result[0].id;
+		       	var picture = result[0].picture;
+
+      			res.contentType('json');
+				res.send({user_id: user_id, picture: picture});
+
+			});
+
+
+	        return -1;
+		}
+
+	}).then(function(result){
+
+		if(result == -1){
+			return;
+		}
+
+		var user_id = result.insertId;
+
+		var sql = "insert into user_g values (?) ";
+		var values = [user_id, req.body.google_id];
+		var result = connection.query(sql, [values]);	
+
+        var sql2 = "select id, picture from user where id = ?";
+		var values2 = [user_id];
+
+		con.query(sql2, values2, function (err, result, fields) {
+        	if (err) throw err;
+
+    	 	var user_id = result[0].id;
+	        var picture = result[0].picture;
+
+
+      		res.contentType('json');
+			res.send({user_id: user_id, picture: picture});
+
+		});
+
+	});
+
+});
+
 
 
 app.get('/register', function(req, res){
 	res.render(path.join(__dirname+'/templates/register.html'),);
 });
+
+
+app.post('/register', function(req, res){
+
+	console.log(req.body);
+
+	res.render(path.join(__dirname+'/templates/register.html'),);
+
+});
+
+
+
 
 app.get('/recover', function(req, res){
 	res.render(path.join(__dirname+'/templates/recover-password.html'),);

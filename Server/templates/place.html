@@ -198,15 +198,17 @@
                             <p><b>Choose visit schedule: </b></p>
                             
 
-                            <div class="form-group">
-                                <select class="form-control" id="visit-day">
-                                    <option>Day</option>
-                                    
-                                    <% days.forEach(function(day) { %>
-                                        <option><%= day %></option>
-                                    <% }); %>
-                                </select>
-                            </div>
+                            <% if(fromPlan) { %>
+                                <div class="form-group">
+                                    <select class="form-control" id="visit-day">
+                                        <option>Day</option>
+
+                                        <% days.forEach(function(day) { %>
+                                            <option><%= day %></option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            <% } %>
 
 
                             <div class="form-group">

@@ -19,16 +19,17 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="/js/myscript.js"></script>
+    <script type="text/javascript" src="/js/home.js"></script>
     
     <script src="https://unpkg.com/gijgo@1.9.11/js/gijgo.min.js" type="text/javascript"></script>
     <link href="https://unpkg.com/gijgo@1.9.11/css/gijgo.min.css" rel="stylesheet" type="text/css" />
 
     <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcM_AepOJRN1QIx96d2n0FOfOcGfZYfck&libraries=places"></script>
     
   
   </head>
-  <body>
+  <body onload="loadNavbar();">
         <!-- header navbar -->
         <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
             <a class="navbar-brand" href="./index.html">HomePage</a>
@@ -37,16 +38,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
               <ul class="navbar-nav ml-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#dropdown-menu" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-search" style="padding-right: 5px;"></i>Plan a trip
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                      <a class="dropdown-item" href="./search">Get a Aplicação plan</a>
-                      <a class="dropdown-item" href="./create-plan">Create your plan manually</a>
-                    </div>
+                
+                  <li class="nav-item">
+                    <a class="nav-link" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
                   </li>
-
+                
                 <li class="nav-item">
                   <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
                 </li>
@@ -54,7 +50,7 @@
                   <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="./search-restaurants"><i class="fas fa-utensils" style="padding-right: 5px;"></i>Restaurants</a>
+                    <a class="nav-link" href="#"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -69,19 +65,16 @@
               <ul class="navbar-nav ml-auto">
                 <li>
                   <div id="login-user">
-                    <div id="login">
+                    <div id="login" style="display: none;">
                       <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
                     </div>
-                    <div id="profile" class="dropleft">
-                      <!--div class="float-left">
-                        <span id="message-user">Hello <span id="user">Eduardo</span></span>
-                      </div>-->
+                    <div id="profile" class="dropleft" style="display: none;">
                       <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <img id="user-profile-pic" >
+                          <img id="user-profile-pic">
                       </a>
                       <div class="dropdown-menu" aria-labelledby="profile-btn">
                         <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                        <a class="dropdown-item" href="/trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                        <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
                       </div>   
@@ -91,9 +84,6 @@
               </ul>
             </div>
         </nav>
-        <script>
-          loadNavbar();
-        </script>
 
 
         <div class="container-fluid home-image" style=" background-image: url('/img/home-image.jpg'); ">
@@ -113,6 +103,10 @@
                       var list_cities = cities.split(',');
                       autocomplete(document.getElementById("inputDestination"), list_cities);
                     </script>
+
+                    <div class="form-group" style="display: none">
+                      <input type="text" class="form-control" id="user-id" aria-describedby="emailHelp" name="user" style="display: none">
+                    </div>
                     
                     <div class="row">
                       <div class='col-sm-6'>
@@ -285,46 +279,19 @@
               <div class="col-md-10 col-sm-10">
                   <br>
                   <div class="row">
-                      <div class="col-md col-sm-12 cont">
-                          <div class="card" style="width: 18rem;">
-                            <a href="/places?dest=Aveiro"><img class="card-img-top cities-imgs" src="/img/cities/aveiro.jpg"></a>
-                            <div class="card-body">
-                              <h5 class="card-title">Aveiro</h5>
-                              <p class="card-text"></p>
-                              <a href="/places?dest=Aveiro" class="btn btn-warning float-right">Find out more</a>
-                            </div>
-                          </div>
-                      </div>
-                      <div class="col-md col-sm-12 cont">
-                          <div class="card" style="width: 18rem;">
-                            <a href="/places?dest=Porto"><img class="card-img-top cities-imgs" src="/img/cities/porto.jpg"></a>
-                            <div class="card-body">
-                              <h5 class="card-title">Porto</h5>
-                              <p class="card-text"></p>
-                              <a href="/places?dest=Porto" class="btn btn-warning float-right">Find out more</a>
-                            </div>
-                          </div>
-                      </div>
-                      <div class="col-md col-sm-12 cont">
-                          <div class="card" style="width: 18rem;">
-                            <a href="/places?dest=New York"><img class="card-img-top  cities-imgs" src="/img/cities/new_york.jpg"></a>
-                            <div class="card-body">
-                              <h5 class="card-title">New York</h5>
-                              <p class="card-text"></p>
-                              <a href="/places?dest=New York" class="btn btn-warning float-right">Find out more</a>
-                            </div>
-                          </div>
-                      </div>
-                      <div class="col-md col-sm-12 cont">
-                          <div class="card" style="width: 18rem;">
-                              <a href="/places?dest=Copenhagen"><img class="card-img-top cities-imgs" src="/img/cities/copenhagen.jpg"></a>
+                      <% recommended_dest.forEach(function(dest) { %>
+                        <a href="/places?dest=<%= dest.name %>" class="card-home-link">
+                        <div class="col-md col-sm-12 cont">
+                            <div class="card card-home" style="width: 18rem;">
+                              <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
                               <div class="card-body">
-                                <h5 class="card-title">Copenhagen</h5>
-                                <p class="card-text"></p>
-                                <a href="/places?dest=Copenhagen" class="btn btn-warning float-right">Find out more</a>
+                                <h5 class="card-title"><b><%= dest.name %></b></h5>
+                                <p class="card-text"><%= dest.plans %> trips planned for <%= dest.name %></p>
                               </div>
                             </div>
-                      </div>
+                        </div>
+                        </a>
+                      <% }); %>
                   </div>
               </div>
               <div class="col-md-1 col-sm-1"></div>
@@ -346,46 +313,19 @@
               <div class="col-md-10 col-sm-10">
                   <br>
                   <div class="row">
-                      <div class="col-md col-sm-12 cont">
-                          <div class="card" style="width: 18rem;">
-                            <a href="/places?dest=Lisbon"><img class="card-img-top cities-imgs" src="/img/cities/lisboa.jpg"></a>
-                            <div class="card-body">
-                              <h5 class="card-title">Lisbon</h5>
-                              <p class="card-text"></p>
-                              <a href="/places?dest=Lisbon" class="btn btn-warning float-right">Find out more</a>
-                            </div>
-                          </div>
-                      </div>
-                      <div class="col-md col-sm-12 cont">
-                          <div class="card" style="width: 18rem;">
-                            <a href="/places?dest=Paris"><img class="card-img-top cities-imgs" src="/img/cities/paris.jpg"></a>
-                            <div class="card-body">
-                              <h5 class="card-title">Paris</h5>
-                              <p class="card-text"></p>
-                              <a href="/places?dest=Paris" class="btn btn-warning float-right">Find out more</a>
-                            </div>
-                          </div>
-                      </div>
-                      <div class="col-md col-sm-12 cont">
-                          <div class="card" style="width: 18rem;">
-                            <a href="/places?dest=Rome"><img class="card-img-top  cities-imgs" src="/img/cities/rome.jpg"></a>
-                            <div class="card-body">
-                              <h5 class="card-title">Rome</h5>
-                              <p class="card-text"></p>
-                              <a href="/places?dest=Rome" class="btn btn-warning float-right">Find out more</a>
-                            </div>
-                          </div>
-                      </div>
-                      <div class="col-md col-sm-12 cont">
-                          <div class="card" style="width: 18rem;">
-                              <a href="/places?dest=London"><img class="card-img-top cities-imgs" src="/img/cities/london.jpg"></a>
+                      <% top_dest.forEach(function(dest) { %>
+                        <a href="/places?dest=<%= dest.name %>" class="card-home-link">
+                        <div class="col-md col-sm-12 cont">
+                            <div class="card card-home" style="width: 18rem;">
+                              <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
                               <div class="card-body">
-                                <h5 class="card-title">London</h5>
-                                <p class="card-text"></p>
-                                <a href="/places?dest=London" class="btn btn-warning float-right">Find out more</a>
+                                <h5 class="card-title"><b><%= dest.name %></b></h5>
+                                <p class="card-text"><%= dest.plans %> trips planned for <%= dest.name %></p>
                               </div>
                             </div>
-                      </div>
+                        </div>
+                        </a>
+                      <% }); %>
                   </div>
               </div>
               <div class="col-md-1 col-sm-1"></div>
@@ -408,46 +348,24 @@
               <div class="col-md-10 col-sm-10">
                   <br>
                   <div class="row">
+                    <% count = 0 %>
+                    <% top_places.forEach(function(place) { %>
+                      <a href="/place?id=<%= place.id %>" class="card-home-link">
                       <div class="col-md col-sm-12 cont">
-                          <div class="card" style="width: 18rem;">
-                            <a href="#"><img class="card-img-top cities-imgs" src="/img/places/times_square.jpg"></a>
+                          <div class="card card-home" style="width: 18rem; height: 324px;">
+                            <img class="card-img-top cities-imgs" id="top-places-img-<%= count %>">
                             <div class="card-body">
-                              <h5 class="card-title">Times Square (New York)</h5>
-                              <p class="card-text"></p>
-                              <a href="#" class="btn btn-warning float-right">Find out more</a>
+                              <h5 class="card-title"><b><%= place.name %></b></h5>
+                              <p class="card-text"><%= place.plans %> trips planned with <%= place.name %></p>
                             </div>
                           </div>
                       </div>
-                      <div class="col-md col-sm-12 cont">
-                          <div class="card" style="width: 18rem;">
-                            <a href="#"><img class="card-img-top cities-imgs" src="/img/places/louvre.jpg"></a>
-                            <div class="card-body">
-                              <h5 class="card-title">Musée du Louvre (Paris)</h5>
-                              <p class="card-text"></p>
-                              <a href="#" class="btn btn-warning float-right">Find out more</a>
-                            </div>
-                          </div>
-                      </div>
-                      <div class="col-md col-sm-12 cont">
-                          <div class="card" style="width: 18rem;">
-                            <a href="#"><img class="card-img-top  cities-imgs" src="/img/places/big_ben.jpg"></a>
-                            <div class="card-body">
-                              <h5 class="card-title">Big Ben (London)</h5>
-                              <p class="card-text"></p>
-                              <a href="#" class="btn btn-warning float-right">Find out more</a>
-                            </div>
-                          </div>
-                      </div>
-                      <div class="col-md col-sm-12 cont">
-                          <div class="card" style="width: 18rem;">
-                              <a href="#"><img class="card-img-top cities-imgs" src="/img/places/eiffel_tower.jpg"></a>
-                              <div class="card-body">
-                                <h5 class="card-title">Eiffel Tower (Paris)</h5>
-                                <p class="card-text"></p>
-                                <a href="#" class="btn btn-warning float-right">Find out more</a>
-                              </div>
-                            </div>
-                      </div>
+                      </a>
+                      <script>
+                          loadPlaceImage('top-places-img-<%= count %>', '<%= place.place_id %>');
+                      </script>
+                      <% count = count + 1 %>
+                    <% }); %>
                   </div>
               </div>
               <div class="col-md-1 col-sm-1"></div>
@@ -540,7 +458,6 @@
   
     <!-- Scripts -->
     <script>startGoogleSignIn();</script>
-    
 
   </body>
 </html>

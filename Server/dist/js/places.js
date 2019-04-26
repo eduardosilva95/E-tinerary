@@ -147,9 +147,6 @@ function getCityImage(city){
                 document.getElementById("places-header").style.backgroundImage = "";
         }
       });
-
-
-
 }
 
 function loadIcon(place, poi_type){
@@ -212,6 +209,10 @@ function loadIcon(place, poi_type){
 
 function loadPlace(place_id){
   var queryString = "?id=" + place_id;
+
+  if(/plan=([^&]+)/.exec(location.search) != null)
+    queryString = queryString + "&plan=" + /plan=([^&]+)/.exec(location.search)[1];
+
   window.location.href = "./place" + queryString;
 }
 

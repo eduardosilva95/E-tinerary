@@ -573,7 +573,7 @@ function logout(){
 
 
 function loadNavbar(){
-  var username = sessionStorage.getItem("username");
+  /*var username = sessionStorage.getItem("username");
 
   if(username == "null"){
     document.getElementById("profile").style.display = 'none';
@@ -584,6 +584,16 @@ function loadNavbar(){
     document.getElementById("user-profile-pic").src = sessionStorage.getItem("user-pic");
     document.getElementById("profile").style.display = 'block';
     document.getElementById("login").style.display = 'none';
+  }*/
+
+  if(getUserCookie()){
+    document.getElementById("profile").style.display = 'block';
+    document.getElementById("login").style.display = 'none';
+  }
+
+  else{
+    document.getElementById("profile").style.display = 'none';
+    document.getElementById("login").style.display = 'block';
   }
 
 
@@ -614,8 +624,11 @@ function attachSignin(element) {
         console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
 
         
-        sessionStorage.setItem("username", profile.getEmail());
-        sessionStorage.setItem("user-pic", profile.getImageUrl());
+        //sessionStorage.setItem("username", profile.getEmail());
+        //sessionStorage.setItem("user-pic", profile.getImageUrl());
+
+        setUserCookie(profile.getEmail(), profile.getImageUrl());
+
         window.location.href = "/";
 
       }, function(error) {
@@ -626,9 +639,61 @@ function attachSignin(element) {
 function signOut() {
   var auth2 = gapi.auth2.getAuthInstance();
   auth2.signOut().then(function () {
-    sessionStorage.setItem("username", null);
+    deleteUserCookie();
     window.location.href = "/";
   });
 }
 
 
+
+function setUserCookie(username, picture){
+  var d = new Date();
+  d.setTime(d.getTime() + (365*24*60*60*1000));
+  var expires = "expires="+ d.toUTCString();
+
+  document.cookie = "username=" + username + "; " + expires + ";path=/";
+  document.cookie = "picture=" + picture + "; " + expires + ";path=/";
+
+}
+
+function getUserCookie() {
+  var username = "";
+  var picture = "";
+
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(';');
+
+  var getUsername
+
+  for(var i = 0; i <ca.length; i++) {
+    var c = ca[i];
+
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf("username=") == 0) {
+      username = c.substring("username=".length, c.length);
+    }
+
+    if (c.indexOf("picture=") == 0) {
+      picture = c.substring("picture=".length, c.length);
+    }
+  }
+
+  if(username != "" && picture != ""){
+    document.getElementById("user-profile-pic").src = picture;
+    return true;
+  }
+
+  else{
+    return false;
+  }
+
+
+}
+
+
+function deleteUserCookie(){
+  document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  document.cookie = "picture=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
