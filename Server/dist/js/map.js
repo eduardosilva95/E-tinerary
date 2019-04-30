@@ -67,6 +67,8 @@ function initMap(city) {
 
     infoWindow = new google.maps.InfoWindow;
 
+    loadNavbar();
+
 }
 
 
@@ -171,6 +173,19 @@ function viewPOI(place_dict){
     document.getElementById("sidebar-1").style.display = "none";
     document.getElementById("sidebar-2").style.display = "block";
 
+    $('#sidebar').toggleClass('active');
+    $('#full-map').toggleClass('active');
+    $('#sidebarCollapse').toggleClass('active');
+    
+    if($('#sidebar').children()[0].className == 'text-right'){
+        setTimeout(function(){
+            $('#sidebar').children()[0].className = 'text-center';
+        }, 600);
+    }
+    else{
+        $('#sidebar').children()[0].className = 'text-right';
+    }
+
 
     document.getElementById('poi-name').innerHTML = place_dict['name'];
 
@@ -239,6 +254,16 @@ $(document).ready(function () {
       $('#sidebar').toggleClass('active');
       $('#full-map').toggleClass('active');
       $(this).toggleClass('active');
+    
+    if($('#sidebar').children()[0].className == 'text-right'){
+        setTimeout(function(){
+            $('#sidebar').children()[0].className = 'text-center';
+        }, 600);
+    }
+    else{
+        $('#sidebar').children()[0].className = 'text-right';
+    }
+
   });
 
 });

@@ -11,45 +11,44 @@
     <!-- Custom styles -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/v4-shims.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
 
     
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script>
+
     <script type="text/javascript" src="/js/myscript.js"></script> 
+    <script type="text/javascript" src="js/login.js"></script>
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     
 
   
   </head>
-  <body>
-        <!-- header navbar -->
-        <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
+  <body onload="loadNavbar();">
+      <!-- header navbar -->
+      <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
           <a class="navbar-brand" href="./">HomePage</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
-              <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#dropdown-menu" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="fa fa-search" style="padding-right: 5px;"></i>Plan a trip
-                  </a>
-                  <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="./search">Get a Aplicação plan</a>
-                    <a class="dropdown-item" href="./create-plan">Create your plan manually</a>
-                  </div>
+              
+                <li class="nav-item">
+                  <a class="nav-link" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
                 </li>
-
+              
               <li class="nav-item">
                 <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
               </li>
-              <li class="nav-item active">
-                <a class="nav-link" href="#"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+              <li class="nav-item">
+                <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="./search-restaurants"><i class="fas fa-utensils" style="padding-right: 5px;"></i>Restaurants</a>
+                  <a class="nav-link" href="#"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
               </li>
               <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -63,15 +62,26 @@
             </ul>
             <ul class="navbar-nav ml-auto">
               <li>
-                <form class="form-inline my-2 my-lg-0">
-                  <input class="form-control form-control-sm mr-sm-2" type="email " placeholder="Email" aria-label="Email">
-                  <input class="form-control form-control-sm mr-sm-2" type="password" placeholder="Password" aria-label="Password">
-                  <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="submit">Login</button>
-                </form>
+                <div id="login-user">
+                  <div id="login" style="display: none;">
+                    <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                  </div>
+                  <div id="profile" class="dropleft" style="display: none;">
+                    <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img id="user-profile-pic">
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="profile-btn">
+                      <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                      <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                      <div class="dropdown-divider"></div>
+                      <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                    </div>   
+                  </div>        
+                </div>
               </li>
             </ul>
           </div>
-        </nav>
+      </nav>
 
 
         <div class="container-fluid" style="background-image: url('/img/home-image-4.jpg'); background-size: cover;">
@@ -138,7 +148,61 @@
           
         </div>
 
-
+        <!-- Login Modal -->
+        <div class="modal fade" id="login-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content" style="width: 400px;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                      <img id="profile-img" class="profile-img-card" src="img/login.png" />
+                      <form class="form-signin">
+                        <span id="reauth-email"></span>
+                        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                              <div class="custom-control custom-checkbox" id="remember">
+                                  <input type="checkbox" class="custom-control-input" id="remember-me">
+                                  <label class="custom-control-label" for="remember-me">Remember me</label>
+                              </div>
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <a href="/recover" class="forgot-password">
+                                    Forgot the password?
+                                </a>
+                            </div>
+                        </div>
+                        <br>
+                        <button class="btn btn-success" type="button" onclick="login();"><i class="fas fa-sign-in-alt"></i><span style="padding-left: 10px">Sign in</span></button>
+                            <!--<button class="btn btn-primary" type="submit"><i class="fas fa-user-plus"></i><span style="padding-left: 10px">Register</span></button>-->
+                        <span>Don't have an account yet? <a href="/register" class="forgot-password">Register now</a></span>
+                    
+                      </form>
+                      
+  
+                      <div class="login-or">
+                        <hr class="hr-or">
+                        <span class="span-or">or</span>
+                      </div>
+  
+                      <button class="btn btn-primary btn-facebook" type="submit"><i class="fab fa-facebook-f fa-lg"></i><span style="padding-left: 10px">Log in using Facebook</span></button>
+                      <br><br>
+                                  
+                      <div id="customBtn">
+                          <button class="btn btn-google" type="submit" ><img id="google-signin-icon" src="img/google-icon.png"><span style="padding-left: 10px">Log in using Google</span></button>
+                      </div>
+  
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Footer -->
         <footer class="footer">
@@ -166,7 +230,7 @@
 
   
     <!-- Scripts -->
-    <script type="text/javascript" src="/js/myscript.js"></script> 
+    <script>startGoogleSignIn();</script>
 
     
 

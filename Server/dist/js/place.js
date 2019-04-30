@@ -88,7 +88,9 @@ function getPlaceDetails(place_id){
         else
           document.getElementById("place-image").src = "";
 
-        createOpeningHoursTable(place.opening_hours.weekday_text);
+        if(place.opening_hours != null){
+          createOpeningHoursTable(place.opening_hours.weekday_text);
+        }
 
       }
     });
@@ -137,7 +139,12 @@ function getPlaceDetails(place_id){
     });
   });
 
+  $(function () {
+    $('.btn-create-review-modal').on('click', function () {
 
+        $('#modal-review-title').text($(this).data('title'));
+    });
+  });
 
   $(function () {
     $("#radio-choose-schedule-man").change(function() {
@@ -159,3 +166,61 @@ function getPlaceDetails(place_id){
   });
   
   
+  function getRatingValue(){
+    var value = 0;
+  
+    if(document.getElementById('star5').checked)
+      value = 5;
+    else if(document.getElementById('star4').checked)
+      value = 4;
+    else if(document.getElementById('star3').checked)
+      value = 3;
+    else if(document.getElementById('star2').checked)
+      value = 2;
+    else if(document.getElementById('star1').checked)
+      value = 1;
+  
+    return value;
+  }
+
+
+  function submitReview(){
+    if(hasUserCookies()){
+      var user_id = getUserCookie();
+      var poi_id = /id=([^&]+)/.exec(location.search)[1];
+
+      if(document.getElementById("review-text").value == ''){
+        alert("The review can't be empty");
+        return;
+      }
+      var review = document.getElementById("review-text").value;
+
+      var rating = getRatingValue();
+
+      $.post("/review-poi", {poi: poi_id, user: user_id, review: review, rating: rating}, function(result){
+
+        window.location.reload();
+      });
+    }
+  }
+
+  
+  function loadReviewRating(rating, review){
+    console.log(rating,review);
+
+    rating = parseInt(rating);
+
+    var count = 0;
+
+    while(count < rating){
+      document.getElementById(review).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #ffc107;"></i>';
+      count = count + 1;
+    }
+
+    while(count < 5){
+      document.getElementById(review).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: white; text-shadow: 0 0 3px #000;"></i>';
+      count = count + 1;
+    }
+
+
+  }

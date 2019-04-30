@@ -1,6 +1,7 @@
 var total_number_pages;
 
 function loadPage(){
+  loadNavbar(); 
   loadPageButtons();
 }
 

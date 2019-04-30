@@ -1,3 +1,4 @@
+/*
 CREATE TABLE User (
 	id INT AUTO_INCREMENT NOT NULL, 
 	username VARCHAR(255) NOT NULL, 
@@ -27,4 +28,24 @@ CREATE TABLE User_E (
     FOREIGN KEY (user_id) REFERENCES User(id),
 	CHECK(gender = 'M' OR gender = 'F'), 
     CHECK(type_use = 'Free' or type_use = 'Premium')
+);
+*/
+
+CREATE TABLE Review (
+	id INT AUTO_INCREMENT NOT NULL,
+	user_id INT NOT NULL,
+    PRIMARY KEY(id),
+    FOREIGN KEY(user_id) REFERENCES User(id)
+);
+
+CREATE TABLE Review_POI (
+	review_id INT NOT NULL,
+    poi_id INT NOT NULL,
+    review_text TEXT NOT NULL,
+    review_rating INT,
+    review_timestamp TIMESTAMP NOT NULL,
+    PRIMARY KEY (review_id),
+    FOREIGN KEY (review_id) REFERENCES Review(id),
+    FOREIGN KEY (poi_id) REFERENCES POI(id),
+    CHECK(review_rating > 0 and review_rating < 6)
 );

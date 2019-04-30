@@ -67,6 +67,8 @@ function initMap(city) {
 
     infoWindow = new google.maps.InfoWindow;
 
+    loadNavbar();
+
 }
 
 

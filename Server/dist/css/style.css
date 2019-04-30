@@ -49,19 +49,16 @@ hr {
 /* Track */
 ::-webkit-scrollbar-track {
   background: #f1f1f1; 
-  border-radius: 10px;
 }
  
 /* Handle */
 ::-webkit-scrollbar-thumb {
   background: #dddddd; 
-  border-radius: 10px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #cccccc; 
-  border-radius: 10px;
 }
 
 /* ----------------------------------- */
@@ -159,6 +156,7 @@ hr {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 0.1rem;
 }
 
 .card-home p{
@@ -166,7 +164,7 @@ hr {
   overflow: hidden;
   text-overflow: ellipsis;
   word-wrap: break-word;
-  max-height: 3.6em;
+  max-height: 4.2em;
   line-height: 1.8em;
 }
 
@@ -665,6 +663,19 @@ table tr td a{
 .close-button:hover {
   background-color: red;
   color: white;
+}
+
+#review-div{
+  max-height: 500px;
+  overflow-y: scroll;
+}
+
+.review-img {
+  border-radius: 50%;
+}
+
+.empty-review p{
+  color: #888888;
 }
 
 /* ---------------------------------- CALENDAR ------------------------- */

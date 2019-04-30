@@ -56,7 +56,7 @@ app.get('/', urlencodedParser, function(req, res){
         		top_dest.push(dest);
         	}
 
-        	var sql2 = "select id, name, place_id, count(name) as plans from ( select poi.id, poi.name, poi.place_id from plan join (visit join poi on visit.poi_id = poi.id) on plan.id = visit.plan_id) t group by name order by plans desc limit 4"
+        	var sql2 = "select id, name, place_id, city, count(name) as plans from ( select poi.id, poi.name, poi.place_id, city.name as city from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id) t group by name order by plans desc limit 4"
 
         	con.query(sql2, function (err, result, fields) {
 	        	if (err) throw err;
@@ -67,6 +67,7 @@ app.get('/', urlencodedParser, function(req, res){
 	        		place.id = result[i].id;
 	        		place.place_id = result[i].place_id;
 	        		place.name = result[i].name;
+	        		place.city = result[i].city;
 	        		place.plans = result[i].plans;
 	        		top_places.push(place);
 	        	}
@@ -97,7 +98,47 @@ app.get('/', urlencodedParser, function(req, res){
 });
 
 app.get('/search',function(req,res){  
-  res.render(path.join(__dirname+'/templates/search.html'), );
+  con.query("SELECT name FROM City", function (err, result, fields) {
+        if (err) throw err;
+        var string=JSON.stringify(result);
+        var list_cities = []
+        for(var i =0 ; i < result.length; i++){
+        	list_cities.push(result[i].name);
+        }
+
+        var sql = "select name, count(name) as plans from ( select city.name from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id group by plan.id) t group by name order by plans desc limit 4"
+
+        con.query(sql, function (err, result, fields) {
+        	if (err) throw err;
+
+        	var top_dest = [];
+        	for(var i=0; i<result.length;i++){
+        		var dest = new Object();
+        		dest.name = result[i].name;
+        		dest.plans = result[i].plans;
+        		top_dest.push(dest);
+        	}
+
+        	var sql2 = "select name, count(name) as plans from ( select city.name from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id group by plan.id) t group by name order by rand() limit 4"
+
+        	con.query(sql2, function (err, result, fields) {
+	        	if (err) throw err;
+
+	        	var recommended_dest = [];
+	        	for(var i=0; i<result.length;i++){
+	        		var dest = new Object();
+	        		dest.name = result[i].name;
+	        		dest.plans = result[i].plans;
+	        		recommended_dest.push(dest);
+	        	}
+
+    			res.render(path.join(__dirname+'/templates/search.html'), {cities: list_cities, top_dest: top_dest, recommended_dest: recommended_dest});
+
+    		});
+
+        });
+        
+    });
 });
 
 app.get('/search-places',function(req,res){
@@ -368,7 +409,7 @@ app.get('/places', urlencodedParser, function (req, res){
 
 app.get('/place', function(req,res){  	
 	
-	var place_id = req.query['id'];
+	var poi_id = req.query['id'];
 
 	var planId = -1;
 
@@ -380,7 +421,7 @@ app.get('/place', function(req,res){
 
  		var sql = "SELECT * from poi WHERE id = ?";
 
-		con.query(sql, place_id, function (err, result, fields) {
+		con.query(sql, poi_id, function (err, result, fields) {
 		    if (err) throw err;
 		    var string=JSON.stringify(result);
 
@@ -395,7 +436,26 @@ app.get('/place', function(req,res){
 			var website = result[0].website;
 			var type = result[0].poi_type.charAt(0).toUpperCase() + result[0].poi_type.slice(1);
 
-			res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, description: description, address: address, lat: lat, lon: lon, rating: rating, phone_number: phone_number, website: website, type: type, fromPlan: false});
+			var sql2 = "select user.name as user, user.picture as picture, review_text, review_rating, review_timestamp from review_poi join (review join user on review.user_id = user.id ) on review_poi.review_id = review.id WHERE poi_id = ? order by review_timestamp desc";
+
+			con.query(sql2, poi_id, function (err, result, fields) {
+		    	if (err) throw err;
+
+		    	var reviews = [];
+
+		    	for(var i=0 ; i < result.length; i++){
+		    		var review = new Object();
+		    		review["text"] = result[i].review_text
+		    		review["rating"] = result[i].review_rating;
+		    		review["user"] = result[i].user;
+		    		review["user_pic"] = result[i].picture;
+		    		review["date"] = getReviewDate(result[i].review_timestamp);
+		    		reviews.push(review);
+		    	}
+
+				res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, description: description, address: address, lat: lat, lon: lon, rating: rating, phone_number: phone_number, website: website, type: type, reviews: reviews, fromPlan: false});
+
+			});
 
 		});
 
@@ -410,7 +470,7 @@ app.get('/place', function(req,res){
 	    database: 'placesdb'
 
 		}).then(function(conn){
-			var sql = "select poi_id, plan.start_date as start_date, plan.end_date as end_date, datediff(plan.end_date, plan.start_date) as date_diff from visit join plan on plan_id=plan.id where plan_id = ?";
+			var sql = "select poi_id, plan.start_date as start_date, plan.end_date as end_date, datediff(plan.end_date, plan.start_date) as date_diff from visit join plan on plan_id=plan.id where plan_id = ? ";
 			var values = [planId];
 		    var result = conn.query(sql, [values]);
 
@@ -471,9 +531,8 @@ app.get('/place', function(req,res){
 
 			var sql = "SELECT * from poi WHERE id = ?";
 
-			con.query(sql, place_id, function (err, result, fields) {
+			con.query(sql, poi_id, function (err, result, fields) {
 			    if (err) throw err;
-			    var string=JSON.stringify(result);
 
 			    var place_id = result[0].place_id;
 				var name = result[0].name;
@@ -486,7 +545,27 @@ app.get('/place', function(req,res){
 				var website = result[0].website;
 				var type = result[0].poi_type.charAt(0).toUpperCase() + result[0].poi_type.slice(1);
 
-				res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, description: description, address: address, lat: lat, lon: lon, rating: rating, phone_number: phone_number, website: website, type: type, fromPlan: true, inPlan: inPlan, days: days});
+
+				var sql2 = "select user.name as user, user.picture as picture, review_text, review_rating, review_timestamp from review_poi join (review join user on review.user_id = user.id ) on review_poi.review_id = review.id WHERE poi_id = ? order by review_timestamp desc";
+
+				con.query(sql2, poi_id, function (err, result, fields) {
+			    	if (err) throw err;
+
+			    	var reviews = [];
+
+			    	for(var i=0 ; i < result.length; i++){
+			    		var review = new Object();
+			    		review["text"] = result[i].review_text
+			    		review["rating"] = result[i].review_rating;
+			    		review["user"] = result[i].user;
+			    		review["user_pic"] = result[i].picture;
+		    		review["date"] = getReviewDate(result[i].review_timestamp);
+			    		reviews.push(review);
+			    	}
+
+					res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, description: description, address: address, lat: lat, lon: lon, rating: rating, phone_number: phone_number, website: website, type: type, reviews: reviews, fromPlan: true, inPlan: inPlan, days: days});
+
+				});
 
 			});
 
@@ -1466,6 +1545,45 @@ app.get('/help', function(req, res){
 });
 
 
+app.post('/review-poi', function(req, res){
+	var connection;
+
+	promise.createConnection({
+		host: 'localhost',
+	    user: 'root',
+	    password: 'password',
+	    database: 'placesdb'
+
+	}).then(function(conn){
+		connection = conn;
+
+		var sql = "insert into review (user_id) values (?)";
+		var values = [req.body.user];
+	    var result = connection.query(sql, [values]);
+
+    	return result;
+	}).then(function(result){
+		var review_id = result.insertId;
+
+		if(parseInt(req.body.rating) == 0){
+			var sql = "insert into review_poi (review_id, poi_id, review_text, review_timestamp) values (?)";
+			var values = [review_id, req.body.poi, req.body.review, convertToSQLTimestamp(Date.now())];
+	    	var result = connection.query(sql, [values]);
+
+	    	res.send(JSON.stringify('success'));
+		}
+
+		else{
+			var sql = "insert into review_poi values (?)";
+			var values = [review_id, req.body.poi, req.body.review, req.body.rating, convertToSQLTimestamp(Date.now())];
+	    	var result = connection.query(sql, [values]);
+
+	    	res.send(JSON.stringify('success'));
+		}
+
+	});
+});
+
 
 
 
@@ -1600,4 +1718,70 @@ function diffBetweenDays(day1, day2){
 	var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
 	return diffDays;
+}
+
+function convertToSQLTimestamp(date){
+	var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+
+    return new Date(date - tzoffset).toISOString().slice(0, 19).replace('T', ' ');;
+}
+
+
+function getReviewDate(date){
+	var now = new Date();
+
+	var diff = now - date;
+
+	if(diff / (1000 * 60 * 60 * 24 * 365) < 1){
+		if(diff / (1000 * 60 * 60 * 24 * 30) < 1){
+			if(diff / (1000 * 60 * 60 * 24 ) < 1){
+				if(diff / (1000 * 60 * 60 ) < 1){
+					if(diff / (1000 * 60) < 1){
+						return "less than one minute ago";
+					}
+
+					else{
+						if(Math.floor(diff / (1000 * 60)) == 1)
+							return Math.floor(diff / (1000 * 60)) + " minute ago";
+
+						return Math.floor(diff / (1000 * 60)) + " minutes ago";
+					}
+
+				}
+
+				else{
+					if(Math.floor(diff / (1000 * 60 * 60)) == 1)
+						return Math.floor(diff / (1000 * 60 * 60)) + " hour ago";
+
+					return Math.floor(diff / (1000 * 60 * 60)) + " hours ago";
+				}
+
+			}
+
+			else{
+				if(Math.floor(diff / (1000 * 60 * 60 * 24)) == 1)
+					return Math.floor(diff / (1000 * 60 * 60 * 24)) + " day ago";
+
+				return Math.floor(diff / (1000 * 60 * 60 * 24)) + " days ago";
+			}
+		
+		}
+		
+		else{
+			if(Math.floor(diff / (1000 * 60 * 60 * 24 * 30)) == 1)
+				return Math.floor(diff / (1000 * 60 * 60 * 24 * 30)) + " month ago";
+
+			return Math.floor(diff / (1000 * 60 * 60 * 24 * 30)) + " months ago";
+		}
+
+	}
+
+
+	else{
+		if(Math.floor(diff / (1000 * 60 * 60 * 24 * 365)) == 1)
+			return Math.floor(diff / (1000 * 60 * 60 * 24 * 365)) + " year ago";
+
+		return Math.floor(diff / (1000 * 60 * 60 * 24 * 365)) + " years ago";
+	}
+
 }

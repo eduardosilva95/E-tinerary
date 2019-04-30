@@ -16,6 +16,8 @@
 }
 
 #sidebar.active {
+    background-color: #343a40;
+    overflow-y: unset;
     min-width: 50px;
     max-width: 50px;
     height: 800px;
@@ -99,7 +101,7 @@ a[data-toggle="collapse"] {
     height: 2px;
     margin: 0 auto;
     display: block;
-    background: #555;
+    background: white;
     transition: all 0.8s cubic-bezier(0.810, -0.330, 0.345, 1.375);
 }
 
