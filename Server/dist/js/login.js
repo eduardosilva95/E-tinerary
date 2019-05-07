@@ -2,7 +2,13 @@ function loadNavbar(){
   if(hasUserCookies()){
     var user_id = getUserCookie();
     var picture = getPictureCookie();
+
+    console.log(picture);
     
+    if(picture == 'null'){
+      picture = 'img/login.png';
+    }
+
     if(document.getElementById("user-id") != null){
       document.getElementById("user-id").value = user_id;
     }
@@ -50,6 +56,47 @@ function attachSignin(element) {
       }, function(error) {
       });
 }
+
+
+function login(type=null) {
+
+  var email;
+  var pwd;
+  var dest
+
+  if(type == 'r'){
+    email = document.getElementById("inputEmail-2").value;
+    pwd = document.getElementById("inputPassword-2").value;
+    dest = 'login-error-2';
+  }
+
+  else{
+    email = document.getElementById("inputEmail").value;
+    pwd = document.getElementById("inputPassword").value;
+    dest = 'login-error';
+  }
+
+
+  if(email != "" && pwd != ""){
+
+    $.post("/login-e", {email: email, password: pwd}, function(result){
+      
+      if(result.user_id == 'error'){
+        document.getElementById(dest).style.display = 'block';
+      }
+      
+      else{
+        setUserCookie(result.user_id, result.picture);
+        window.location.reload();
+      }
+
+    });
+
+  }
+
+
+}
+
 
 
 function signOut() {

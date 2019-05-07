@@ -127,7 +127,7 @@
                         <div class="row" id="plan-day-<%= day_no %>">
                             <div class="col-md-2">
                                 <div class="text-center">
-                                    <button class="change-plan-day-btn" onclick="previousDay();"><i class="fas fa-arrow-alt-circle-left fa-lg"></i></button>
+                                    <button id="previous-day-btn" class="change-plan-day-btn" onclick="previousDay();"><i class="fas fa-arrow-alt-circle-left fa-lg"></i></button>
                                 </div>
                             </div>
                             <div class="col-md-8">
@@ -137,7 +137,7 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="text-center">
-                                    <button class="change-plan-day-btn" onclick="nextDay();"><i class="fas fa-arrow-alt-circle-right fa-lg"></i></button>
+                                    <button id="next-day-btn" class="change-plan-day-btn" onclick="nextDay();"><i class="fas fa-arrow-alt-circle-right fa-lg"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -147,7 +147,7 @@
 
                     <% count = 0 %>
                     <% plan.forEach(function(visit) { %>
-                        <% if (visit.day == day.split(', ')[1]) { %>    
+                        <div id="place-<%= count %>">
                             <div class="card" style="height: 150px;">
                                 <div class="row">
                                     <div class="col-md-4">
@@ -180,8 +180,8 @@
                                 <br>
                                 <span id="desloc" style="padding-left: 10px; color: #767676; font-size: 12px;"><i class="fas fa-bus"></i><span style="padding-left: 10px;">10 minutes</span></span>
                             </div>
-                            <% count = count + 1 %>
-                        <% } %>
+                        </div>
+                        <% count = count + 1 %>
                     <% }); %>
                     <hr>
                 </div>

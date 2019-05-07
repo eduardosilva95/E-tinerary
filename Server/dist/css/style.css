@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800|Oswald:400,500,600,700');
 
-@import url('//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css');
+@import url('//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 
 
 html, body {
@@ -38,6 +38,11 @@ hr {
 .dr {
   display: none;
 }
+
+.fa-placeholder {
+  font-family: 'Helvetica Neue', FontAwesome, sans-serif;
+}
+
 
 /* SCROLLBAR */
 
@@ -307,21 +312,41 @@ hr {
 /* ---------------------------------------- */
 
 
-
-.interests-box-left {
-  border-color: white;
+.search-box {
+  background: transparent\9;  
+  background:rgba(52, 58, 64,0.8);  
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#66000000,endColorstr=#66000000);  
+  zoom: 1; 
+  border-radius: 25px; 
+  border-color: #ffc107;
   border-style: solid;
-  border-right: none;
-  height: 200px;
+  padding-bottom: 10px;
+}
+   
+.search-box:nth-child(n) {  
+  filter: none;  
 }
 
-.interests-box-right {
-  border-color: white;
-  border-style: solid;
-  border-left: none;
-  height: 200px;
+#search-form .fg {
+  padding: .375rem .75rem;
 }
 
+.form-search-page {
+  border: 2px solid #ffc107;
+}
+
+.btn-interests-down{
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.btn-interests-down:hover {
+  color: #f4a029;
+}
+
+.form-interests {
+  display: none;
+}
 
 
 .btn-search-place {
@@ -375,8 +400,11 @@ hr {
 }
 
 .input-group-append {
-  background-color: #e9ecef;
+    background-color: #ffc107;
+    border-right: 2px solid #ffc107;
+    border-radius: .25rem;
 }
+
 
 .input-group-append button {
   color: #343a40;
@@ -521,6 +549,12 @@ hr {
 .change-plan-day-btn:hover {
   color: #f4a029;
 }
+
+.change-plan-day-btn:disabled{
+  color: #e5e2be;
+  cursor: default;
+}
+
 
 /* Change views of plan */
 .change-view{

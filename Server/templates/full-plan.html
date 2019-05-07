@@ -163,7 +163,7 @@
 
                         <% count = 0 %>
                         <% plan.forEach(function(visit) { %>
-                            <% if (visit.day == day.split(', ')[1]) { %>    
+                            <div id="place-<%= count %>">
                                 <div class="card" style="height: 150px;">
                                     <div class="row">
                                         <div class="col-md-4">
@@ -176,13 +176,12 @@
                                                         <h6 id="place-<%= count %>-name" class="card-title"><b></b></h6>
                                                         <span id="place-<%= count %>-type" style="color: #767676;"></span>
                                                         <span id="place-<%= count %>-hours" class="text-bottom"></span>
-
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="text-right">
                                                         <span id="place-<%= count %>-weather" style="padding-left: 10px; color: #767676;"></span>
-                                                    </div>                                                   
+                                                    </div>
                                                     <div class="plan-table-icons text-right"> 
                                                         <button type="button" class="plan-table-btn-icons btn-info-modal" id="place-<%= count %>-info" data-toggle="modal" data-target="#info-modal" ><i title="Get info" class="fas fa-info-circle fa-lg"></i></button>
                                                         <button type="button" class="plan-table-btn-icons btn-remove-modal" id="place-<%= count %>-remove" data-toggle="modal" data-target="#remove-modal"><i title="Remove visit" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
@@ -197,8 +196,8 @@
                                     <br>
                                     <span id="desloc" style="padding-left: 10px; color: #767676; font-size: 12px;"><i class="fas fa-bus"></i><span style="padding-left: 10px;">10 minutes</span></span>
                                 </div>
-                                <% count = count + 1 %>
-                            <% } %>
+                            </div>
+                            <% count = count + 1 %>
                         <% }); %>
                         <hr>
                     </div>

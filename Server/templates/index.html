@@ -287,7 +287,11 @@
                               <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
                               <div class="card-body">
                                 <h5 class="card-title"><b><%= dest.name %></b></h5>
-                                <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trips planned for <%= dest.name %></p>
+                                <% if(dest.plans == 1) { %>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trip planned for <%= dest.name %></p>
+                                <% } else { %>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trips planned for <%= dest.name %></p>
+                                <% } %>
                               </div>
                             </div>
                         </div>
@@ -321,7 +325,11 @@
                               <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
                               <div class="card-body">
                                 <h5 class="card-title"><b><%= dest.name %></b></h5>
-                                <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trips planned for <%= dest.name %></p>
+                                <% if(dest.plans == 1) { %>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trip planned for <%= dest.name %></p>
+                                <% } else { %>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trips planned for <%= dest.name %></p>
+                                <% } %>
                               </div>
                             </div>
                         </div>
@@ -358,7 +366,11 @@
                             <div class="card-body">
                               <h5 class="card-title"><b><%= place.name %></b></h5>
                               <span style="color: #767676;"><%= place.city %></span>
-                              <p class="card-text" style="padding-top: 10px;"><%= place.plans %> planned trips contain <span><%= place.name %></span></p>
+                              <% if(place.plans == 1) { %>
+                                <p class="card-text" style="padding-top: 10px;"><%= place.plans %> planned trips contain <span><%= place.name %></span></p>
+                              <% } else { %>
+                                <p class="card-text" style="padding-top: 10px;"><%= place.plans %> planned trips contain <span><%= place.name %></span></p>
+                              <% } %>
                             </div>
                           </div>
                       </div>
@@ -378,8 +390,8 @@
        </div> 
 
 
-        <!-- Login Modal -->
-        <div class="modal fade" id="login-modal" role="dialog">
+      <!-- Login Modal -->
+      <div class="modal fade" id="login-modal" role="dialog">
           <div class="modal-dialog">
               <div class="modal-content" style="width: 400px;">
                   <div class="modal-header">
@@ -389,9 +401,14 @@
                       </button>
                   </div>
                   <div class="modal-body">
+                      
+
                     <img id="profile-img" class="profile-img-card" src="img/login.png" />
                     <form class="form-signin">
                       <span id="reauth-email"></span>
+                      <div class="alert alert-danger" id="login-error" role="alert" style="display: none;">
+                          <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">The email or password is incorrect</span>
+                      </div>
                       <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
                       <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
                       <div class="row">

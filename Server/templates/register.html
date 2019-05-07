@@ -20,12 +20,11 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/register.js"></script>
     <script type="text/javascript" src="js/login.js"></script>
-
     
+
     <script src="https://unpkg.com/gijgo@1.9.11/js/gijgo.min.js" type="text/javascript"></script>
     <link href="https://unpkg.com/gijgo@1.9.11/css/gijgo.min.css" rel="stylesheet" type="text/css" />
 
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
     
 
   </head>
@@ -88,6 +87,12 @@
 
         <div class="container">
             <div class="cont">
+                <% if(alreadyExists) { %>
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">The email is already registered</span>
+                    </div>
+                <% } %>
+
                 <div class="card card-body bg-light">
                     <div class="text-left">
                         <h3><b>Register on Aplicação</b></h3>
@@ -97,7 +102,7 @@
 
             <div class="cont">
                 <div class="card card-body bg-light">
-                    <form name="register-form" action="/register" method="POST"  onsubmit="return verify();">
+                    <form name="register-form" action="/register" method="POST"  enctype="multipart/form-data" onsubmit="return verify();">
                         <div class="row">
                             <div class="col-md-6">
                                 <h5><b>Personal Information</b></h5>
@@ -114,11 +119,11 @@
                                 <div class="form-group">
                                     Gender: 
                                     <div class="custom-control custom-radio custom-control-inline">
-                                        <input type="radio" id="gender-male" name="gender" class="custom-control-input" value="male">
+                                        <input type="radio" id="gender-male" name="gender" class="custom-control-input" value="M">
                                         <label class="custom-control-label" for="gender-male">Male</label>
                                     </div>
                                     <div class="custom-control custom-radio custom-control-inline">
-                                        <input type="radio" id="gender-female" name="gender" class="custom-control-input" value="female">
+                                        <input type="radio" id="gender-female" name="gender" class="custom-control-input" value="F">
                                         <label class="custom-control-label" for="gender-female">Female</label>
                                     </div>
                                 </div>
@@ -389,19 +394,19 @@
                                 <div class="form-group">
                                     <select class="custom-select" name="type_use">
                                         <option selected>Type of use</option>
-                                        <option value="1">Personal use (Free)</option>
+                                        <option value="Free">Personal use (Free)</option>
                                     </select>
                                 </div>
                                 <div class="form-group" name="profile_pic">
                                     <label for="user-photo">Profile picture (optional)</label>
-                                    <input type="file" class="form-control-file" id="user-photo">
+                                    <input type="file" class="form-control-file" accept="image/*" id="user-photo" name="photo">
                                 </div>
                             </div>
 
                         </div>
                         <div class="form-group pull-right">
                             <button type="reset" class="btn btn-danger">Clear</button>
-                            <button type="submit" onclick="" class="btn btn-primary">Register</button>
+                            <button type="submit" value="upload" class="btn btn-primary">Register</button>
                         </div>
 
                     </form>
@@ -429,9 +434,14 @@
                         </button>
                     </div>
                     <div class="modal-body">
+                        
+
                       <img id="profile-img" class="profile-img-card" src="img/login.png" />
                       <form class="form-signin">
                         <span id="reauth-email"></span>
+                        <div class="alert alert-danger" id="login-error" role="alert" style="display: none;">
+                            <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">The email or password is incorrect</span>
+                        </div>
                         <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
                         <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
                         <div class="row">
@@ -474,6 +484,47 @@
             </div>
         </div>
 
+
+        <!-- Login after Register Modal -->
+        <div class="modal fade" id="login-after-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content" style="width: 400px;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-success text-center" role="alert">
+                            <i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Registered with success</span>
+                        </div>
+
+                        <img id="profile-img" class="profile-img-card" src="img/login.png" />
+                        <form class="form-signin">
+                        <span id="reauth-email"></span>
+                        <div class="alert alert-danger" id="login-error-2" role="alert" style="display: none;">
+                            <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">The email or password is incorrect </span>
+                        </div>
+                        <input type="email" id="inputEmail-2" class="form-control" placeholder="Email address" required autofocus>
+                        <input type="password" id="inputPassword-2" class="form-control" placeholder="Password" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox" id="remember">
+                                    <input type="checkbox" class="custom-control-input" id="remember-me-2">
+                                    <label class="custom-control-label" for="remember-me-2">Remember me</label>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <button class="btn btn-success" type="button" onclick="login('r');"><i class="fas fa-sign-in-alt"></i><span style="padding-left: 10px">Sign in</span></button>                   
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Footer -->
         <footer class="footer">
           <!-- Footer Elements -->
@@ -499,11 +550,22 @@
   
     <!-- Scripts -->
     <script>startGoogleSignIn();</script>
+    
     <script>
-			$('#bday').datepicker({
-                uiLibrary: 'bootstrap4',
-                format: 'dd/mm/yyyy',
-		    });
+        var isRegistered = '<%= isRegistered %>';
+
+        if(isRegistered == "true"){
+            $(window).on('load',function(){
+                $('#login-after-modal').modal('show');
+            });
+        }
+    </script>
+
+    <script>
+        $('#bday').datepicker({
+            uiLibrary: 'bootstrap4',
+            format: 'dd/mm/yyyy',
+        });
     </script>
 
   </body>

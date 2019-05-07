@@ -123,12 +123,18 @@ function loadPlan(plan_array, days){
 
         places[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number};
 
-        if(p.day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
-            visits.push(p);
-        }
+        visits.push(p); 
     }
 
-    loadVisits(visits, weekdays[day]);
+    loadVisits(visits, weekdays[day], plan_days[day]);
+
+    document.getElementById('previous-day-btn').disabled = true;
+
+    if(day + 1 >= weekdays.length){
+        document.getElementById('next-day-btn').disabled = true;
+    }
+
+
 }
 
 
@@ -142,12 +148,28 @@ function nextDay(){
     for(var j=0 ; j < plan.length ; j++){
         p = JSON.parse(plan[j]);
 
-        if(p.day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
-            visits.push(p);
+        visits.push(p);
+    }
+    
+    document.getElementById('visit-day').innerText = weekdays[day];
+
+    for(var i=0 ; i < visits.length ; i++){
+        if(visits[i].day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
+            document.getElementById('place-' + i).style.display = 'block';
+            loadImage(visits[i].place_id, 'place-' + i + '-img');
+
+        }
+        else{
+            document.getElementById('place-' + i).style.display = 'none';
         }
     }
 
-    loadVisits(visits, weekdays[day]);
+    document.getElementById('previous-day-btn').disabled = false;
+
+    if(day + 1 >= weekdays.length){
+        document.getElementById('next-day-btn').disabled = true;
+    }
+
 }
 
 function previousDay(){
@@ -160,16 +182,31 @@ function previousDay(){
     for(var j=0 ; j < plan.length ; j++){
         p = JSON.parse(plan[j]);
 
-        if(p.day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
-            visits.push(p);
+        visits.push(p);
+    }
+    
+    document.getElementById('visit-day').innerText = weekdays[day];
+
+    for(var i=0 ; i < visits.length ; i++){
+        if(visits[i].day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
+            document.getElementById('place-' + i).style.display = 'block';
+            loadImage(visits[i].place_id, 'place-' + i + '-img');
+        }
+        else{
+            document.getElementById('place-' + i).style.display = 'none';
         }
     }
 
-    loadVisits(visits, weekdays[day]);
+    document.getElementById('next-day-btn').disabled = false;
+
+    if(day - 1 == 0){
+        document.getElementById('previous-day-btn').disabled = true;
+    }
+
 }
 
 
-function loadVisits(visits, day){
+function loadVisits(visits, day, checkDay){
     document.getElementById('visit-day').innerText = day;
     for(var i=0 ; i < visits.length ; i++){
         document.getElementById('place-' + i + '-name').innerText = visits[i].name;
@@ -240,9 +277,17 @@ function loadVisits(visits, day){
             document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-train" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
         }
 
-        loadImage(visits[i].place_id, 'place-' + i + '-img');
 
         place_info[i] = {'id': visits[i].id, 'name': visits[i].name, 'city': visits[i].city, 'place_id': visits[i].place_id, 'address': visits[i].address, 'coordinates': visits[i].coordinates, 'website': visits[i].website, 'phone_number': visits[i].phone_number}
+        
+        if(visits[i].day.replace(/\s/g, '') == checkDay.replace(/\s/g, '')){
+            document.getElementById('place-' + i).style.display = 'block';
+            loadImage(visits[i].place_id, 'place-' + i + '-img');
+        }
+        else{
+            document.getElementById('place-' + i).style.display = 'none';
+        }
+    
     }
 }
 

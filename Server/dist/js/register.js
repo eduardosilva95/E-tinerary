@@ -7,7 +7,7 @@ function verify(){
 
     var gender = document.forms["register-form"]["gender"].value;
 
-    if(gender != "male" && gender != "female"){
+    if(gender != "M" && gender != "F"){
         alert("Must specify the gender");
         return false;
     }
@@ -42,14 +42,17 @@ function verify(){
       return false;
     }
 
-    var pwd = document.forms["register-form"]["password"];
-    var rep_pwd = document.forms["register-form"]["password_repeat"];
+    var pwd = document.forms["register-form"]["password"].value;
+    var rep_pwd = document.forms["register-form"]["password_repeat"].value;
 
     if(pwd != rep_pwd){
         alert("Passwords do not match !!");
         return false;
     }
 
+
     return true;
 
 }
+
+

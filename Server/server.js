@@ -6,6 +6,21 @@ var urlencodedParser = bodyParser.urlencoded({ extended: true });
 var mysql = require('mysql');
 var http = require('http');
 var url = require('url');
+var md5 = require('md5');
+var multer = require('multer');
+var fs = require('fs');
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, 'dist/img/users'))
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() +  path.extname(file.originalname)) //Appending extension
+  }
+})
+
+var upload = multer({storage: storage});
+
 
 var promise = require('promise-mysql');
  
@@ -524,7 +539,7 @@ app.get('/place', function(req,res){
 
 	        var inPlan = false;
 
-	        if (list_places_plan.includes(parseInt(place_id))){
+	        if (list_places_plan.includes(parseInt(poi_id))){
 	        	inPlan = true;
 	        }
 
@@ -1510,20 +1525,290 @@ app.post('/login-g', function(req, res){
 });
 
 
+app.post('/login-e', function(req, res){
+
+	var connection;
+
+	promise.createConnection({
+		host: 'localhost',
+	    user: 'root',
+	    password: 'password',
+	    database: 'placesdb'
+
+	}).then(function(conn){
+		connection = conn;
+
+		var sql = "select id, picture, CAST(password AS CHAR(32) CHARACTER SET utf8) as password from user_e join user on user_e.user_id = user.id where username = ?";
+		var values = [req.body.email];
+	    var result = connection.query(sql, [values]);
+
+    	return result;
+	}).then(function(result){
+
+		if(parseInt(result.length) == 1){
+
+			if(result[0].password == md5(req.body.password)){
+
+	    	 	var user_id = result[0].id;
+		       	var picture = result[0].picture;
+
+      			res.contentType('json');
+				res.send({user_id: user_id, picture: picture});
+
+			}
+
+			else{
+				res.contentType('json');
+				res.send({user_id: 'error', picture: 'wrong password'});
+			}
+
+		}
+
+		else{
+
+      		res.contentType('json');
+			res.send({user_id: 'error', picture: 'email not found'});
+
+		}
+
+	});
+
+});
+
+
 
 app.get('/register', function(req, res){
-	res.render(path.join(__dirname+'/templates/register.html'),);
+	res.render(path.join(__dirname+'/templates/register.html'), {isRegistered: false, alreadyExists: false});
 });
 
 
-app.post('/register', function(req, res){
+app.post('/register', upload.single('photo'), function (req, res, next){
 
-	console.log(req.body);
+	var connection;
 
-	res.render(path.join(__dirname+'/templates/register.html'),);
+	if(req.file) {
+
+		var password = md5(req.body.password);
+
+		promise.createConnection({
+			host: 'localhost',
+		    user: 'root',
+		    password: 'password',
+		    database: 'placesdb'
+
+		}).then(function(conn){
+
+			connection = conn;
+
+			var sql = "select count(*) as count from user where username = ?";
+			var values = [req.body.email];
+		    var result = connection.query(sql, [values]);
+
+	    	return result;
+		}).then(function(result){
+
+			if(parseInt(result[0].count) == 0){
+
+				/* Begin transaction */
+				con.beginTransaction(function(err) {
+  					if (err) { throw err; }
+
+					var sql = "insert into user (username, name, picture) values (?)";
+					var values = [req.body.email, req.body.fname + " " + req.body.lname, req.file.filename];
+
+					con.query(sql, [values], function(err, result) {
+    					if (err) { 
+      						con.rollback(function() {
+        						throw err;
+      						});
+      					}
+
+
+	      				var user_id = result.insertId;
+
+	      				var picture_fn = req.file.path.split('.')[0] + "_" + user_id + "." + req.file.path.split('.')[1];
+
+						fs.rename(req.file.path, picture_fn, function(err) {
+			    			if ( err ) console.log('ERROR: ' + err);
+
+				    		var birthday = req.body.birthday.split('/')[2] + "-" + req.body.birthday.split('/')[1] + "-" + req.body.birthday.split('/')[0];
+
+							if(req.body.phone != undefined){
+								sql = "insert into user_e values (?) ";
+								values = [user_id, birthday, req.body.gender, req.body.country, req.body.phone, req.body.type_use, password];
+							}
+
+							else{
+								sql = "insert into user_e (birthday, gender, country, type_use, password) values (?) ";
+								values = [user_id, birthday, req.body.gender, req.body.country, req.body.type_use, password];
+
+							}
+
+							con.query(sql, [values],  function(err, result) {
+								if (err) { 
+	    							con.rollback(function() {
+						          		throw err;
+						        	});
+					     		}
+
+								var sql2 = "update user set picture = (?) where id = (?)";
+								var values2 = [picture_fn, user_id];
+
+								con.query(sql2, [values2],  function(err, result) {
+									if (err) { 
+		    							con.rollback(function() {
+							       	   		throw err;
+							        	});
+						     		}
+
+		        					var sql3 = "select id, picture from user where id = ?";
+									var values3 = [user_id];
+
+									con.query(sql3, values3, function (err, result, fields) {
+			        					if (err) { 
+		    								con.rollback(function() {
+							       	   			throw err;
+						        			});
+						     			}
+
+						     			con.commit(function(err) {
+								        	if (err) { 
+								          		con.rollback(function() {
+								            		throw err;
+								          		});
+								        	}
+								       	 	console.log('Transaction Complete.');
+								        	con.end();
+								      	});	
+
+		    	 						var user_id = result[0].id;
+				        				var picture = result[0].picture;
+
+
+										res.render(path.join(__dirname+'/templates/register.html'), {isRegistered: true, alreadyExists: false});
+
+									});
+								});
+							});
+						});
+					});
+				});
+			}
+
+			else{
+
+				res.render(path.join(__dirname+'/templates/register.html'), {isRegistered: false, alreadyExists: true});
+			}
+
+		});
+			
+	}
+
+
+	else{
+
+		var password = md5(req.body.password);
+
+		promise.createConnection({
+			host: 'localhost',
+		    user: 'root',
+		    password: 'password',
+		    database: 'placesdb'
+
+		}).then(function(conn){
+
+			connection = conn;
+
+			var sql = "select count(*) as count from user where username = ?";
+			var values = [req.body.email];
+		    var result = connection.query(sql, [values]);
+
+	    	return result;
+		}).then(function(result){
+
+			if(parseInt(result[0].count) == 0){
+
+				/* Begin transaction */
+				con.beginTransaction(function(err) {
+  					if (err) { throw err; }
+
+					var sql = "insert into user (username, name) values (?)";
+					var values = [req.body.email, req.body.fname + " " + req.body.lname];
+
+					con.query(sql, [values], function(err, result) {
+    					if (err) { 
+      						con.rollback(function() {
+        						throw err;
+      						});
+      					}
+
+	      				var user_id = result.insertId;
+
+      					console.log('User ' + user_id + ' added');
+
+			    		var birthday = req.body.birthday.split('/')[2] + "-" + req.body.birthday.split('/')[1] + "-" + req.body.birthday.split('/')[0];
+
+						if(req.body.phone != undefined){
+							sql = "insert into user_e values (?) ";
+							values = [user_id, birthday, req.body.gender, req.body.country, req.body.phone, req.body.type_use, password];
+						}
+
+						else{
+							sql = "insert into user_e (birthday, gender, country, type_use, password) values (?) ";
+							values = [user_id, birthday, req.body.gender, req.body.country, req.body.type_use, password];
+
+						}
+
+						con.query(sql, [values],  function(err, result) {
+							if (err) { 
+    							con.rollback(function() {
+					          		throw err;
+					        	});
+				     		}
+
+      						console.log('Register completed');
+
+        					var sql2 = "select id, picture from user where id = ?";
+							var values2 = [user_id];
+
+							con.query(sql2, values2, function (err, result, fields) {
+	        					if (err) { 
+    								con.rollback(function() {
+					       	   			throw err;
+				        			});
+				     			}
+
+				     			con.commit(function(err) {
+						        	if (err) { 
+						          		con.rollback(function() {
+						            		throw err;
+						          		});
+						        	}
+						       	 	console.log('Transaction Complete.');
+						        	con.end();
+						      	});	
+
+    	 						var user_id = result[0].id;
+		        				var picture = result[0].picture;
+
+
+								res.render(path.join(__dirname+'/templates/register.html'), {isRegistered: true, alreadyExists: false});
+							});
+						});
+					});
+				});
+			}
+
+			else{
+
+				res.render(path.join(__dirname+'/templates/register.html'), {isRegistered: false, alreadyExists: true});
+			}
+
+		});
+
+	}
 
 });
-
 
 
 

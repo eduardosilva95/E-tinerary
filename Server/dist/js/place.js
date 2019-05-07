@@ -218,7 +218,7 @@ function getPlaceDetails(place_id){
     }
 
     while(count < 5){
-      document.getElementById(review).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: white; text-shadow: 0 0 3px #000;"></i>';
+      document.getElementById(review).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #d0cfd1;"></i>';
       count = count + 1;
     }
 
