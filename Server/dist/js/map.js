@@ -173,11 +173,13 @@ function viewPOI(place_dict){
     document.getElementById("sidebar-1").style.display = "none";
     document.getElementById("sidebar-2").style.display = "block";
 
-    $('#sidebar').toggleClass('active');
-    $('#full-map').toggleClass('active');
-    $('#sidebarCollapse').toggleClass('active');
+    if($('#sidebar').className == 'active'){
+        $('#sidebar').toggleClass('active');
+        $('#full-map').toggleClass('active');
+        $('#sidebarCollapse').toggleClass('active');
+    }
     
-    if($('#sidebar').children()[0].className == 'text-right'){
+    if($('#sidebar').children()[0].className == 'text-right' && $('#sidebar').className == 'active'){
         setTimeout(function(){
             $('#sidebar').children()[0].className = 'text-center';
         }, 600);

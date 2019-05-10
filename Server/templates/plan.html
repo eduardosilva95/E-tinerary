@@ -94,7 +94,7 @@
                     <div class="row">
                         <div class="col-md-9">
                             <div class="text-left">
-                                <h3 id="place_name"><b>Your visit to <%= city %></b></h3><h8 id="place_name"><%= start_date %>  - <%= end_date %></h8>                      
+                                <h3 id="place_name"><b><%= name %></b></h3><h8 id="place_name"><%= start_date %>  - <%= end_date %></h8>                      
                             </div>
                         </div>
 
@@ -338,7 +338,7 @@
                         Are you sure that you want to delete <span id="modal-delete-visit-name" style="font-weight: bold;"></span> from the plan ?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-dismiss="modal"><i class="fas fa-trash-alt"></i><span style="padding-left: 10px;">Yes</span></button>
+                        <button type="button" class="btn btn-success" id="confirm-remove-btn" data-dismiss="modal"><i class="fas fa-trash-alt"></i><span style="padding-left: 10px;">Yes</span></button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">No</span></button>
                     </div>
                 </div>

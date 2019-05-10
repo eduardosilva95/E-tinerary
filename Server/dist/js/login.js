@@ -2,8 +2,6 @@ function loadNavbar(){
   if(hasUserCookies()){
     var user_id = getUserCookie();
     var picture = getPictureCookie();
-
-    console.log(picture);
     
     if(picture == 'null'){
       picture = 'img/login.png';

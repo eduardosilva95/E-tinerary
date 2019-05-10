@@ -416,6 +416,7 @@ hr {
 }
 
 .card-title {
+  font-size: 1.25rem;
 	letter-spacing: 0.25px;
 }
 
@@ -517,6 +518,17 @@ hr {
   position: absolute;
   bottom: 0;
 }
+
+.trip-link{
+  color: black;
+  cursor: pointer;
+}
+
+.trip-link:hover{
+  color: #ffc107;
+  text-decoration: none;
+}
+
 
 .plan-table-icons {
   position: absolute;

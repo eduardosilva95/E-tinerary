@@ -118,6 +118,7 @@ function loadPlan(plan_array, days){
     }
 
     var visits = [];
+
     for(var j=0 ; j < plan.length ; j++){
         p = JSON.parse(plan[j]);
 
@@ -199,7 +200,7 @@ function previousDay(){
 
     document.getElementById('next-day-btn').disabled = false;
 
-    if(day - 1 == 0){
+    if(day - 1 < 0){
         document.getElementById('previous-day-btn').disabled = true;
     }
 
@@ -277,7 +278,8 @@ function loadVisits(visits, day, checkDay){
             document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-train" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
         }
 
-
+        $("#place-" + i + "-remove").attr("data-poi", visits[i].id);
+        
         place_info[i] = {'id': visits[i].id, 'name': visits[i].name, 'city': visits[i].city, 'place_id': visits[i].place_id, 'address': visits[i].address, 'coordinates': visits[i].coordinates, 'website': visits[i].website, 'phone_number': visits[i].phone_number}
         
         if(visits[i].day.replace(/\s/g, '') == checkDay.replace(/\s/g, '')){
@@ -373,6 +375,8 @@ $(function () {
 
         $('#modal-delete-visit-name').text(place_info[id]['name']);
 
+        document.getElementById('confirm-remove-btn').setAttribute( "onClick", "javascript: deleteVisit("+$(this).data('poi')+");" );
+
         
     });
 });
@@ -415,6 +419,27 @@ function changeView(view){
 
     else if(view == 'map'){
         window.location.href = url + "&v=map";
+    }
+
+}
+
+function deleteVisit(poi_id){
+    var user = getUserCookie();
+
+    var plan_id = /id=([^&]+)/.exec(location.search)[1];
+
+    if(user != null){
+        $.post("/delete-visit", {plan: plan_id, user: user, poi: poi_id}, function(result){
+      
+            if(result.result == 'error'){
+            }
+            
+            else{
+              window.location.reload();
+            }
+      
+        });
+    
     }
 
 }

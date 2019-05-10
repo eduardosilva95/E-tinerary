@@ -278,10 +278,6 @@ function filterSearch(){
 
   }
 
-
-  //var queryString = "?dest=" + destination + "&query=" + query;
-  //window.location.href = "./places" + queryString;
-
 }
 
 
@@ -305,7 +301,10 @@ function classify(){
 $(function () {
   $('.btn-add-visit-modal').on('click', function () {
 
-      $('#modal-title').text($(this).data('title'));      
+      $('#modal-title').text($(this).data('title')); 
+      
+      document.getElementById('confirm-add-visit-btn').setAttribute( "onClick", "javascript: addVisit("+$(this).data('poi')+");" );
+
   });
 });
 
@@ -314,7 +313,6 @@ $(function () {
   $("#radio-choose-schedule-man").change(function() {
     $('.dr').slideUp();
     if ($(this).is(':checked')) {
-        console.log($(this).parent().next());
         $("#choose-schedule-man").slideToggle();
     }
   });
@@ -329,3 +327,25 @@ $(function () {
 
 });
 
+
+function addVisit(poi_id){
+  var plan = /plan=([^&]+)/.exec(location.search)[1];
+
+  $.post("/add-visit", {plan: plan, poi: poi_id}, function(result){
+      
+    if(result.result == 'error'){
+      if(result.msg == 'schedule error'){
+        $('#add-visit-error').css("display", "block");
+        $('#add-visit-error-msg').text("Could not find a schedule for the visit in this plan")
+      }
+    }
+    
+    else{
+      window.location.href = "/plan?id=" + plan;
+    
+    }
+
+  });
+
+
+}

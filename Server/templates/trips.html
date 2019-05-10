@@ -105,19 +105,19 @@
 
             <% count = 0 %>
             <% scheduled_trips.forEach(function(trip) { %>
-
               <div class="card" style="height: 150px;">
                   <div class="row">
                       <div class="col-md-3">
-                          <img id="sched-trip-<%= count %>-img" class="img-fluid" alt="" style="height: 150px; width: 100%;">
+                          <img id="sched-trip-<%= count %>-img" class="img-fluid card-img" alt="" style="height: 148px; width: 100%;">
                       </div>
                       <div class="col-md-9">
                           <div class="card-body row">
                               <div class="col-md-8">
                                   <div class="text-left">
-                                      <h5  class="card-title"><b><%= trip.city %></b></h5>
+                                      <a href="/plan?id=<%= trip.id %>" class="trip-link"><span class="card-title"><b><%= trip.name %></b></span></a>
+                                      <button type="button" class="plan-table-btn-icons btn-rename-modal" data-toggle="modal" data-target="#rename-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Rename the trip" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
+                                      <br>
                                       <span class="text-bottom"><%= trip.start %> - <%= trip.end %></span> 
-
                                   </div>
                               </div>
                               <div class="col-md-4">
@@ -126,7 +126,7 @@
                                       <button type="button" class="plan-table-btn-icons"><i title="See calendar" class="fas fa-calendar-alt fa-lg" style="padding-left: 10px;"></i></button>
                                       <button type="button" class="plan-table-btn-icons"><i title="Download plan" class="fas fa-file-download fa-lg" style="padding-left: 10px;"></i></button>
                                       <button type="button" class="plan-table-btn-icons"><i title="Share plan" class="fas fa-share-alt fa-lg" style="padding-left: 10px;"></i></button>
-                                      <button type="button" class="plan-table-btn-icons"><i title="Delete plan" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
+                                      <button type="button" class="plan-table-btn-icons btn-remove-modal" data-toggle="modal" data-target="#remove-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Delete plan" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
                                   </div>
                               </div>
                           </div>
@@ -159,15 +159,16 @@
               <div class="card" style="height: 150px;">
                   <div class="row">
                       <div class="col-md-3">
-                          <img id="past-trip-<%= count %>-img" class="img-fluid" alt="" style="height: 150px; width: 100%;">
+                          <img id="past-trip-<%= count %>-img" class="img-fluid card-img" alt="" style="height: 148px; width: 100%;">
                       </div>
                       <div class="col-md-9">
                           <div class="card-body row">
                               <div class="col-md-8">
                                   <div class="text-left">
-                                      <h5  class="card-title"><b><%= trip.city %></b></h5>
+                                    <a href="/plan?id=<%= trip.id %>" class="trip-link"><span class="card-title"><b><%= trip.name %></b></span></a>
+                                      <button type="button" class="plan-table-btn-icons btn-rename-modal" data-toggle="modal" data-target="#rename-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Rename the trip" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
+                                      <br>
                                       <span class="text-bottom"><%= trip.start %> - <%= trip.end %></span> 
-
                                   </div>
                               </div>
                               <div class="col-md-4">
@@ -201,6 +202,7 @@
 
         <br><br><br>
 
+
         <!-- Login Modal -->
         <div class="modal fade" id="login-modal" role="dialog">
           <div class="modal-dialog">
@@ -215,6 +217,9 @@
                     <img id="profile-img" class="profile-img-card" src="img/login.png" />
                     <form class="form-signin">
                       <span id="reauth-email"></span>
+                      <div class="alert alert-danger" id="login-error" role="alert" style="display: none;">
+                          <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">The email or password is incorrect</span>
+                      </div>
                       <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
                       <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
                       <div class="row">
@@ -255,63 +260,50 @@
                   </div>
               </div>
           </div>
-      </div>
+        </div>
+
+        <!-- Remove Modal -->
+        <div class="modal fade" id="remove-modal" role="dialog">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Delete trip: <span id="modal-delete-trip-title"></span></h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      Are you sure that you want to delete your trip <span id="modal-delete-trip-name" style="font-weight: bold;"></span> ?
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-success" id="confirm-remove-btn"><i class="fas fa-trash-alt"></i><span style="padding-left: 10px;">Yes</span></button>
+                      <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">No</span></button>
+                  </div>
+              </div>
+          </div>
+        </div>
 
 
-        <!-- Login Modal -->
-        <div class="modal fade" id="login-modal" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content" style="width: 400px;">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Login</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                      <img id="profile-img" class="profile-img-card" src="img/login.png" />
-                      <form class="form-signin">
-                        <span id="reauth-email"></span>
-                        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
-                        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-                        <div class="row">
-                            <div class="col-md-6">
-                              <div class="custom-control custom-checkbox" id="remember">
-                                  <input type="checkbox" class="custom-control-input" id="remember-me">
-                                  <label class="custom-control-label" for="remember-me">Remember me</label>
-                              </div>
-                            </div>
-                            <div class="col-md-6 text-right">
-                                <a href="/recover" class="forgot-password">
-                                    Forgot the password?
-                                </a>
-                            </div>
-                        </div>
-                        <br>
-                        <button class="btn btn-success" type="button" onclick="login();"><i class="fas fa-sign-in-alt"></i><span style="padding-left: 10px">Sign in</span></button>
-                            <!--<button class="btn btn-primary" type="submit"><i class="fas fa-user-plus"></i><span style="padding-left: 10px">Register</span></button>-->
-                        <span>Don't have an account yet? <a href="/register" class="forgot-password">Register now</a></span>
-                    
-                      </form>
-                      
-  
-                      <div class="login-or">
-                        <hr class="hr-or">
-                        <span class="span-or">or</span>
-                      </div>
-  
-                      <button class="btn btn-primary btn-facebook" type="submit"><i class="fab fa-facebook-f fa-lg"></i><span style="padding-left: 10px">Log in using Facebook</span></button>
-                      <br><br>
-                                  
-                      <div id="customBtn">
-                          <button class="btn btn-google" type="submit" ><img id="google-signin-icon" src="img/google-icon.png"><span style="padding-left: 10px">Log in using Google</span></button>
-                      </div>
-  
-                    </div>
-                    <div class="modal-footer">
-                    </div>
-                </div>
-            </div>
+        <!-- Rename Modal -->
+        <div class="modal fade" id="rename-modal" role="dialog">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Rename trip: <span id="modal-rename-trip-title"></span></h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      <label for="inputName">Enter a name for the trip</label>
+                      <input type="text" id="inputName" class="form-control" required>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
+                      <button type="button" class="btn btn-success" id="confirm-rename-btn"><i class="fas fa-check"></i><span style="padding-left: 10px;">Rename</span></button>
+                  </div>
+              </div>
+          </div>
         </div>
 
         <!-- Footer -->

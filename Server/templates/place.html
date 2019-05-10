@@ -199,13 +199,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="text-left">
-                                <button class="btn btn-primary" onclick="window.history.back();"><i class="fas fa-undo"></i><span style="padding-left: 10px;">Back to the plan</span></button>
+                                <button class="btn btn-primary" onclick="window.history.back();"><i class="fas fa-undo"></i><span style="padding-left: 10px;">Back to plan</span></button>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="text-right">
                                 <% if(inPlan == false) { %>
-                                    <button class="btn btn-success btn-add-visit-modal" data-toggle="modal" data-target="#add-visit-modal" data-title="<%= place %>"><i class="far fa-calendar-alt"></i><span style="padding-left: 10px;">Add to your trip</span></button>
+                                    <button class="btn btn-success btn-add-visit-modal" data-toggle="modal" data-target="#add-visit-modal" data-title="<%= place %>"><i class="far fa-calendar-alt"></i><span style="padding-left: 10px;">Add to the trip</span></button>
                                 <% } else { %>
                                     <button type="button" style="background-color: #dcf2e2; color: black;" class="btn btn-success" disabled><i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Already in trip</span></button>
                                 <% } %>                    

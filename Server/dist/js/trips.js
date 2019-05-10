@@ -18,3 +18,67 @@ function getCityImage(city, dest){
         }
     });
 }
+
+$(function () {
+    $('.btn-remove-modal').on('click', function () {
+        $('#modal-delete-trip-title').text($(this).data('name'));
+        $('#modal-delete-trip-name').text($(this).data('name'));
+    
+        document.getElementById('confirm-remove-btn').setAttribute( "onClick", "javascript: deleteTrip("+$(this).data('id')+");" );
+
+    });
+});
+
+$(function () {
+    $('.btn-rename-modal').on('click', function () {
+        $('#modal-rename-trip-title').text($(this).data('name'));
+        $('#inputName').attr("value", $(this).data('name'));
+    
+        document.getElementById('confirm-rename-btn').setAttribute( "onClick", "javascript: renameTrip("+$(this).data('id')+");");
+
+    });
+});
+
+
+
+function deleteTrip(trip_id){
+    var user = getUserCookie();
+
+    if(user != null){
+        $.post("/delete-plan", {plan: trip_id, user: user}, function(result){
+    
+      
+            if(result.result == 'error'){
+            }
+            
+            else{
+              window.location.reload();
+            }
+      
+        });
+      
+    }
+
+}
+
+function renameTrip(trip_id){
+    var user = getUserCookie();
+
+    var name = document.getElementById("inputName").value;
+
+    if(user != null){
+        $.post("/rename-plan", {plan: trip_id, user: user, name: name}, function(result){
+
+            console.log(result);
+    
+      
+            if(result.result == 'error'){
+            }
+            
+            else{
+              window.location.reload();
+            }
+        })    
+    }
+
+}
