@@ -431,7 +431,7 @@
                             <label class="custom-control-label" for="radio-choose-schedule-auto">Let us choose the schedule</label>
                         </div>
                         <div class="custom-control custom-radio">
-                            <input type="radio" id="radio-choose-schedule-man" name="customRadio" class="custom-control-input" disabled>
+                            <input type="radio" id="radio-choose-schedule-man" name="customRadio" class="custom-control-input">
                             <label class="custom-control-label" for="radio-choose-schedule-man">Choose the schedule</label>
                         </div>
 
@@ -443,55 +443,40 @@
                             
                             <% if(fromPlan) { %>
                                 <div class="form-group">
-                                    <select class="form-control" id="visit-day">
-                                        <option>Day</option>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <select class="form-control" id="visit-day">
+                                                <option value="null">Day</option>
 
-                                        <% days.forEach(function(day) { %>
-                                            <option><%= day %></option>
-                                        <% }); %>
-                                    </select>
+                                                <% days.forEach(function(day) { %>
+                                                    <option value='<%= day %>'><%= day %></option>
+                                                <% }); %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <select class="form-control" id="visit-start-hour">
+                                                <option value="null">Begin at</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             <% } %>
 
-
+                            <!--
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <select class="form-control" id="visit-start-hour">
                                             <option>Begin at</option>
-                                            <option>10:00</option>
-                                            <option>11:00</option>
-                                            <option>12:00</option>
-                                            <option>13:00</option>
-                                            <option>14:00</option>
-                                            <option>15:00</option>
-                                            <option>16:00</option>
-                                            <option>17:00</option>
-                                            <option>18:00</option>
-                                            <option>19:00</option>
-                                            <option>20:00</option>
-                                            <option>21:00</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
                                         <select class="form-control" id="visit-end-hour">
                                             <option>End at</option>
-                                            <option>10:00</option>
-                                            <option>11:00</option>
-                                            <option>12:00</option>
-                                            <option>13:00</option>
-                                            <option>14:00</option>
-                                            <option>15:00</option>
-                                            <option>16:00</option>
-                                            <option>17:00</option>
-                                            <option>18:00</option>
-                                            <option>19:00</option>
-                                            <option>20:00</option>
-                                            <option>21:00</option>
                                         </select>
                                     </div>
                                 </div>
-                            </div>
+                            </div>-->
                         </div>
 
                     </div>
@@ -532,6 +517,16 @@
 
   
     <!-- Scripts -->
+    <script>
+        var fromPlan = '<%= (fromPlan) %>';
+
+        if(fromPlan == true){
+            var openslots = '<%- JSON.stringify(openslots) %>';
+            loadOpenSlots(openslots);
+        }
+            
+    </script>
+
     <script>startGoogleSignIn();</script>
 
     

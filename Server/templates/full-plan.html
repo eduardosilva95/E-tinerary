@@ -184,7 +184,7 @@
                                                     </div>
                                                     <div class="plan-table-icons text-right"> 
                                                         <button type="button" class="plan-table-btn-icons btn-info-modal" id="place-<%= count %>-info" data-toggle="modal" data-target="#info-modal" ><i title="Get info" class="fas fa-info-circle fa-lg"></i></button>
-                                                        <button type="button" class="plan-table-btn-icons btn-remove-modal" id="place-<%= count %>-remove" data-toggle="modal" data-target="#remove-modal"><i title="Remove visit" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
+                                                    <button type="button" class="plan-table-btn-icons btn-remove-modal" id="place-<%= count %>-remove" data-toggle="modal" data-target="#remove-modal"><i title="Remove visit" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
                                                         <button type="button" class="plan-table-btn-icons btn-edit-modal" id="place-<%= count %>-edit" data-toggle="modal" data-target="#edit-modal"><i title="Edit visit" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
                                                     </div>
                                                 </div>
@@ -279,7 +279,7 @@
                         <div class="form-group text-right">
                             <!--<a id="view_map_btn" href="#"><button type="button" class="btn btn-warning" >View Map</button></a>
                             <a id="view_calendar_btn" href="#"><button type="button" class="btn btn-warning" >View Calendar</button></a>-->
-                            <a id="save_plan_btn" href="#"><button type="button" class="btn btn-success" >Save Plan</button></a>
+                            <button type="button" class="btn btn-success" onclick="savePlan();" >Save Plan</button>
                         </div>
                     </div>
                 </div>
@@ -396,7 +396,7 @@
                         Are you sure that you want to delete <span id="modal-delete-visit-name" style="font-weight: bold;"></span> from the plan ?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-dismiss="modal"><i class="fas fa-trash-alt"></i><span style="padding-left: 10px;">Yes</span></button>
+                        <button type="button" class="btn btn-success" id="confirm-remove-btn" data-dismiss="modal"><i class="fas fa-trash-alt"></i><span style="padding-left: 10px;">Yes</span></button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">No</span></button>
                     </div>
                 </div>

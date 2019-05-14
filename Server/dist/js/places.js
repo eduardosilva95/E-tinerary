@@ -1,5 +1,7 @@
 var total_number_pages;
 
+var open_slots = {};
+
 function loadPage(){
   loadNavbar(); 
   loadPageButtons();
@@ -217,6 +219,21 @@ function loadPlace(place_id){
   window.location.href = "./place" + queryString;
 }
 
+
+function loadOpenSlots(openslots){
+  openslots = JSON.parse(openslots);
+
+  for(day in openslots){
+    var list = [];
+    for(var i=0; i < openslots[day].length ; i++){
+      list.push(openslots[day][i]);
+    }
+    open_slots[day] = list;
+  }
+  
+}
+
+
 function queryPlace(city_id){
   var destination = /dest=([^&]+)/.exec(location.search)[1]
 
@@ -321,6 +338,7 @@ $(function () {
   $("#radio-choose-schedule-auto").change(function() {
     if ($(this).is(':checked')) {
         $("#choose-schedule-man").slideToggle();
+
     }
   });
 
@@ -331,7 +349,16 @@ $(function () {
 function addVisit(poi_id){
   var plan = /plan=([^&]+)/.exec(location.search)[1];
 
-  $.post("/add-visit", {plan: plan, poi: poi_id}, function(result){
+  var schedule;
+
+  if($('#radio-choose-schedule-man').is(':checked') && $('#visit-day option:selected').val() != "null" && $('#visit-start-hour option:selected').val() != "null"){
+    var day = new Date ($('#visit-day option:selected').val());
+    day = day.getFullYear() + "-" + (day.getMonth()<10?'0':'') + (day.getMonth() + 1)  + "-" + (day.getDate()<10?'0':'') + day.getDate();
+    var hour = $('#visit-start-hour option:selected').val();
+    schedule = day + " " + hour;
+  }
+
+  $.post("/add-visit", {plan: plan, poi: poi_id, schedule: schedule}, function(result){
       
     if(result.result == 'error'){
       if(result.msg == 'schedule error'){
@@ -341,11 +368,28 @@ function addVisit(poi_id){
     }
     
     else{
-      window.location.href = "/plan?id=" + plan;
+      if(result.isManual == true)
+        window.location.href = "/plan-m?id=" + plan;
+      else
+        window.location.href = "/plan?id=" + plan;
     
+    }
+  });
+
+}
+
+$(function () {
+  $("#visit-day").on('change', function() {
+    var day = new Date(this.value.split(', ')[1]);
+    day = day.getFullYear() + "-" + (day.getMonth()<10?'0':'') + (day.getMonth() + 1)  + "-" + (day.getDate()<10?'0':'') + day.getDate();
+
+    $('#visit-start-hour')[0].options.length = 1;
+
+    if(open_slots[day] != undefined){
+      for(var i=0 ; i<open_slots[day].length; i++){
+        $('#visit-start-hour').append( '<option value="'+open_slots[day][i]+'">'+open_slots[day][i]+'</option>' );
+      }
     }
 
   });
-
-
-}
+});

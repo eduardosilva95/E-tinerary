@@ -205,7 +205,7 @@
                         <div class="col-md-6">
                             <div class="text-right">
                                 <% if(inPlan == false) { %>
-                                    <button class="btn btn-success btn-add-visit-modal" data-toggle="modal" data-target="#add-visit-modal" data-title="<%= place %>"><i class="far fa-calendar-alt"></i><span style="padding-left: 10px;">Add to the trip</span></button>
+                                    <button class="btn btn-success btn-add-visit-modal" data-toggle="modal" data-target="#add-visit-modal" data-title="<%= place %>" data-poi="<%= id %>"><i class="far fa-calendar-alt"></i><span style="padding-left: 10px;">Add to your trip</span></button>
                                 <% } else { %>
                                     <button type="button" style="background-color: #dcf2e2; color: black;" class="btn btn-success" disabled><i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Already in trip</span></button>
                                 <% } %>                    
@@ -240,6 +240,16 @@
                         </div>
                     </div>
 
+                    <br>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title"><b><%= place %></b> in <span style="color: #fce107">E-tinerary</span></h6>
+                        </div>
+                    </div>
+
+
+
                 </div>
             </div>
 
@@ -248,59 +258,58 @@
 
         <!-- Login Modal -->
         <div class="modal fade" id="login-modal" role="dialog">
-                <div class="modal-dialog">
-                    <div class="modal-content" style="width: 400px;">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Login</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                          <img id="profile-img" class="profile-img-card" src="img/login.png" />
-                          <form class="form-signin">
-                            <span id="reauth-email"></span>
-                            <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
-                            <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-                            <div class="row">
-                                <div class="col-md-6">
-                                  <div class="custom-control custom-checkbox" id="remember">
-                                      <input type="checkbox" class="custom-control-input" id="remember-me">
-                                      <label class="custom-control-label" for="remember-me">Remember me</label>
-                                  </div>
-                                </div>
-                                <div class="col-md-6 text-right">
-                                    <a href="/recover" class="forgot-password">
-                                        Forgot the password?
-                                    </a>
+            <div class="modal-dialog">
+                <div class="modal-content" style="width: 400px;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <img id="profile-img" class="profile-img-card" src="img/login.png" />
+                        <form class="form-signin">
+                        <span id="reauth-email"></span>
+                        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox" id="remember">
+                                    <input type="checkbox" class="custom-control-input" id="remember-me">
+                                    <label class="custom-control-label" for="remember-me">Remember me</label>
                                 </div>
                             </div>
-                            <br>
-                            <button class="btn btn-success" type="button" onclick="login();"><i class="fas fa-sign-in-alt"></i><span style="padding-left: 10px">Sign in</span></button>
-                                <!--<button class="btn btn-primary" type="submit"><i class="fas fa-user-plus"></i><span style="padding-left: 10px">Register</span></button>-->
-                            <span>Don't have an account yet? <a href="/register" class="forgot-password">Register now</a></span>
+                            <div class="col-md-6 text-right">
+                                <a href="/recover" class="forgot-password">
+                                    Forgot the password?
+                                </a>
+                            </div>
+                        </div>
+                        <br>
+                        <button class="btn btn-success" type="button" onclick="login();"><i class="fas fa-sign-in-alt"></i><span style="padding-left: 10px">Sign in</span></button>
+                            <!--<button class="btn btn-primary" type="submit"><i class="fas fa-user-plus"></i><span style="padding-left: 10px">Register</span></button>-->
+                        <span>Don't have an account yet? <a href="/register" class="forgot-password">Register now</a></span>
+                    
+                        </form>
                         
-                          </form>
-                          
-      
-                          <div class="login-or">
-                            <hr class="hr-or">
-                            <span class="span-or">or</span>
-                          </div>
-      
-                          <button class="btn btn-primary btn-facebook" type="submit"><i class="fab fa-facebook-f fa-lg"></i><span style="padding-left: 10px">Log in using Facebook</span></button>
-                          <br><br>
-                                      
-                          <div id="customBtn">
-                              <button class="btn btn-google" type="submit" ><img id="google-signin-icon" src="img/google-icon.png"><span style="padding-left: 10px">Log in using Google</span></button>
-                          </div>
-      
+    
+                        <div class="login-or">
+                        <hr class="hr-or">
+                        <span class="span-or">or</span>
                         </div>
-                        <div class="modal-footer">
+    
+                        <button class="btn btn-primary btn-facebook" type="submit"><i class="fab fa-facebook-f fa-lg"></i><span style="padding-left: 10px">Log in using Facebook</span></button>
+                        <br><br>
+                                    
+                        <div id="customBtn">
+                            <button class="btn btn-google" type="submit" ><img id="google-signin-icon" src="img/google-icon.png"><span style="padding-left: 10px">Log in using Google</span></button>
                         </div>
+    
                     </div>
+                    <div class="modal-footer"></div>
                 </div>
             </div>
+        </div>
 
         <!-- Add Visit Modal -->
         <div class="modal fade" id="add-visit-modal" role="dialog">
@@ -313,6 +322,10 @@
                         </button>
                     </div>
                     <div class="modal-body">
+                        <div class="alert alert-danger" id="add-visit-error" role="alert" style="display: none;">
+                            <i class="fas fa-times-circle"></i><span style="padding-left: 10px;" id="add-visit-error-msg"></span>
+                        </div>
+
                         <div class="custom-control custom-radio">
                             <input type="radio" id="radio-choose-schedule-auto" name="customRadio" class="custom-control-input" checked>
                             <label class="custom-control-label" for="radio-choose-schedule-auto">Let us choose the schedule</label>
@@ -328,64 +341,48 @@
 
                             <p><b>Choose visit schedule: </b></p>
                             
-
                             <% if(fromPlan) { %>
                                 <div class="form-group">
-                                    <select class="form-control" id="visit-day">
-                                        <option>Day</option>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <select class="form-control" id="visit-day">
+                                                <option>Day</option>
 
-                                        <% days.forEach(function(day) { %>
-                                            <option><%= day %></option>
-                                        <% }); %>
-                                    </select>
+                                                <% days.forEach(function(day) { %>
+                                                    <option value='<%= day %>'><%= day %></option>
+                                                <% }); %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <select class="form-control" id="visit-start-hour">
+                                                <option>Begin at</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             <% } %>
 
-
+                            <!--
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <select class="form-control" id="visit-start-hour">
                                             <option>Begin at</option>
-                                            <option>10:00</option>
-                                            <option>11:00</option>
-                                            <option>12:00</option>
-                                            <option>13:00</option>
-                                            <option>14:00</option>
-                                            <option>15:00</option>
-                                            <option>16:00</option>
-                                            <option>17:00</option>
-                                            <option>18:00</option>
-                                            <option>19:00</option>
-                                            <option>20:00</option>
-                                            <option>21:00</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
                                         <select class="form-control" id="visit-end-hour">
                                             <option>End at</option>
-                                            <option>10:00</option>
-                                            <option>11:00</option>
-                                            <option>12:00</option>
-                                            <option>13:00</option>
-                                            <option>14:00</option>
-                                            <option>15:00</option>
-                                            <option>16:00</option>
-                                            <option>17:00</option>
-                                            <option>18:00</option>
-                                            <option>19:00</option>
-                                            <option>20:00</option>
-                                            <option>21:00</option>
                                         </select>
                                     </div>
                                 </div>
-                            </div>
+                            </div>-->
                         </div>
 
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
-                        <button type="button" class="btn btn-success" data-dismiss="modal"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Add</span></button>
+                        <button type="button" class="btn btn-success" id="confirm-add-visit-btn"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Add</span></button>
                     </div>
                 </div>
             </div>
@@ -457,8 +454,18 @@
     <script>startGoogleSignIn();</script>
 
     <script>
-        var place_id = "<%= place_id %>";
-        getPlaceDetails(place_id);
+        var fromPlan = '<%= (fromPlan) %>';
+
+        if(fromPlan == true){
+            var openslots = '<%- JSON.stringify(openslots) %>';
+            loadOpenSlots(openslots);
+        }
+            
+    </script>
+
+    
+    <script>
+        loadOpenSlots('<%- JSON.stringify(openslots) %>');
     </script>
     
 

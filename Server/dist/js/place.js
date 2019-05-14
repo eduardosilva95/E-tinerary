@@ -1,4 +1,6 @@
 
+var open_slots = {};
+
 $(window).on('load', function() {
     var coordinates = document.getElementById("place-coordinates").innerText;
 
@@ -97,6 +99,19 @@ function getPlaceDetails(place_id){
 
   }
 
+  function loadOpenSlots(openslots){
+    openslots = JSON.parse(openslots);
+  
+    for(day in openslots){
+      var list = [];
+      for(var i=0; i < openslots[day].length ; i++){
+        list.push(openslots[day][i]);
+      }
+      open_slots[day] = list;
+    }
+
+
+  }
 
   function loadIcon(poi_type){
     var place_icon = "place_icon";
@@ -134,8 +149,11 @@ function getPlaceDetails(place_id){
 
   $(function () {
     $('.btn-add-visit-modal').on('click', function () {
-
-        $('#modal-title').text($(this).data('title'));
+  
+        $('#modal-title').text($(this).data('title')); 
+        
+        document.getElementById('confirm-add-visit-btn').setAttribute( "onClick", "javascript: addVisit("+$(this).data('poi')+");" );
+  
     });
   });
 
@@ -224,3 +242,52 @@ function getPlaceDetails(place_id){
 
 
   }
+
+
+  function addVisit(poi_id){
+    var plan = /plan=([^&]+)/.exec(location.search)[1];
+  
+    var schedule;
+  
+    if($('#radio-choose-schedule-man').is(':checked') && $('#visit-day option:selected').val() != "null" && $('#visit-start-hour option:selected').val() != "null"){
+      var day = new Date ($('#visit-day option:selected').val());
+      day = day.getFullYear() + "-" + (day.getMonth()<10?'0':'') + (day.getMonth() + 1)  + "-" + (day.getDate()<10?'0':'') + day.getDate();
+      var hour = $('#visit-start-hour option:selected').val();
+      schedule = day + " " + hour;
+    }
+  
+    $.post("/add-visit", {plan: plan, poi: poi_id, schedule: schedule}, function(result){
+        
+      if(result.result == 'error'){
+        if(result.msg == 'schedule error'){
+          $('#add-visit-error').css("display", "block");
+          $('#add-visit-error-msg').text("Could not find a schedule for the visit in this plan")
+        }
+      }
+      
+      else{
+        if(result.isManual == true)
+          window.location.href = "/plan-m?id=" + plan;
+        else
+          window.location.href = "/plan?id=" + plan;
+      
+      }
+    });
+  
+  }
+  
+  $(function () {
+    $("#visit-day").on('change', function() {
+      var day = new Date(this.value.split(', ')[1]);
+      day = day.getFullYear() + "-" + (day.getMonth()<10?'0':'') + (day.getMonth() + 1)  + "-" + (day.getDate()<10?'0':'') + day.getDate();
+  
+      $('#visit-start-hour')[0].options.length = 1;
+  
+      if(open_slots[day] != undefined){
+        for(var i=0 ; i<open_slots[day].length; i++){
+          $('#visit-start-hour').append( '<option value="'+open_slots[day][i]+'">'+open_slots[day][i]+'</option>' );
+        }
+      }
+  
+    });
+  });

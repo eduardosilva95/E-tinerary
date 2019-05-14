@@ -96,17 +96,17 @@
                 <br>
 
                 <div class="text-center">
-                    <h2 style="color: #ffc107; font-weight: bold;">Let us plan your trip</h2>
+                    <h2 style="color: #ffc107; font-weight: bold;">Create your plan</h2>
                 </div>
 
                 <br><br>
 
-                <form autocomplete="off" id="search-form" >
+                <form autocomplete="off" id="search-form" method="POST" action="/create-plan-m">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group autocomplete fg">
                                 <label class="mr-2" for="inputDestination" style="color: #ffc107; font-weight: bold;">Destination</label>
-                                <input type="text" class="form-control" id="inputDestination" placeholder="Enter your destination">
+                                <input type="text" class="form-control" id="inputDestination" name="destination" placeholder="Enter your destination">
                             </div>
                             <script>
                                 var cities = "<%= cities %>";
@@ -114,11 +114,15 @@
                                 autocomplete(document.getElementById("inputDestination"), list_cities);
                             </script>
 
+                            <div class="form-group" style="display: none">
+                              <input type="text" class="form-control" id="user-id" aria-describedby="emailHelp" name="user" style="display: none">
+                            </div>
+
                             <div class="form-group fg">
                                 <div class="row">
                                     <div class="col-sm-6">
-                                        <label class="mr-2" for="inlineFormCustomSelectPref" style="color: #ffc107; font-weight: bold;">Adults</label>
-                                        <select class="custom-select mr-sm-2" id="inlineFormCustomSelectPref">
+                                        <label class="mr-2" for="select-adults" style="color: #ffc107; font-weight: bold;">Adults</label>
+                                        <select class="custom-select mr-sm-2" id="select-adults">
                                         <option selected value="1">1</option>
                                         <option value="2">2</option>
                                         <option value="3">3</option>
@@ -130,8 +134,8 @@
                                         </select>
                                     </div>
                                     <div class="col-sm-6">
-                                        <label class="my-1 mr-2" for="inlineFormCustomSelectPref" style="color: #ffc107; font-weight: bold;">Children (< 12 years)</label>
-                                        <select class="custom-select mr-sm-2" id="inlineFormCustomSelectPref">
+                                        <label class="my-1 mr-2" for="select-children" style="color: #ffc107; font-weight: bold;">Children (< 12 years)</label>
+                                        <select class="custom-select mr-sm-2" id="select-children">
                                         <option selected value="0">0</optsion>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
@@ -151,7 +155,7 @@
                                     <div class='col-sm-6'>
                                         <div class="input-group date ">
                                         <label class="mr-2" for="arrival-date" style="color: #ffc107; font-weight: bold;">Dates</label>
-                                        <input type="text" class="form-control" placeholder="Arrival" id="arrival-date" required>
+                                        <input type="text" class="form-control" placeholder="Arrival" id="arrival-date" name="arrival" required>
                                         <script>
                                             $('#arrival-date').datepicker({
                                                 uiLibrary: 'bootstrap4',
@@ -165,7 +169,7 @@
                                     <div class='col-sm-6' >
                                         <div class="input-group date" >
                                             <label class="mr-2" for="departure-date" style="color: #ffc107; font-weight: bold; visibility: hidden;">Dates</label>
-                                            <input type="text" class="form-control" placeholder="Departure" id="departure-date" required>
+                                            <input type="text" class="form-control" placeholder="Departure" id="departure-date" name="departure" required>
                                             <script>
                                             $('#departure-date').datepicker({
                                                 uiLibrary: 'bootstrap4',
@@ -175,21 +179,6 @@
                                         </div>
                                     </div>
                                         
-                                </div>
-                            </div>
-
-                            <div class="form-group fg">
-                                <legend style="color: #ffc107; font-size: 1rem; font-weight: bold; padding-top: .375rem;">Budget: </legend>
-                                <div class="custom-control custom-radio custom-control-inline my-1 mr-sm-2">
-                                    <input type="radio" name="radioBudget" class="custom-control-input" id="radioBudgetNo"  value="option1" onclick="disableBudgetBox()" checked>
-                                    <label class="custom-control-label" for="radioBudgetNo" style="color: white; font-size: 1rem;">No</label>
-                                </div>
-                                <div class="custom-control custom-radio custom-control-inline my-1 mr-sm-2">
-                                    <input type="radio" name="radioBudget" class="custom-control-input" id="radioBudgetYes" value="option2" onclick="enableBudgetBox()">
-                                    <label class="custom-control-label" for="radioBudgetYes" style="color: white; font-size: 1rem;">Yes</label>
-                                </div>
-                                <div class="custom-control custom-control-inline mr-sm-2 float-right">
-                                    <input type="text" class="form-control" id="inputBudget" placeholder="Budget (€)" disabled>
                                 </div>
                             </div>
 
@@ -219,53 +208,10 @@
                         </div>
 
                     </div>
-
-                    <button type="button" class="btn btn-interests-down"><i class="fas fa-chevron-down" id="btn-interests-icon"></i><span style="padding-left: 10px;">Interests</span></button>
-
-                    <br><br>
-
-                    <div class="form-group fg form-interests" id="interests-div">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-museums">
-                                    <label class="custom-control-label" for="checkbox-interests-museums">Museums</label>
-                                </div>
-                                <br>
-                                <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-recreation">
-                                    <label class="custom-control-label" for="checkbox-interests-recreation">Recreation</label>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-3">
-                                <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-theaters">
-                                    <label class="custom-control-label" for="checkbox-interests-theaters">Theaters</label>
-                                </div>
-                                <br>
-                                <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-nature">
-                                    <label class="custom-control-label" for="checkbox-interests-nature">Nature Places</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3">
-                                <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-shopping">
-                                    <label class="custom-control-label" for="checkbox-interests-shopping">Shopping</label>
-                                </div>
-                                <br>
-                                <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-history">
-                                    <label class="custom-control-label" for="checkbox-interests-history">Historic Places</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  
                     
                     <div class="float-right">
-                        <button type="submit" class="btn btn-success" style="color: white; font-weight: bold;">Create plan</button>
+                        <button type="submit" class="btn btn-success" style="color: white; font-weight: bold;">Next</button>
                     </div>
 
                 </form>

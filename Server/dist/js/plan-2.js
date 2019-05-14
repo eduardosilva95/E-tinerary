@@ -443,3 +443,25 @@ function deleteVisit(poi_id){
     }
 
 }
+
+
+function savePlan(){
+    var user = getUserCookie();
+
+    var plan_id = /id=([^&]+)/.exec(location.search)[1];
+
+    if(user != null){
+        $.post("/save-plan", {plan: plan_id, user: user}, function(result){
+      
+            if(result.result == 'error'){
+            }
+            
+            else{
+                window.location.href = "/plan?id=" + plan_id;
+            }
+      
+        });
+    
+    }
+
+}
