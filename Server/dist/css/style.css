@@ -737,6 +737,19 @@ table tr td a{
 }
 
 
+/* ---------------------------------- HOTELS ------------------------- */
+
+.view-offer{
+  position: absolute;
+  bottom: 10px;
+  right: 30px;
+}
+
+.booking-btn {
+  background-color: #003580;
+}
+
+
 
 /* ---------------------------------- FOOTER ------------------------------ */
 

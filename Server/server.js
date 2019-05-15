@@ -314,6 +314,12 @@ app.get('/places', urlencodedParser, function (req, res){
 				        	var list_places_plan = [];
 		        			var plan = {};
 
+		        			for(var i=0 ; i < days.length; i++){
+			    				var d = new Date(days[i]);
+			    				d = d.getFullYear() + "-" + (d.getMonth()<10?'0':'') + (d.getMonth() + 1)  + "-" + (d.getDate()<10?'0':'') + d.getDate();
+			    				plan[d] = [];
+			    			}
+
 		        			for(var i =0 ; i < result.length; i++){
 					        	list_places_plan.push(result[i].poi_id);
 
@@ -552,6 +558,12 @@ app.get('/places', urlencodedParser, function (req, res){
 				        	var list_places_plan = [];
 		        			var plan = {};
 
+		        			for(var i=0 ; i < days.length; i++){
+			    				var d = new Date(days[i]);
+			    				d = d.getFullYear() + "-" + (d.getMonth()<10?'0':'') + (d.getMonth() + 1)  + "-" + (d.getDate()<10?'0':'') + d.getDate();
+			    				plan[d] = [];
+			    			}
+
 		        			for(var i =0 ; i < result.length; i++){
 					        	list_places_plan.push(result[i].poi_id);
 
@@ -725,7 +737,7 @@ app.get('/place', function(req,res){
 		    		reviews.push(review);
 		    	}
 
-				res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, rating: rating, phone_number: phone_number, website: website, type: type, reviews: reviews, fromPlan: false});
+				res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, rating: rating, phone_number: phone_number, website: website, type: type, reviews: reviews, fromPlan: false, openslots: []});
 
 			});
 
@@ -806,6 +818,12 @@ app.get('/place', function(req,res){
 	        	var list_places_plan = [];
     			var plan = {};
 
+    			for(var i=0 ; i < days.length; i++){
+    				var d = new Date(days[i]);
+    				d = d.getFullYear() + "-" + (d.getMonth()<10?'0':'') + (d.getMonth() + 1)  + "-" + (d.getDate()<10?'0':'') + d.getDate();
+    				plan[d] = [];
+    			}
+
     			for(var i =0 ; i < result.length; i++){
 		        	list_places_plan.push(result[i].poi_id);
 
@@ -835,6 +853,7 @@ app.get('/place', function(req,res){
         		if (list_places_plan.includes(parseInt(poi_id))){
 	        		inPlan = true;
     			}
+
 
 		        var sql = "SELECT * from poi WHERE id = ?";
 
@@ -876,7 +895,6 @@ app.get('/place', function(req,res){
 					});
 
 				});
-
 	        	
 	        	return 1;
 
@@ -1084,12 +1102,12 @@ app.get('/hotels', function(req,res){
 
 		destination = req.query['dest'];
 
-		var sql = "SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.rating AS rating, poi.poi_type AS poi_type, poi.description as description FROM poi JOIN city ON poi.city = city.id WHERE city.name = ? AND poi.poi_type = 'Hotel' ORDER BY poi.num_reviews DESC LIMIT ?, ?";
+		var sql = "SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.latitude as latitude, poi.longitude as longitude, poi.website as website, poi.phone_number as phone FROM poi JOIN city ON poi.city = city.id WHERE city.name = ? AND poi.poi_type = 'Hotel' ORDER BY poi.num_reviews DESC LIMIT ?, ?";
 		var parameters = [destination, limit_inf, total_results];
 
 		con.query(sql, parameters, function (err, result, fields) {
 	        if (err) throw err;
-	        var list_places = []
+	        var list_hotels = []
 
          	var city = destination;
 	        var country = 'Portugal';
@@ -1101,33 +1119,24 @@ app.get('/hotels', function(req,res){
 
 	        for(var i =0 ; i < result.length; i++){
 
-	        	var place = new Object();
-	        	place["id"] = result[i].id;
-	        	place["place_id"] = result[i].place_id;
-	            place["name"] = result[i].place;
-	            place["type"] = result[i].poi_type.charAt(0).toUpperCase() + result[i].poi_type.slice(1);
-	            place["description"] = result[i].description;
-	            place["address"] = result[i].address;
-	            place["rating"] = result[i].rating;
+	        	var hotel = new Object();
+	        	hotel["id"] = result[i].id;
+	        	hotel["place_id"] = result[i].place_id;
+	            hotel["name"] = result[i].place;
+	            hotel["city"] = result[i].city;
+	            hotel["type"] = result[i].poi_type.charAt(0).toUpperCase() + result[i].poi_type.slice(1);
+	            hotel["description"] = result[i].description;
+	            hotel["address"] = result[i].address;
+	            hotel["rating"] = result[i].rating;
+	        	hotel["coordinates"] = result[i].latitude + ", " + result[i].longitude;
+	        	hotel["website"] = result[i].website;
+	        	hotel["phone_number"] = result[i].phone;
 
-	        	list_places.push(place);
+	        	list_hotels.push(hotel);
 	        }
 
-	        var sql_num = "SELECT count(*) as number_results FROM poi JOIN city ON poi.city = city.id WHERE city.name = ? ORDER BY poi.num_reviews DESC";
-	        var parameters_2 = [destination]
-			
-	        con.query(sql_num, parameters_2, function (err, result, fields) {
-	        	if (err) throw err;
-
-	        	var count = 0;
-
-	        	if(result.length)
-	        		count = result[0].number_results;
-        		
-
-				res.render(path.join(__dirname+'/templates/hotels.html'), {places: list_places, city: city, country: country, number_results: count});
-
-	        });
+	        res.render(path.join(__dirname+'/templates/hotels.html'), {hotels: list_hotels, city: city, country: country});
+	        
 
 		});
 
@@ -1728,10 +1737,12 @@ app.post('/add-visit', function(req, res){
 
 	        var schedule;
 
-	        if(req.body.schedule != undefined)
-	        	schedule = req.body.schedule;
+	        if(req.body.schedule != undefined){
+	        	schedule = getFinalSchedule(req.body.schedule.split(" ")[0], req.body.schedule.split(" ")[1]);
+	        }
 	        else
 	    		schedule = getPlanOpenSlot(plan);
+
 
 	    	if(schedule != false){
 	        	var values;
@@ -1851,6 +1862,8 @@ app.post('/delete-visit', function(req, res){
 	var user = parseInt(req.body.user);
 	var connection;
 
+	var isManual;
+
 	if(plan_id != undefined && user != undefined){
 
 		promise.createConnection({
@@ -1860,23 +1873,38 @@ app.post('/delete-visit', function(req, res){
 	    database: 'placesdb'
 
 		}).then(function(conn){
+
 			connection = conn;
 
-			var sql = "select user from plan where id = ?";
+			var sql = "select isManual from plan where id = ?";
 			var values = [plan_id];
 
-		    var result = conn.query(sql, [values]);
-
-		    return result;
+			return connection.query(sql, [values]);
+							
 		}).then(function(result){
 
+			isManual = parseInt(result[0].isManual[0]);
+
+			sql = "select user from plan where id = ?";
+			values = [plan_id];
+
+		    var result = connection.query(sql, [values]);
+
+		    return result;
+
+		}).then(function(result){
 			if(result[0].user == user){
-				sql = "update visit set isActive = 0 where plan_id = ? and poi_id = ?";
+
+				if(isManual == 0)
+					sql = "update visit set isActive = 0 where plan_id = ? and poi_id = ?";
+
+				else
+					sql = "delete from visit where plan_id = ? and poi_id = ?";
+
 				values = [plan_id, poi_id];
 
-				var result = connection.query(sql, values);
+				result = connection.query(sql, values);
 		    	connection.end();
-
 
 				res.contentType('json');
 				res.send({result: 'success'});
@@ -2535,15 +2563,11 @@ app.get('/plan-m', function(req,res){
 
         		});
 			});
-
-
-   	
     	});
 		
 	}
 	
 });
-
 
 
 
@@ -3398,92 +3422,11 @@ function getPlanOpenSlot(plan){
 }
 
 
-function getAllOpenSlots(planId){
-
-	var sql = "select plan.start_date as start_date, plan.end_date as end_date, datediff(plan.end_date, plan.start_date) as date_diff from plan where id = ?";
-	var parameters = [parseInt(planId)];
-
-	promise.createConnection({
-	    host: 'localhost',
-	    user: 'root',
-	    password: 'password',
-	    database: 'placesdb'
-
-	}).then(function(conn){
-
-		return conn.query(sql, [parameters]);
-
-
-	}).then(function(result){
-
-		var start_date = "n/a";
-        var end_date = "n/a";
-        var date_diff = 0;
-        var days = [];
-
-        if(result.length > 0){
-        	var month = new Array();
-			month[0] = "January";
-			month[1] = "February";
-			month[2] = "March";
-			month[3] = "April";
-			month[4] = "May";
-			month[5] = "June";
-			month[6] = "July";
-			month[7] = "August";
-			month[8] = "September";
-			month[9] = "October";
-			month[10] = "November";
-			month[11] = "December";
-
-
-        	start_date = new Date(result[0].start_date);
-        	end_date = new Date(result[0].end_date);
-
-        	start_date_aux = start_date.getDate() + "-" + (start_date.getMonth()+1) + "-" + start_date.getFullYear();
-
-        	start_date = start_date.getDate() + " " + month[start_date.getMonth()] + " " + start_date.getFullYear();
-        	end_date = end_date.getDate() + " " + month[end_date.getMonth()] + " " + end_date.getFullYear();
-
-        	date_diff = result[0].date_diff;
-
-        	days = getPlanDays(start_date_aux, parseInt(date_diff));
-
-        }
-
-	    var schedules = getSchedules();
-	    var openslots = [];
-
-
-	    console.log(schedules);
-
-	    for(var i=0 ; i < days.length; i++){
-	    	var day = new Date(days[i]);
-	    	day = day.getFullYear() + "-" + (day.getMonth()<10?'0':'') + (day.getMonth() + 1)  + "-" + (day.getDate()<10?'0':'') + day.getDate();
-
-	    	for(var j=0; j < schedules.length; j++){
-	    		if(openslots[day] != undefined)
-					openslots[day].push(schedules[j]);
-				else
-					openslots[day] = [schedules[j]];
-	    	}
-
-	    }
-
-	    console.log(openslots);
-
-	    return [days, openslots];
-
-	});
-
-}
-
-
 
 function getAllOpenSlotsAvailable(plan){
 
 	var schedules = getSchedules();
-	var openslots = [];
+	var openslots = {};
 
 	for(var day in plan){
 		for(var i=0; i < schedules.length; i++){

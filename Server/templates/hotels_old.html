@@ -22,8 +22,9 @@
     <script type="text/javascript" src="js/places.js"></script>
     <script type="text/javascript" src="js/login.js"></script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcM_AepOJRN1QIx96d2n0FOfOcGfZYfck&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpKgqxjCAowTT9qWEaYm-7ALBc7MwVyz4&libraries=places"></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
+
     
   </head>
   <body onload="loadPage();">
@@ -31,54 +32,48 @@
         <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
             <a class="navbar-brand" href="./">HomePage</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-              <ul class="navbar-nav ml-auto">
-                
-                  <li class="nav-item">
-                    <a class="nav-link" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
-                  </li>
-                
+                <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#dropdown-menu" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-search" style="padding-right: 5px;"></i>Plan a trip
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="./search">Get a Aplicação plan</a>
+                        <a class="dropdown-item" href="./create-plan">Create your plan manually</a>
+                    </div>
+                    </li>
+
                 <li class="nav-item">
-                  <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                    <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+                    <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+                    <a class="nav-link" href="./search-restaurants"><i class="fas fa-utensils" style="padding-right: 5px;"></i>Restaurants</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
                     </a>
                     <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
-                      <a class="dropdown-item" href="./about-us">Aplicacao</a>
-                      <a class="dropdown-item" href="./help">Help</a>
+                        <a class="dropdown-item" href="./about-us">Aplicacao</a>
+                        <a class="dropdown-item" href="./help">Help</a>
                     </div>
                 </li>
-              </ul>
-              <ul class="navbar-nav ml-auto">
+                </ul>
+                <ul class="navbar-nav ml-auto">
                 <li>
-                  <div id="login-user">
-                    <div id="login" style="display: none;">
-                      <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
-                    </div>
-                    <div id="profile" class="dropleft" style="display: none;">
-                      <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <img id="user-profile-pic">
-                      </a>
-                      <div class="dropdown-menu" aria-labelledby="profile-btn">
-                        <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                        <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
-                      </div>   
-                    </div>        
-                  </div>
+                    <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control form-control-sm mr-sm-2" type="email " placeholder="Email" aria-label="Email">
+                    <input class="form-control form-control-sm mr-sm-2" type="password" placeholder="Password" aria-label="Password">
+                    <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="submit">Login</button>
+                    </form>
                 </li>
-              </ul>
+                </ul>
             </div>
         </nav>
 
@@ -110,12 +105,12 @@
                 <div class="col-md-5 cont">
                   <div class="form-group has-search">
                     <span class="fa fa-search form-control-feedback"></span>
-                    <input type="text" class="form-control float-left" placeholder="Search for a place in <%= city %>" id="search-place-input" name="query">
+                    <input type="text" class="form-control float-left" placeholder="Search for a hotel in <%= city %>" id="search-place-input" name="query">
                   </div>
                 </div>
                 <div class="col-md-1 cont">
                   <div class="form-group float-right">
-                    <button type="button" onclick="queryPlace()" class="btn btn-outline-warning" id="btn-search-place" >Search</button>
+                    <button type="button" onclick="queryHotel()" class="btn btn-outline-warning" id="btn-search-place" >Search</button>
                   </div>
                 </div>
                 <div class="col-md-1 cont">
@@ -124,9 +119,8 @@
                         Sort
                         </button>
                         <div class="dropdown-menu" aria-labelledby="sortDropdownMenu">
-                            <a class="dropdown-item" href="#"><i class="fab fa-amilia"></i><span style="padding-left: 10px;">Alphabetically (A-Z)</span></a>
-                            <a class="dropdown-item" href="#"><i class="fas fa-eye"></i><span style="padding-left: 10px;">Number of reviews</span></a>
-                            <a class="dropdown-item" href="#"><i class="fas fa-star"></i><span style="padding-left: 10px;">Rating</span></a>
+                            <a class="dropdown-item" href="#">Number of reviews</a>
+                            <a class="dropdown-item" href="#">Rating</a>
                         </div>
                     </div>
                 </div>
@@ -140,7 +134,7 @@
         <div class="container" style="padding-top: 30px;">
 
             <div class="text-center">
-                <h3><b>The top places in <span></span><%= city %></b></h3>
+                <h3><b>The top hotels in <span></span><%= city %></b></h3>
             </div>
 
 
@@ -185,22 +179,18 @@
                             
                             <div class="row">
                                 <div class="col-md-6"></div>
-                                <div class="col-md-6">
-                                    <!-- botão para adicionar ao plano -->
-                                    <div class="form-group text-right">
-                                        <button type="button" class="btn btn-warning" onclick="loadPlace('<%= place.id %>')" style="color: white;"><i class="fas fa-search"></i><span style="padding-left: 10px;">Find out more</span></button>
-                                        <% if(fromPlan == true) { %>
-                                            <% if(visits.includes(place.id)){ %>
-                                                <button type="button" style="background-color: #dcf2e2; color: black;" class="btn btn-success" disabled><i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Already in trip</span></button>
-                                            <% } else{ %>
-                                                <button class="btn btn-success btn-add-visit-modal" data-toggle="modal" data-target="#add-visit-modal" data-title="<%= place.name %>" data-poi="<%= place.id %>"><i class="far fa-calendar-alt"></i><span style="padding-left: 10px;">Add to your trip</span></button>
-                                            <% } %>
-                                        <% } %>
+                                <div class="col-md-3">
+                                    <!-- botão para adicionar ao plano 
+                                    <div class="float-right">
+                                        <button type="button" class="btn btn-primary" onclick="loadPlace('<%= place.id %>')">Find out more</button>
+                                    </div>-->
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="float-right">
+                                        <button type="button" class="btn btn-primary" onclick="loadPlace('<%= place.id %>')">Find out more</button>
                                     </div>
                                 </div> 
                             </div>
-
-                            
                         </div>
                         <script>
                             var place_place_id = "<%= place.place_id %>";
@@ -219,32 +209,23 @@
 
                 <!-- Filter div -->
                 <div class="col-md-3">
-
-                    <% if(fromPlan == true) { %>
-                        <div class="text-center">
-                            <button class="btn btn-primary" onclick="window.history.back();"><i class="fas fa-undo"></i><span style="padding-left: 10px;">Back to the plan</span></button>
-                        </div>
-                        <br>
-                    <% } %>
-
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title"><b>Filter</b></h5>
                             <p><b>Type of place</b></p>
                             <div class="form-group">
-                                <input type="checkbox" name="hotels-filter" value="Hotels" id="hotels-filter" checked><i style="padding-left: 10px;" class="fas fa-bed"></i> Hotels
-                                <br>
-                                <input type="checkbox" name="restaurants-filter" value="Restaurants" id="restaurants-filter" checked><i style="padding-left: 10px;" class="fas fa-utensils"></i> Restaurants
-                                <br>
-                                <input type="checkbox" name="museums-filter" value="Museums" id="museums-filter" checked><i style="padding-left: 10px;" class="fas fa-archway"></i> Museums
-                                <br>
-                                <input type="checkbox" name="churchs-filter" value="Museums" id="churchs-filter" checked><i style="padding-left: 10px;" class="fas fa-church"></i> Churchs
-                                <br>
-                                <input type="checkbox" name="pois-filter" value="Museums" id="pois-filter" checked><i style="padding-left: 10px;" class="fas fa-monument"></i> Points of Interest
-                                <br>
-                                <input type="checkbox" name="parks-filter" value="Museums" id="parks-filter" checked><i style="padding-left: 10px;" class="fas fa-tree"></i> Parks
+                                    <input type="checkbox" name="hotels-filter" value="Hotels" id="hotels-filter" checked><i style="padding-left: 10px;" class="fas fa-bed"></i> Hotels
+                                    <br>
+                                    <input type="checkbox" name="restaurants-filter" value="Restaurants" id="restaurants-filter" disabled><i style="padding-left: 10px;" class="fas fa-utensils"></i> Restaurants
+                                    <br>
+                                    <input type="checkbox" name="museums-filter" value="Museums" id="museums-filter" disabled><i style="padding-left: 10px;" class="fas fa-archway"></i> Museums
+                                    <br>
+                                    <input type="checkbox" name="churchs-filter" value="Museums" id="churchs-filter" disabled><i style="padding-left: 10px;" class="fas fa-church"></i> Churchs
+                                    <br>
+                                    <input type="checkbox" name="pois-filter" value="Museums" id="pois-filter" disabled><i style="padding-left: 10px;" class="fas fa-monument"></i> Points of Interest
+                                    <br>
+                                    <input type="checkbox" name="parks-filter" value="Museums" id="parks-filter" disabled><i style="padding-left: 10px;" class="fas fa-tree"></i> Parks
                             </div>
-
 
                             <div id="rating-filter">
                                 <p><b>Rating</b></p>
@@ -254,7 +235,7 @@
                             </div>
 
                             <div class="float-right">
-                                <button type="button" class="btn btn-warning" onclick="filterSearch();" style="color: white;"><i class="fas fa-search"></i><span style="padding-left: 10px; "><b>Search</b></span></button>
+                                <button type="button" class="btn btn-warning" onclick="filterSearch();"><b>Search</b></button>
                             </div>
                         </div>
                     </div>
@@ -274,45 +255,11 @@
                             </div>
 
                             <div class="float-right">
-                                <button type="button" class="btn btn-success" onclick="classify();"><i class="fas fa-check"></i><span style="padding-left: 10px;"><b>Submit</b></span></button>
+                                <button type="button" class="btn btn-warning" onclick="classify();" ><b>Submit</b></button>
                             </div>
 
                         </div>
                     </div>
-                    
-                    <br>
-
-                    <div class="card" id="review-div">
-                        <div class="card-body">
-                            <h5 class="card-title"><b>User Reviews</b></h5>
-
-                            <!--
-                            <div class="card" style="height: 150px;">
-                                <div class="row">
-                                    <div class="col-md-4 text-center" style="margin: auto;">
-                                        <img src="/img/perfil.jpg" class="img-fluid review-img">
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body">
-                                            <div class="text-right">
-                                                <small>1 hour ago</small>
-                                            </div>
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <h6 class="mb-1">Eduardo Silva</h6>
-                                            </div>
-                                            <p class="mb-1">skdjgdkfjgdgfd</p>                                                                        
-                                            
-                                            <div class="text-right">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>-->
-                                    
-                        </div>
-                    </div>
-
-
 
                 </div>
             </div>
@@ -354,6 +301,8 @@
         <script>
             filterPage('<%= number_results %>');    
         </script>
+
+        <br><br><br><br>
 
         <!-- Login Modal -->
         <div class="modal fade" id="login-modal" role="dialog">
@@ -411,91 +360,6 @@
                 </div>
             </div>
 
-        <!-- Add Visit Modal -->
-        <div class="modal fade" id="add-visit-modal" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Add <span id="modal-title" style="font-weight: bold;"></span> to the plan</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="alert alert-danger" id="add-visit-error" role="alert" style="display: none;">
-                            <i class="fas fa-times-circle"></i><span style="padding-left: 10px;" id="add-visit-error-msg"></span>
-                        </div>
-
-                        <div class="custom-control custom-radio">
-                            <input type="radio" id="radio-choose-schedule-auto" name="customRadio" class="custom-control-input" checked>
-                            <label class="custom-control-label" for="radio-choose-schedule-auto">Let us choose the schedule</label>
-                        </div>
-                        <div class="custom-control custom-radio">
-                            <input type="radio" id="radio-choose-schedule-man" name="customRadio" class="custom-control-input">
-                            <label class="custom-control-label" for="radio-choose-schedule-man">Choose the schedule</label>
-                        </div>
-
-                        <br>
-
-                        <div class="dr" id="choose-schedule-man">
-
-                            <p><b>Choose visit schedule: </b></p>
-                            
-                            <% if(fromPlan) { %>
-                                <div class="form-group">
-                                    <div id="schedule-error" class="alert alert-danger text-center" role="alert" style="display: none;">
-                                        <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">Please choose a day and a hour for the visit</span>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <select class="form-control" id="visit-day">
-                                                <option value="null">Day</option>
-
-                                                <% days.forEach(function(day) { %>
-                                                    <option value='<%= day %>'><%= day %></option>
-                                                <% }); %>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <select class="form-control" id="visit-start-hour">
-                                                <option value="null">Begin at</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            <% } %>
-
-                            <!--
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <select class="form-control" id="visit-start-hour">
-                                            <option>Begin at</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <select class="form-control" id="visit-end-hour">
-                                            <option>End at</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>-->
-                        </div>
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
-                        <button type="button" class="btn btn-success" id="confirm-add-visit-btn"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Add</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-
-        <br><br><br><br>
-
-
         <!-- Footer -->
         <footer class="footer">
           <!-- Footer Elements -->
@@ -520,16 +384,6 @@
 
   
     <!-- Scripts -->
-    <script>
-        var fromPlan = '<%= (fromPlan) %>';
-
-        if(fromPlan == "true"){
-            var openslots = '<%- JSON.stringify(openslots) %>';
-            loadOpenSlots(openslots);
-        }
-            
-    </script>
-
     <script>startGoogleSignIn();</script>
 
     

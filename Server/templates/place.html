@@ -343,10 +343,13 @@
                             
                             <% if(fromPlan) { %>
                                 <div class="form-group">
+                                    <div id="schedule-error" class="alert alert-danger text-center" role="alert" style="display: none;">
+                                        <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">Please choose a day and a hour for the visit</span>
+                                    </div>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <select class="form-control" id="visit-day">
-                                                <option>Day</option>
+                                                <option value="null">Day</option>
 
                                                 <% days.forEach(function(day) { %>
                                                     <option value='<%= day %>'><%= day %></option>
@@ -355,7 +358,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <select class="form-control" id="visit-start-hour">
-                                                <option>Begin at</option>
+                                                <option value="null">Begin at</option>
                                             </select>
                                         </div>
                                     </div>
@@ -456,16 +459,9 @@
     <script>
         var fromPlan = '<%= (fromPlan) %>';
 
-        if(fromPlan == true){
-            var openslots = '<%- JSON.stringify(openslots) %>';
-            loadOpenSlots(openslots);
+        if(fromPlan == "true"){
+            loadOpenSlots('<%- JSON.stringify(openslots) %>');
         }
-            
-    </script>
-
-    
-    <script>
-        loadOpenSlots('<%- JSON.stringify(openslots) %>');
     </script>
     
 

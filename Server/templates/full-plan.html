@@ -136,12 +136,13 @@
                 <% if (!locals.day_no) { %>
                     <% day_no = 0 %>
                 <% } %>
+
                 <% day = days[day_no] %>
                 <div class="card card-body" style="height: 70px;">
                     <div class="row" id="plan-day-<%= day_no %>">
                         <div class="col-md-2">
                             <div class="text-center">
-                                <button class="change-plan-day-btn" onclick="previousDay();"><i class="fas fa-arrow-alt-circle-left fa-lg"></i></button>
+                                <button id="previous-day-btn" class="change-plan-day-btn" onclick="previousDay();"><i class="fas fa-arrow-alt-circle-left fa-lg"></i></button>
                             </div>
                         </div>
                         <div class="col-md-8">
@@ -151,7 +152,7 @@
                         </div>
                         <div class="col-md-2">
                             <div class="text-center">
-                                <button class="change-plan-day-btn" onclick="nextDay();"><i class="fas fa-arrow-alt-circle-right fa-lg"></i></button>
+                                <button id="next-day-btn" class="change-plan-day-btn" onclick="nextDay();"><i class="fas fa-arrow-alt-circle-right fa-lg"></i></button>
                             </div>
                         </div>
                     </div>

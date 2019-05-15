@@ -4,7 +4,7 @@ import mysql.connector
 import wikipedia
 import sys
 
-API_KEY = 'AIzaSyDpKgqxjCAowTT9qWEaYm-7ALBc7MwVyz4'
+API_KEY = 'AIzaSyCcM_AepOJRN1QIx96d2n0FOfOcGfZYfck'
 
 mydb = mysql.connector.connect(
   host="localhost",
@@ -87,7 +87,7 @@ def requestInfoPlace(place):
 
 
 def requestHotels(lat, lon, places_dict):
-	url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?location=' + str(lat) + ',' + str(lon) + '&radius=20000&type=hotel&key=' + API_KEY  
+	url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?location=' + str(lat) + ',' + str(lon) + '&radius=20000&type=lodging&key=' + API_KEY  
 
 	response = urllib.request.urlopen(url)
 	jsonRaw = response.read()
@@ -325,7 +325,7 @@ def addPlacetoDB(place_id, poi_type, city):
 
 if __name__== "__main__":
 
-
+	# request a place with its name
 	if len(sys.argv) == 4 and sys.argv[1] == 'place':
 		try:
 
@@ -355,6 +355,7 @@ if __name__== "__main__":
 		except:
 			pass
 
+	# request places of a city
 	elif len(sys.argv) == 3 and sys.argv[1] == 'city':
 		try:
 			city = sys.argv[2]
@@ -371,6 +372,33 @@ if __name__== "__main__":
 		except:
 			pass
 
+	# request de um tipo de locais de uma cidade 
+	elif len(sys.argv) == 4 and sys.argv[1] == 'citytype':
+		
+			city = sys.argv[2]
+			tpe = sys.argv[3]
+
+			sql = """SELECT id, latitude, longitude FROM City WHERE name = '%s' """ % (city)
+
+			mycursor.execute(sql)
+
+			data = mycursor.fetchall()
+
+			city_id, latitude, longitude = data[0]
+
+			places = {}
+
+			if tpe == 'hotel':
+				places = requestHotels(latitude, longitude, places)
+
+			for place in places.keys():
+				try:
+					addPlacetoDB(place, places[place][1], city_id)
+				except:
+					pass
+
+
+	# teste para a UA
 	elif len(sys.argv) == 2 and sys.argv[1] == 'ua':
 
 		place_id = 'ChIJsV7ar6qiIw0RbttezXqeR7c'
@@ -400,7 +428,7 @@ if __name__== "__main__":
 		except:
 			pass
 
-
+	#request para todas as cidades de um ficheiro
 	elif len(sys.argv) == 1:
 		for city in readCitiesFromFile():
 			try:

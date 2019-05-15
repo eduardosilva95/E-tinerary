@@ -110,7 +110,6 @@ function getPlaceDetails(place_id){
       open_slots[day] = list;
     }
 
-
   }
 
   function loadIcon(poi_type){
@@ -168,7 +167,6 @@ function getPlaceDetails(place_id){
     $("#radio-choose-schedule-man").change(function() {
       $('.dr').slideUp();
       if ($(this).is(':checked')) {
-          console.log($(this).parent().next());
           $("#choose-schedule-man").slideToggle();
       }
     });
@@ -249,31 +247,40 @@ function getPlaceDetails(place_id){
   
     var schedule;
   
-    if($('#radio-choose-schedule-man').is(':checked') && $('#visit-day option:selected').val() != "null" && $('#visit-start-hour option:selected').val() != "null"){
-      var day = new Date ($('#visit-day option:selected').val());
-      day = day.getFullYear() + "-" + (day.getMonth()<10?'0':'') + (day.getMonth() + 1)  + "-" + (day.getDate()<10?'0':'') + day.getDate();
-      var hour = $('#visit-start-hour option:selected').val();
-      schedule = day + " " + hour;
-    }
-  
-    $.post("/add-visit", {plan: plan, poi: poi_id, schedule: schedule}, function(result){
-        
-      if(result.result == 'error'){
-        if(result.msg == 'schedule error'){
-          $('#add-visit-error').css("display", "block");
-          $('#add-visit-error-msg').text("Could not find a schedule for the visit in this plan")
-        }
+    if($('#radio-choose-schedule-man').is(':checked')){
+
+      if($('#visit-day option:selected').val() == "null" || $('#visit-start-hour option:selected').val() == "null"){
+        $('#schedule-error').css("display", "block");
       }
-      
+
       else{
-        if(result.isManual == true)
-          window.location.href = "/plan-m?id=" + plan;
-        else
-          window.location.href = "/plan?id=" + plan;
-      
+        $('#schedule-error').css("display", "none");
+
+        var day = new Date ($('#visit-day option:selected').val());
+        day = day.getFullYear() + "-" + (day.getMonth()<10?'0':'') + (day.getMonth() + 1)  + "-" + (day.getDate()<10?'0':'') + day.getDate();
+        var hour = $('#visit-start-hour option:selected').val();
+        schedule = day + " " + hour;
+
+        $.post("/add-visit", {plan: plan, poi: poi_id, schedule: schedule}, function(result){
+        
+          if(result.result == 'error'){
+            if(result.msg == 'schedule error'){
+              $('#add-visit-error').css("display", "block");
+              $('#add-visit-error-msg').text("Could not find a schedule for the visit in this plan")
+            }
+          }
+          
+          else{
+            if(result.isManual == true)
+              window.location.href = "/plan-m?id=" + plan;
+            else
+              window.location.href = "/plan?id=" + plan;
+          
+          }
+        });
+
       }
-    });
-  
+    }
   }
   
   $(function () {
