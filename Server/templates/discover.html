@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Nome da aplicação">
+    <meta name="author" content="Eduardo Silva">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Simple Map</title>
+
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/v4-shims.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    
+    <script type="text/javascript" src="js/myscript.js"></script>
+    <script type="text/javascript" src="js/trips.js"></script>
+    <script type="text/javascript" src="js/login.js"></script>
+    
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcM_AepOJRN1QIx96d2n0FOfOcGfZYfck&libraries=places"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+  
+  </head>
+  <body onload="loadNavbar();">
+      <!-- header navbar -->
+      <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
+          <a class="navbar-brand" href="./">HomePage</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+              
+                <li class="nav-item">
+                  <a class="nav-link" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+                </li>
+              
+              <li class="nav-item">
+                <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+              </li>
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
+                    <a class="dropdown-item" href="./about-us">Aplicacao</a>
+                    <a class="dropdown-item" href="./help">Help</a>
+                  </div>
+              </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+              <li>
+                <div id="login-user">
+                  <div id="login" style="display: none;">
+                    <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                  </div>
+                  <div id="profile" class="dropleft" style="display: none;">
+                    <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img id="user-profile-pic">
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="profile-btn">
+                      <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                      <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                      <div class="dropdown-divider"></div>
+                      <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                    </div>   
+                  </div>        
+                </div>
+              </li>
+            </ul>
+          </div>
+      </nav>
+
+
+        <div class="container-fluid" style="background-color: #343a40;">
+            <div class="row">
+                <div class="col-md-1 col-sm-1"></div>
+                <div class="col-md-10 col-sm-10">
+                    <div class="container cont text-center">
+                        <h1 style="color: white; font-weight: bold;">Discover the trips shared by our community</h1>
+                    </div>
+
+
+                    <div class="row cont">
+                      <div class="col-md-12">
+                        <div class="discover-search text-center">
+                          <span class="fa fa-search form-control-feedback"></span>
+                          <input type="text" class="form-control" placeholder="Search">
+                        </div>
+                      </div>
+                      
+                    </div>
+
+                    <br><br>
+
+                    <hr class="hr-home">
+
+                    <!-- DIV -->
+                    
+                    <div class="container cont text-center">
+                        <h2 style="color: white; font-weight: bold;">Recommended</h2>
+                        <p style="color: #fff; font-size: 23px; opacity: .7">Discover the places that are more visited by our users</p>
+                    </div>
+
+
+                    <div class="row">
+
+                      <% trips.forEach(function(trip) { %> 
+
+                        <a href="/plan?id=<%= trip.id %>" class="card-home-link">
+                        <div class="col-md-3 col-sm-12 cont">
+                            <div class="card card-home" style="width: 18rem; height: 380px;">
+                              <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
+                              <% if(trip.isPremium == 1) { %>
+                                <p class="card-text" ><i style="padding-left: 0.75rem; color: #bffbff" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
+                              <% } else { %>
+                                <p class="card-text" ><small class="text-muted" style="font-weight: 0.6; padding-left: 1.25rem">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
+                              <% } %>
+                            
+                              <div class="card-body" style="padding-top: 0;">
+                                  <h5 class="card-title"><b><%= trip.city %></b></h5>
+                                  <p class="card-text" style="padding-top: 10px;"><%= trip.description %></p>
+
+                                  <div class="row">
+                                    <div class="col-md-4">
+                                      <div class="text-left">
+                                          <span id="viewers"><%= trip.num_viewers %></span><i style="padding-left: 10px;" class="fas fa-eye"></i>
+                                      </div>
+                                    </div>
+
+                                    <div class="col-md-8">
+                                        <div class="text-right">
+                                            <button type="button" class="btn btn-warning">Qualquer coisa</button>
+                                        </div>
+                                    </div>
+                                    
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                        </a>
+
+                      <% }); %>
+
+                    </div>
+                  </div>
+
+                  <div class="col-md-1 col-sm-1"></div>
+
+            </div>
+
+            <br><br><br>
+
+        </div>
+
+
+        <!-- Login Modal -->
+        <div class="modal fade" id="login-modal" role="dialog">
+          <div class="modal-dialog">
+              <div class="modal-content" style="width: 400px;">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                    <img id="profile-img" class="profile-img-card" src="img/login.png" />
+                    <form class="form-signin">
+                      <span id="reauth-email"></span>
+                      <div class="alert alert-danger" id="login-error" role="alert" style="display: none;">
+                          <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">The email or password is incorrect</span>
+                      </div>
+                      <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                      <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                      <div class="row">
+                          <div class="col-md-6">
+                            <div class="custom-control custom-checkbox" id="remember">
+                                <input type="checkbox" class="custom-control-input" id="remember-me">
+                                <label class="custom-control-label" for="remember-me">Remember me</label>
+                            </div>
+                          </div>
+                          <div class="col-md-6 text-right">
+                              <a href="/recover" class="forgot-password">
+                                  Forgot the password?
+                              </a>
+                          </div>
+                      </div>
+                      <br>
+                      <button class="btn btn-success" type="button" onclick="login();"><i class="fas fa-sign-in-alt"></i><span style="padding-left: 10px">Sign in</span></button>
+                          <!--<button class="btn btn-primary" type="submit"><i class="fas fa-user-plus"></i><span style="padding-left: 10px">Register</span></button>-->
+                      <span>Don't have an account yet? <a href="/register" class="forgot-password">Register now</a></span>
+                  
+                    </form>
+                    
+
+                    <div class="login-or">
+                      <hr class="hr-or">
+                      <span class="span-or">or</span>
+                    </div>
+
+                    <button class="btn btn-primary btn-facebook" type="submit"><i class="fab fa-facebook-f fa-lg"></i><span style="padding-left: 10px">Log in using Facebook</span></button>
+                    <br><br>
+                                
+                    <div id="customBtn">
+                        <button class="btn btn-google" type="submit" ><img id="google-signin-icon" src="img/google-icon.png"><span style="padding-left: 10px">Log in using Google</span></button>
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                  </div>
+              </div>
+          </div>
+        </div>
+ 
+
+
+        <!-- Footer -->
+        <footer class="footer">
+          <!-- Footer Elements -->
+
+          <div id="social">
+              <a class="facebookBtn smGlobalBtn" href="#" ></a>
+              <a class="twitterBtn smGlobalBtn" href="#" ></a>
+              <a class="googleplusBtn smGlobalBtn" href="#" ></a>
+              <a class="linkedinBtn smGlobalBtn" href="#" ></a>
+              <a class="instagramBtn smGlobalBtn" href="#" ></a>
+          </div>
+            <!-- Footer Elements -->
+        
+            <!-- Copyright -->
+            <div class="footer-copyright"> 2019 Copyright:
+              <a href="">&copy; Aplicacao, todos os direitos reservados</a>
+            </div>
+
+        </footer>
+        <!-- Footer -->
+
+
+  
+    <!-- Scripts -->
+    <script>startGoogleSignIn();</script>
+    
+
+  </body>
+</html>

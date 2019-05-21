@@ -4,6 +4,7 @@ var infowindow;
 
 var plan;
 var weekdays = [];
+var dif_days;
 var plan_days = [];
 var day;
 var place_info = [];
@@ -109,6 +110,8 @@ function loadPlan(plan_array, days){
     day = 0;
     days = days.split(',');
 
+    dif_days = days.length / 2 - 1;
+
     for(var i=1; i < days.length ; i+=2){
         plan_days.push(days[i]);
     }
@@ -135,8 +138,26 @@ function loadPlan(plan_array, days){
         document.getElementById('next-day-btn').disabled = true;
     }
 
+    loadBottomNavbar();
 
 }
+
+
+function loadBottomNavbar(){
+
+    var start = new Date(plan_days[0]);
+    var now = new Date();
+
+    if(now >= start){
+        $("#add-visit-div").css("display", "none");
+    }
+    else{
+        $(".btn-share-modal").css("display", "none");
+    }
+
+
+}
+
 
 
 function nextDay(){
@@ -439,9 +460,7 @@ function deleteVisit(poi_id){
             }
       
         });
-    
     }
-
 }
 
 
@@ -463,5 +482,55 @@ function savePlan(){
         });
     
     }
+}
 
+$(function () {
+    $('.btn-rate-modal').on('click', function () {
+        $('#modal-rate-title').text($(this).data('title'));
+    });
+});
+
+
+$(function () {
+    $('.btn-use-plan-modal').on('click', function () {
+        $('#modal-use-plan-title').text($(this).data('title'));
+    });
+  });
+
+$(function () {
+    $("#arrival-date").datepicker({ 
+        uiLibrary: 'bootstrap4',
+        format: 'dd/mm/yyyy',
+        minDate: new Date(),
+    });
+
+});
+
+
+function usePlan(){
+    var plan_id = /id=([^&]+)/.exec(location.search)[1];
+
+    var start_date = $("#arrival-date").val();
+
+    if(start_date == "")
+        return;
+
+    start_date = new Date(start_date.split('/')[2]+"/"+start_date.split('/')[1]+"/"+start_date.split('/')[0]);
+    var end_date = new Date(start_date.getTime() + dif_days * 24 * 60 * 60 * 1000);
+
+    start_date = start_date.getFullYear() + "/" + ((start_date.getMonth()+1).toString()<10?'0':'') + (start_date.getMonth()+1).toString() + "/" + (start_date.getDate()<10?'0':'') + start_date.getDate();
+    end_date = end_date.getFullYear() + "/" + ((end_date.getMonth()+1).toString()<10?'0':'') + (end_date.getMonth()+1).toString() + "/" + (end_date.getDate()<10?'0':'') + end_date.getDate();
+
+    console.log(start_date, end_date);
+
+    $.post("/create-child-plan", {plan: plan_id, start_date: start_date, end_date: end_date}, function(result){
+    
+        if(result.result == 'error'){
+        }
+        
+        else{
+           window.location.href = "/plan?id=" + result.plan;
+        }
+    
+    });
 }

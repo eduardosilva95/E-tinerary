@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/v4-shims.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
 
     
@@ -19,12 +20,16 @@
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+
+    
+    <script src="https://unpkg.com/gijgo@1.9.11/js/gijgo.min.js" type="text/javascript"></script>
+    <link href="https://unpkg.com/gijgo@1.9.11/css/gijgo.min.css" rel="stylesheet" type="text/css" />
     
     <script type="text/javascript" src="js/plan-2.js"></script>
     <script type="text/javascript" src="js/login.js"></script>
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcM_AepOJRN1QIx96d2n0FOfOcGfZYfck&libraries=places"></script>
+    <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
     <script type="text/javascript" src="js/map-font-icons.js"></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 
@@ -183,6 +188,10 @@
                         </div>
                         <% count = count + 1 %>
                     <% }); %>
+                    <div class="vl" style="border-left: 2px solid #dddddd; margin-left: 50px;">
+                        <br>
+                        <a id="plan-link-hotels" href="/hotels?dest=<%= city %>"><i class="fas fa-bed"></i><span style="padding-left: 10px;">Discover hotels in <%= city %></span></a>          
+                    </div>
                     <hr>
                 </div>
 
@@ -195,7 +204,7 @@
             <div class="card card-body bg-light">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="dropdown">
+                        <div class="dropdown" id="add-visit-div">
                             <button class="btn btn-info dropdown-toggle" type="button" id="add-visit-dropdown-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-plus"></i><span style="padding-left: 10px;">Add visit</span>
                             </button>
@@ -207,13 +216,23 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group text-right">
-                            <!--<a id="view_map_btn" href="#"><button type="button" class="btn btn-warning" >View Map</button></a>
-                            <a id="view_calendar_btn" href="#"><button type="button" class="btn btn-warning" >View Calendar</button></a>-->
-                            <a id="save_plan_btn" href="#"><button type="button" class="btn btn-success" >Save Plan</button></a>
+                            <% if(source == "author") { %>
+                                <button type="button" class="btn btn-success"><i class="fas fa-comment"></i><span style="padding-left: 10px;">Comment Plan</span></button>
+                                <button type="button" class="btn btn-success btn-rate-modal" data-toggle="modal" data-target="#rate-modal" data-title="<%= name %>"><i class="fas fa-star"></i><span style="padding-left: 10px;">Rate Plan</span></button>
+                                <% if(isPublic == 0) { %>
+                                    <button type="button" class="btn btn-success btn-share-modal"><i class="fas fa-share-alt"></i><span style="padding-left: 10px;">Share Plan</span></button>
+                                <% } else { %> 
+                                    <button type="button" style="background-color: #dcf2e2; color: black;" class="btn btn-success btn-share-modal" disabled><i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Shared plan</span></button>
+                                <% } %>
+                                <a id="save_plan_btn" href="#"><button type="button" class="btn btn-success"><i class="fas fa-save"></i><span style="padding-left: 10px;">Save Plan</span></button></a>
+                            <% } else { %>
+                                <button type="button" class="btn btn-success"><i class="fas fa-comment"></i><span style="padding-left: 10px;">Comment Plan</span></button>
+                                <button type="button" class="btn btn-success btn-rate-modal" data-toggle="modal" data-target="#rate-modal" data-title="<%= name %>"><i class="fas fa-star"></i><span style="padding-left: 10px;">Rate Plan</span></button>
+                                <button type="button" class="btn btn-success btn-use-plan-modal" data-toggle="modal" data-target="#use-plan-modal" data-title="<%= name %>"><i class="fas fa-save"></i><span style="padding-left: 10px;">Use this Plan</span></button>
+                            <% } %>                        
                         </div>
                     </div>
                 </div>
-                
             </div>
 
             <br><br>
@@ -391,7 +410,67 @@
                 </div>
             </div>
         </div>
+
+        <!-- Use Plan Modal -->
+        <div class="modal fade" id="use-plan-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Use <span id="modal-use-plan-title" style="font-weight: bold;"></span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <p><b>Choose your dates: </b></p>
+
+                        <div class="row">
+                            <div class='col-sm-6'>
+                                <div class="input-group date">
+                                    <input type="text" class="form-control" placeholder="Arrival" id="arrival-date" name="arrival" required>
+                                </div>
+                            </div>
+                                
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
+                        <button type="button"  class="btn btn-success" onclick="usePlan();" data-dismiss="modal"><i class="fas fa-check"></i><span style="padding-left: 10px;">Confirm</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
         
+
+        <!-- Rate Modal -->
+        <div class="modal fade" id="rate-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Rate <span id="modal-rate-title" style="font-weight: bold;"></span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
+                            <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 star">5</label>
+                            <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 star">4</label>
+                            <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 star">3</label>
+                            <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 star">2</label>
+                            <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">1</label>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
+                        <button type="button" onclick="submitRate();" class="btn btn-success" data-dismiss="modal"><i class="fas fa-check"></i><span style="padding-left: 10px;">Submit</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Footer -->
         <footer class="footer">

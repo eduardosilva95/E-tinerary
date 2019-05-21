@@ -96,35 +96,45 @@
             </div>  
 
             <div class="row cont" style="height: 600px;">
-                <div class="col-md-4" id="sideb">
+                <div class="col-md-5" id="sideb">
                     <% count = 0 %>
                     <% hotels.forEach(function(hotel) { %>
-                        <div id="hotel-<%= count %>">
-                            <div class="card" style="height: 150px;">
-                                <div class="row">
-                                    <div class="col-md-5">
-                                        <img id="hotel-<%= count %>-img" class="img-fluid" alt="" style="height: 150px; width: 100%;">
-                                    </div>
-                                    <div class="col-md-7">
-                                        <div class="card-body">
-                                            <h6 id="hotel-<%= count %>-name" class="card-title"><b></b></h6>
-                                            
-                                            <div class="text-right view-offer">
-                                                <button class="btn btn-success booking-btn">View offer</button>
+                        <a id="hotel-<%= count %>-link" class="hotel-link" data-toggle="modal" data-target="#info-modal">
+                            <div id="hotel-<%= count %>" class="hotel-div">
+                                <div class="card" style="height: 150px;">
+                                    <div class="row">
+                                        <div class="col-md-5">
+                                            <img id="hotel-<%= count %>-img" class="img-fluid" alt="" style="height: 150px; width: 100%;">
+                                        </div>
+                                        <div class="col-md-7">
+                                            <div class="card-body">
+                                                <h6 id="hotel-<%= count %>-name" class="card-title hotel-name"><b></b></h6>
+                                                <div id="hotel-<%= count %>-stars">
+                                                    <i class="fas fa-star fa-xs" aria-hidden="true" style="color: #ffc107;"></i>
+                                                    <i class="fas fa-star fa-xs" aria-hidden="true" style="color: #ffc107;"></i>
+                                                    <i class="fas fa-star fa-xs" aria-hidden="true" style="color: #ffc107;"></i>
+                                                    <i class="fas fa-star fa-xs" aria-hidden="true" style="color: #ffc107;"></i>
+                                                    <i class="fas fa-star fa-xs" aria-hidden="true" style="color: #d0cfd1;"></i>
+                                                </div>
+                                                
+                                                <div class="text-right view-offer">
+                                                    <img src="img/booking-logo.png" height="32px" width="100px">
+                                                    <button class="btn btn-success booking-btn">100 €</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
+                                <br>
                             </div>
+                        </a>
 
-                            <br>
-
-                        </div>
                         <% count = count + 1 %>
                     <% }); %>
                 </div>
 
-                <div class="col-md-8" id="map"></div>
+                <div class="col-md-7" id="map"></div>
 
             </div>
 
@@ -254,9 +264,6 @@
         '<% hotels.forEach(function(hotel) { %>'
             hotels_list.push('<%- JSON.stringify(hotel) %>');
         '<% }); %>'
-
-        console.log(hotels_list);
-
 
         loadHotels(hotels_list);
     

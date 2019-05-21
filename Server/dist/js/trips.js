@@ -40,6 +40,19 @@ $(function () {
 });
 
 
+$(function () {
+    $('.btn-share-modal').on('click', function () {
+        $('#share-modal-title').text($(this).data('name'));
+
+        $('#share-modal-plan-id').val($(this).data('id'));
+        $('#share-modal-user').val(getUserCookie());
+
+       // document.getElementById('confirm-public-btn').setAttribute( "onClick", "javascript: makePublic("+$(this).data('id')+");");
+
+    });
+});
+
+
 
 function deleteTrip(trip_id){
     var user = getUserCookie();
@@ -72,6 +85,28 @@ function renameTrip(trip_id){
             console.log(result);
     
       
+            if(result.result == 'error'){
+            }
+            
+            else{
+              window.location.reload();
+            }
+        })    
+    }
+
+}
+
+function makePublic(trip_id){
+    var user = getUserCookie();
+
+    var description = document.getElementById("inputDescription").value;
+    var picture = document.getElementById("plan-picture").value;
+
+    if(user != null){
+        $.post("/make-plan-public", {plan: trip_id, user: user, description: description, picture: picture}, function(result){
+
+            console.log(result);
+    
             if(result.result == 'error'){
             }
             

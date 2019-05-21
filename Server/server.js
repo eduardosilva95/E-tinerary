@@ -6,6 +6,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: true });
 var mysql = require('mysql');
 var http = require('http');
 var https = require('https');
+var cookieParser = require('cookie-parser');
 var url = require('url');
 var md5 = require('md5');
 var multer = require('multer');
@@ -21,9 +22,20 @@ var storage = multer.diskStorage({
   filename: function (req, file, cb) {
     cb(null, Date.now() +  path.extname(file.originalname)) //Appending extension
   }
-})
+});
+
+var storage_plan = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, 'dist/img/plans'))
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() +  '_' + Math.random().toString(36).substring(2) + path.extname(file.originalname)) //Appending extension
+  }
+});
+
 
 var upload = multer({storage: storage});
+var upload_plan = multer({storage: storage_plan});
 
 
 var promise = require('promise-mysql');
@@ -45,6 +57,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //put static files (js, css, images) into /dist directory
 app.use(express.static(path.join(__dirname, 'dist')));
+app.use(cookieParser());
 
 
 con.connect(function(err) {
@@ -1486,6 +1499,105 @@ app.post('/create-plan-m', function(req, res){
 });
 
 
+app.post('/create-child-plan', function(req, res){
+	var connection;
+
+	var plan_id = req.body.plan;
+	var start_date = req.body.start_date;
+	var end_date = req.body.end_date;
+	var user_id = req.cookies['user'];
+
+	var start_time_list = [];
+	var end_time_list = [];
+
+	promise.createConnection({
+		host: 'localhost',
+	    user: 'root',
+	    password: 'password',
+	    database: 'placesdb'
+
+	}).then(function(conn){
+
+		connection = conn;
+
+		var sql = "select city, poi_id, start_time, end_time from plan join visit on plan.id = visit.plan_id where plan_id = ?";
+		var values = [plan_id];
+	    var result = connection.query(sql, [values]);
+
+    	return result;
+	}).then(function(result){
+
+		var visits = [];
+
+		for(var i=0; i<result.length; i++){
+			visits.push(result[i]);
+		}
+
+		var num_days = diffBetweenDays(start_date.split('/')[2]+"/"+start_date.split('/')[1]+"/"+start_date.split('/')[0], end_date.split('/')[2]+"/"+end_date.split('/')[1]+"/"+end_date.split('/')[0]);
+		days = getPlanDays(start_date.split('/')[2]+"-"+start_date.split('/')[1]+"-"+start_date.split('/')[0], parseInt(num_days), false);
+
+		var k=0;
+		var current_date = visits[0].start_time.getFullYear() + "/" + ((visits[0].start_time.getMonth()+1).toString()<10?'0':'') + (visits[0].start_time.getMonth()+1).toString() + "/" + (visits[0].start_time.getDate()<10?'0':'') + visits[0].start_time.getDate();
+
+		for(var i=0; i<visits.length; i++){
+			var date = visits[i].start_time.getFullYear() + "/" + ((visits[i].start_time.getMonth()+1).toString()<10?'0':'') + (visits[i].start_time.getMonth()+1).toString() + "/" + (visits[i].start_time.getDate()<10?'0':'') + visits[i].start_time.getDate();
+			var st_time = (visits[i].start_time.getHours()<10?'0':'') + visits[i].start_time.getHours() + ":" + (visits[i].start_time.getMinutes()<10?'0':'') + visits[i].start_time.getMinutes();
+			var end_time = (visits[i].end_time.getHours()<10?'0':'') + visits[i].end_time.getHours() + ":" + (visits[i].end_time.getMinutes()<10?'0':'') + visits[i].end_time.getMinutes();
+
+			if(current_date != date){
+				current_date = date;
+				k++;
+			}
+
+			var day = days[k].split('-')[2]+"/"+days[k].split('-')[1]+"/"+days[k].split('-')[0];
+
+			start_time_list.push(day + " " + st_time);
+			end_time_list.push(day + " " + end_time);
+
+		}
+
+		return visits
+
+	}).then(function(result){
+
+		var city = result[0].city;
+
+		var visits = result;
+
+		sql = "insert into plan (start_date, end_date, user, city, parent_plan) values (?)";
+		values = [start_date, end_date, user_id, city, plan_id];
+
+		con.query(sql, [values], function(err, result) {
+			if (err) throw err;
+
+			var new_plan = result.insertId;
+
+			var i = 0;
+
+			while(i < start_time_list.length){
+				sql= "insert into Visit (plan_id, poi_id, start_time, end_time, weather) VALUES ?";
+				values = [[new_plan, visits[i].poi_id, start_time_list[i], end_time_list[i], 'Sunny']];
+
+				con.query(sql, [values], function (err, result) {
+			    	if (err) throw err;
+			  	});
+
+		  		i++;
+			}
+
+			console.log("PLAN CREATED: ", new_plan)
+
+			res.contentType('json');
+			res.send({result: 'success', plan: new_plan});
+
+		});
+});
+
+
+
+
+	});
+
 
 app.post('/delete-plan', function(req, res){
 	var plan_id = parseInt(req.body.plan);
@@ -1931,12 +2043,14 @@ app.post('/delete-visit', function(req, res){
 app.get('/plan', function(req,res){
 	if(req.query['id'] != undefined){
 
+		var connection;
+
+		var user = req.cookies['user'];
 		var plan_id = req.query['id'];
-
-		var sql = "select plan.name as plan_name, plan.start_date as start_date, plan.end_date as end_date, datediff(plan.end_date, plan.start_date) as date_diff, visit.start_time as start_time, visit.end_time as end_time, weather, poi.name as name, poi.id as id, city.name as city, place_id, website, phone_number, address, poi_type, poi.latitude as latitude, poi.longitude as longitude from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id where plan.id = ? and plan.isActive = 1 and visit.isActive = 1 order by start_time";
-		var parameters = [plan_id];
-
 		var view_method = req.query['v'];
+
+		var sql = "select plan.name as plan_name, plan.user as user, plan.start_date as start_date, plan.end_date as end_date, datediff(plan.end_date, plan.start_date) as date_diff, plan.isPublic as isPublic, visit.start_time as start_time, visit.end_time as end_time, weather, poi.name as name, poi.id as id, city.name as city, place_id, website, phone_number, address, poi_type, poi.latitude as latitude, poi.longitude as longitude from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id where plan.id = ? and plan.isActive = 1 and visit.isActive = 1 order by start_time";
+		var parameters = [plan_id];
 
 		if(view_method == 'full'){
 			con.query(sql, parameters, function (err, result, fields) {
@@ -1947,6 +2061,8 @@ app.get('/plan', function(req,res){
 		        var city = "";
 		        var name;
 		        var date_diff = 0;
+		        var isPublic = 0;
+		        var source;
 
 		        var dates = [];
 		        if(result.length > 0){
@@ -1984,6 +2100,12 @@ app.get('/plan', function(req,res){
 		        	else
 		        		name = 'Your visit to ' + city;
 
+		        	isPublic = result[0].isPublic[0];
+
+		        	if(result[0].user == user)
+		        		source = "author";
+		        	else
+		        		source = "viewer";
 
 		        }
 
@@ -2020,10 +2142,11 @@ app.get('/plan', function(req,res){
 				    database: 'placesdb'
 
 				}).then(function(conn){
+					connection = conn;
+
 					var sql = "select distinct city from plan where id = ?";
 					var values = [plan_id];
-				    var result = conn.query(sql, [values]);
-				    conn.end();
+				    var result = connection.query(sql, [values]);
 
 			    	return result;
 				}).then(function(result){
@@ -2069,14 +2192,22 @@ app.get('/plan', function(req,res){
 					        	suggested_hotels.push(visit);
 					        }
 
-					        res.render(path.join(__dirname+'/templates/full-plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels});
+					        if(isPublic == "1" || source == "author")
+					        	res.render(path.join(__dirname+'/templates/full-plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic});
+					        else
+					        	res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
+				        
 
 				        });
 
 	        		});
+				}).then(function(result){
+					sql = "update plan set num_viewers = num_viewers + 1 where id = ?";
+					values = [plan_id];
+				    result = connection.query(sql, [values]);
+				    connection.end();
+
 				});
-
-
        	
 	    	});
 		}
@@ -2089,6 +2220,8 @@ app.get('/plan', function(req,res){
 		        var end_date = "n/a";
 		        var city = ""; 
 		        var date_diff = 0;
+		        var isPublic = 0;
+		        var source;
 
 		        var dates = [];
 		        if(result.length > 0){
@@ -2126,6 +2259,13 @@ app.get('/plan', function(req,res){
 		        	else
 		        		name = 'Your visit to ' + city;
 
+		        	isPublic = result[0].isPublic[0];
+
+		        	if(result[0].user == user)
+		        		source = "author";
+		        	else
+		        		source = "viewer";
+
 		        }
 
 		        var plan = []
@@ -2161,10 +2301,12 @@ app.get('/plan', function(req,res){
 				    database: 'placesdb'
 
 				}).then(function(conn){
+					connection = conn;
+
 					var sql = "select distinct city from plan where id = ?";
 					var values = [plan_id];
-				    var result = conn.query(sql, [values]);
-				    conn.end();
+				    var result = connection.query(sql, [values]);
+				    connection.end();
 
 			    	return result;
 				}).then(function(result){
@@ -2210,11 +2352,21 @@ app.get('/plan', function(req,res){
 					        	suggested_hotels.push(visit);
 					        }
 
-					        res.render(path.join(__dirname+'/templates/map.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels});
+					        if(isPublic == "1" || source == "author")
+					        	res.render(path.join(__dirname+'/templates/map.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic});
+					        else
+					        	res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
 
+					        
 				        });
 
 	        		});
+				}).then(function(result){
+					sql = "update plan set num_viewers = num_viewers + 1 where id = ?";
+					values = [plan_id];
+				    result = connection.query(sql, [values]);
+				    connection.end();
+				    
 				});
 
 
@@ -2231,6 +2383,8 @@ app.get('/plan', function(req,res){
 		        var end_date = "n/a";
 		        var city = ""; 
 		        var date_diff = 0;
+		        var isPublic = 0;
+		        var source;
 
 		        var dates = [];
 		        if(result.length > 0){
@@ -2267,6 +2421,13 @@ app.get('/plan', function(req,res){
 		        		name = result[0].plan_name;
 		        	else
 		        		name = 'Your visit to ' + city;
+
+		        	isPublic = result[0].isPublic[0];
+
+		        	if(result[0].user == user)
+		        		source = "author";
+		        	else
+		        		source = "viewer";
 
 		        }
 
@@ -2302,10 +2463,11 @@ app.get('/plan', function(req,res){
 				    database: 'placesdb'
 
 				}).then(function(conn){
+					connection = conn;
+
 					var sql = "select distinct city from plan where id = ?";
 					var values = [plan_id];
-				    var result = conn.query(sql, [values]);
-				    conn.end();
+				    var result = connection.query(sql, [values]);
 
 			    	return result;
 				}).then(function(result){
@@ -2351,11 +2513,21 @@ app.get('/plan', function(req,res){
 					        	suggested_hotels.push(visit);
 					        }
 
-					        res.render(path.join(__dirname+'/templates/plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels});
+					        if(isPublic == "1" || source == "author")
+					        	res.render(path.join(__dirname+'/templates/plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic});
+					        else
+					        	res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
 
+					        
 				        });
 
 	        		});
+				}).then(function(result){
+					sql = "update plan set num_viewers = num_viewers + 1 where id = ?";
+					values = [plan_id];
+				    result = connection.query(sql, [values]);
+				    connection.end();
+				    
 				});
        	
 	    	});
@@ -2586,7 +2758,7 @@ app.get('/trips', function(req, res){
 
 		var user_id = req.query['id'];
 
-		var sql = "select distinct plan.name as name, city.name as city, plan.start_date as start, plan.end_date as end, plan.id as plan_id from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id where plan.user = ? and plan.isActive = 1";
+		var sql = "select distinct plan.name as name, city.name as city, plan.start_date as start, plan.end_date as end, plan.id as plan_id, plan.isPublic as isPublic from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id where plan.user = ? and plan.isActive = 1";
 		var parameters = [user_id];
 
 		con.query(sql, parameters, function (err, result, fields) {
@@ -2607,9 +2779,11 @@ app.get('/trips', function(req, res){
 
 	        	plan["city"] = result[i].city;
 
+	        	plan["isPublic"] = result[i].isPublic[0];
+
 	        	var month = new Array();
 				month[0] = "January";
-				month[1] = "February";
+ 				month[1] = "February";
 				month[2] = "March";
 				month[3] = "April";
 				month[4] = "May";
@@ -2628,7 +2802,7 @@ app.get('/trips', function(req, res){
 	        	plan["start"] = start_date.getDate() + " " + month[start_date.getMonth()] + " " + start_date.getFullYear();
 	        	plan["end"] = end_date.getDate() + " " + month[end_date.getMonth()] + " " + end_date.getFullYear();
 
-	        	if(end_date < now){
+	        	if(start_date < now){
 	        		past_trips.push(plan);
 	        	}
 
@@ -3076,6 +3250,60 @@ app.post('/review-poi', function(req, res){
 });
 
 
+app.post('/share-plan', upload_plan.single('picture'), function (req, res, next){
+
+	var sql = "update plan set isPublic = 1, photo = ?, description = ? where id = ? and user = ? and isActive = 1";
+	var values = [req.file.filename, req.body.description, req.body.plan, req.body.user];
+
+	con.query(sql, values, function (err, result, fields) {
+		if (err) throw err;
+
+	}); 
+
+
+	res.redirect('http://localhost:8080/trips?id='+ req.body.user);
+
+
+
+});
+
+
+
+app.get('/discover', function(req, res){
+
+	var sql = "select plan.id, plan.name, plan.description, plan.photo, plan.plan_timestamp, plan.num_viewers, user.name as user, city.name as city from plan join user on plan.user = user.id join city on plan.city = city.id  where isPublic = 1;";
+	con.query(sql, function (err, result, fields) {
+		if (err) throw err;
+
+		var trips = [];
+
+		for(var i=0; i < result.length; i++){
+			var trip = new Object();
+			trip["id"] = result[i].id;
+			trip["name"] = result[i].name;
+			trip["description"] = result[i].description;
+			trip["photo"] = result[i].photo;
+			trip["creation_date"] = result[i].plan_timestamp.toJSON().slice(0,10);
+			trip["num_viewers"] = result[i].num_viewers;
+			trip["author"] = result[i].user;
+			trip["city"] = result[i].city;
+			trip["isPremium"] = 0;
+
+			trips.push(trip);
+		}
+
+
+		res.render(path.join(__dirname+'/templates/discover.html'),  {trips: trips});
+
+	}); 
+
+});
+
+
+
+
+
+
 app.get('/teste', function(req, res){
 
 	getPoiOpeningHours();
@@ -3115,6 +3343,7 @@ function getPlanDays(start_date, number_days, convert=true){
 		var next_day = parseInt(day) + 1;
 		var next_month = month;
 		var next_year = year;
+
 		if(month == 2 && !isYearEven(year) && next_day > 28){
 			next_day = 1;
 			next_month = parseInt(month) + 1;
@@ -3125,12 +3354,12 @@ function getPlanDays(start_date, number_days, convert=true){
 			next_month = parseInt(month) + 1;
 		}
 
-		else if(!is31daysMonth && next_day > 30){
+		else if(!is31daysMonth(month) && next_day > 30){
 			next_day = 1;
 			next_month = parseInt(month) + 1;
 		}
 
-		else if(is31daysMonth && next_day > 31){
+		else if(is31daysMonth(month) && next_day > 31){
 			next_day = 1;
 			next_month = parseInt(month) + 1;
 			if(next_month > 12){

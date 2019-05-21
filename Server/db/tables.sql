@@ -29,7 +29,7 @@ CREATE TABLE User_E (
 	CHECK(gender = 'M' OR gender = 'F'), 
     CHECK(type_use = 'Free' or type_use = 'Premium')
 );
-*/
+
 
 CREATE TABLE Review (
 	id INT AUTO_INCREMENT NOT NULL,
@@ -48,4 +48,15 @@ CREATE TABLE Review_POI (
     FOREIGN KEY (review_id) REFERENCES Review(id),
     FOREIGN KEY (poi_id) REFERENCES POI(id),
     CHECK(review_rating > 0 and review_rating < 6)
+);*/
+
+CREATE TABLE Hotel (
+	poi_id INT NOT NULL,
+    stars INT,
+	PRIMARY KEY (poi_id),
+    FOREIGN KEY (poi_id) REFERENCES Poi(id),
+    CHECK(stars > 0 and stars < 6)
 );
+
+
+

@@ -104,7 +104,11 @@ function loadHotels(hotels_list){
 
         hotels[hotel.name] = hotel;
 
+        $("#hotel-" + i + "-link").attr("data-title", hotel.name);
+
         document.getElementById('hotel-' + i + '-name').innerText = hotel.name;
+        document.getElementById('hotel-' + i + '-name').title = hotel.name;
+
         loadImage(hotel.place_id, 'hotel-' + i + '-img');
     
     }
@@ -146,3 +150,25 @@ function loadModalInMap(hotels_dict){
     var dest =  '/place?id=' + hotels_dict['id'];
     $('#modal-find-more-btn').attr("onclick", "window.location.href = " + "'" + dest + "'");
 }
+
+$(function () {
+    $('.hotel-link').on('click', function () {
+        
+        hotels_dict = hotels[$(this).data('title')];
+
+        $('.modal-title').text(hotels_dict['name']);
+
+        loadImage(hotels_dict['place_id'], "info-modal-img");
+    
+        $('#modal-info-city').text(hotels_dict['city']);
+        $('#modal-info-addr').text(hotels_dict['address']);
+        $('#modal-info-coord').text(hotels_dict['coordinates']);
+        $('#modal-info-phone').text(hotels_dict['phone_number']);
+        $('#modal-info-website').text(hotels_dict['website']);
+        $('#modal-info-website').attr("href", hotels_dict['website']);
+
+        var dest =  '/place?id=' + hotels_dict['id'];
+        $('#modal-find-more-btn').attr("onclick", "window.location.href = " + "'" + dest + "'");
+        
+    });
+});

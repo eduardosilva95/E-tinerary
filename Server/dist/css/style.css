@@ -15,6 +15,12 @@ html, body {
 	padding-top: 25px;
 }
 
+
+.bg-dark {
+  background-color: #263238 !important;
+}
+
+
 hr {
   display: block;
   margin-top: 0;
@@ -598,6 +604,16 @@ hr {
 	border: 3px solid #ffc107;
 }
 
+#plan-link-hotels {
+  padding-left: 10px; 
+  color: #767676; 
+  font-size: 14px;
+}
+
+#plan-link-hotels:hover {
+  text-decoration: none;
+  opacity: 0.7;
+}
 
 
 .suggestions-title {
@@ -739,6 +755,21 @@ table tr td a{
 
 /* ---------------------------------- HOTELS ------------------------- */
 
+.hotel-div {
+  color: black;
+  border: none;
+}
+
+.hotel-link{
+  cursor: pointer;
+}
+
+.hotel-link:hover{
+  text-decoration: none;
+}
+
+
+
 .view-offer{
   position: absolute;
   bottom: 10px;
@@ -746,8 +777,57 @@ table tr td a{
 }
 
 .booking-btn {
+  color: white;
   background-color: #003580;
+  font-weight: bold;
 }
+
+.booking-btn:hover {
+  color: #003580;
+  background-color: white;
+}
+
+
+.hotel-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------------------------------- DISCOVER ------------------------------ */
+
+.discover-search{
+  width: 60%;
+  margin: auto;
+}
+
+.discover-search input[type=text] {
+  border: none; 
+  background-color: #4b5259;
+  color: #aaa;
+  font-size: 16px;
+  padding-left: 2.375rem;
+}
+
+.discover-search input[type=text]:focus {
+  outline: none !important;
+  border: none;
+  box-shadow: 0 0 10px #719ECE;
+}
+
+
+.discover-search .form-control-feedback {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  width: 2.375rem;
+  height: 2.375rem;
+  line-height: 2.375rem;
+  text-align: center;
+  pointer-events: none;
+  color: white;
+}
+
 
 
 

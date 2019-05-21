@@ -50,7 +50,7 @@
                 <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="#"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+                  <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
               </li>
               <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -176,9 +176,14 @@
                                       <a class="plan-table-btn-icons" href="/plan?id=<%= trip.id %>"><i title="See plan" class="fas fa-search-location"></i></i></a>
                                       <button type="button" class="plan-table-btn-icons"><i title="See calendar" class="fas fa-calendar-alt fa-lg" style="padding-left: 10px;"></i></button>
                                       <button type="button" class="plan-table-btn-icons"><i title="Download plan" class="fas fa-file-download fa-lg" style="padding-left: 10px;"></i></button>
-                                      <button type="button" class="plan-table-btn-icons"><i title="Share plan" class="fas fa-share-alt fa-lg" style="padding-left: 10px;"></i></button>
+                                      <% if(trip.isPublic == 0) { %>
+                                        <button type="button" class="plan-table-btn-icons btn-share-modal" data-toggle="modal" data-target="#share-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Share plan" class="fas fa-share-alt fa-lg" style="padding-left: 10px;"></i></button>
+                                      <% } else { %>
+                                        <i title="Plan is public" class="fas fa-eye fa-lg" style="padding-left: 10px; color: #4dd658"></i>                              
+                                      <% } %>
+                                      
                                       <button type="button" class="plan-table-btn-icons"><i title="Rating plan" class="fas fa-star fa-lg" style="padding-left: 10px;"></i></button>
-                                      <button type="button" class="plan-table-btn-icons"><i title="Make a review of the plan" class="fas fa-comment-alt fa-lg" style="padding-left: 10px;"></i></button>
+                                      <button type="button" class="plan-table-btn-icons"><i title="Review plan" class="fas fa-comment-alt fa-lg" style="padding-left: 10px;"></i></button>
                                   </div>
                               </div>
                           </div>
@@ -305,6 +310,43 @@
               </div>
           </div>
         </div>
+
+
+        <!-- Share Modal -->
+        <div class="modal fade" id="share-modal" role="dialog">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Share <span id="share-modal-title"></span></h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <form name="register-form" action="/share-plan" method="POST" enctype="multipart/form-data">
+                    <div class="modal-body">
+
+                        <input type="text" name="user" id="share-modal-user" style="display: none;">
+                        <input type="text" name="plan" id="share-modal-plan-id" style="display: none;">
+
+                        <label for="inputName">Enter a description for the plan</label>
+                        <textarea type="text" id="inputDescription" class="form-control" name="description" required></textarea>
+                        
+                        <br>
+
+                        <label for="plan-picture">Submit a picture for the plan</label>
+                        <input type="file" class="form-control-file" accept="image/*" id="plan-picture" name="picture" required>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
+                        <button type="submit" value="upload" class="btn btn-success"><i class="fas fa-check"></i><span style="padding-left: 10px;">Share</span></button>
+                    </div>
+                  </form>
+              </div>
+          </div>
+        </div>
+
+
 
         <!-- Footer -->
         <footer class="footer">
