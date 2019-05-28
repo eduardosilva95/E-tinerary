@@ -1156,17 +1156,6 @@ app.get('/hotels', function(req,res){
 	}
 });
 
-app.get('/search-restaurants',function(req,res){  
-  con.query("SELECT name FROM City", function (err, result, fields) {
-        if (err) throw err;
-        var string=JSON.stringify(result);
-        var list_cities = []
-        for(var i =0 ; i < result.length; i++){
-        	list_cities.push(result[i].name);
-        }
-        res.render(path.join(__dirname+'/templates/search-restaurants.html'), {cities: list_cities});
-    });
-});
 
 app.get('/restaurants', function(req,res){
 	var destination = req.query['dest'];
@@ -1348,7 +1337,7 @@ app.post('/create-plan', function(req, res){
 
 	departure = req.body.departure;
 
-	user_id = parseInt(req.body.user);
+	user_id = req.cookies['user'];
 
     promise.createConnection({
 	    host: 'localhost',
@@ -1707,6 +1696,151 @@ app.post('/rename-plan', function(req, res){
 
 
 
+app.post('/share-plan', upload_plan.single('picture'), function (req, res, next){
+	var user_id = req.cookies['user'];
+	var plan_id = req.cookies['plan'];
+
+	var connection;
+
+	var sql = "update plan set isPublic = 1, photo = ?, description = ?, category = ? where id = ? and user = ? and isActive = 1";
+	var values = [req.file.filename, req.body.description, req.body.category, plan_id, user_id];
+
+	con.query(sql, values, function (err, result, fields) {
+		if (err) throw err;
+
+		promise.createConnection({
+		host: 'localhost',
+	    user: 'root',
+	    password: 'password',
+	    database: 'placesdb'
+
+		}).then(function(conn){
+			connection = conn;
+
+			sql = "insert into review (user_id) values (?)";
+			values = [user_id];
+		    var result = connection.query(sql, [values]);
+
+	    	return result;
+		}).then(function(result){
+			var review_id = result.insertId;
+
+			sql = "insert into review_plan values (?)";
+			values = [review_id, plan_id, req.body.description, req.body.rating, convertToSQLTimestamp(Date.now())];
+	    	result = connection.query(sql, [values]);
+
+	    	res.redirect('http://localhost:8080/trips?id='+ user_id);
+
+		});
+
+	});
+
+	
+
+});
+
+
+
+app.post('/review-plan', function(req, res){
+	var connection;
+
+	var user_id = req.cookies['user'];
+
+	promise.createConnection({
+		host: 'localhost',
+	    user: 'root',
+	    password: 'password',
+	    database: 'placesdb'
+
+	}).then(function(conn){
+		connection = conn;
+
+		var sql = "insert into review (user_id) values (?)";
+		var values = [user_id];
+	    var result = connection.query(sql, [values]);
+
+    	return result;
+	}).then(function(result){
+		var review_id = result.insertId;
+
+		if(req.body.review == ""){
+			var sql = "insert into review_plan (review_id, plan_id, review_rating, review_timestamp) values (?)";
+			var values = [review_id, req.body.plan, req.body.rating, convertToSQLTimestamp(Date.now())];
+	    	var result = connection.query(sql, [values]);
+
+	    	res.send(JSON.stringify('success'));
+		}
+
+		else{
+			var sql = "insert into review_plan values (?)";
+			var values = [review_id, req.body.plan, req.body.review, req.body.rating, convertToSQLTimestamp(Date.now())];
+	    	var result = connection.query(sql, [values]);
+
+	    	res.send(JSON.stringify('success'));
+		}
+
+	});
+});
+
+
+app.post('/archive-plan', function(req, res){
+	var plan_id = parseInt(req.body.plan);
+	var user = req.cookies['user'];
+
+	var connection;
+
+	if(plan_id != undefined && user != undefined){
+
+		promise.createConnection({
+	    host: 'localhost',
+	    user: 'root',
+	    password: 'password',
+	    database: 'placesdb'
+
+		}).then(function(conn){
+			connection = conn;
+
+			var sql = "select user from plan where id = ?";
+			var values = [plan_id];
+
+		    var result = conn.query(sql, [values]);
+
+		    return result;
+		}).then(function(result){
+
+			if(result[0].user == user){
+				sql = "update plan set isArchived = 1 where id = ?";
+				values = [plan_id];
+
+				var result = connection.query(sql, values);
+		    	connection.end();
+
+				res.contentType('json');
+				res.send({result: 'success'});
+
+			}
+
+			else{
+				res.contentType('json');
+				res.send({result: 'error'});
+			}
+
+		});
+
+	}
+
+	else{
+		res.contentType('json');
+		res.send({result: 'error'});
+	}
+
+
+
+});
+
+
+
+
 app.post('/save-plan', function(req, res){
 	var plan_id = parseInt(req.body.plan);
 	var user = parseInt(req.body.user);
@@ -1779,6 +1913,9 @@ app.post('/save-plan', function(req, res){
 
 
 app.post('/add-visit', function(req, res){
+	
+	console.log("ADD VISIT " + req.body.poi + " TO THE PLAN " + req.body.plan);
+
 	var connection;
 
 	var plan_id = parseInt(req.body.plan);
@@ -2049,7 +2186,7 @@ app.get('/plan', function(req,res){
 		var plan_id = req.query['id'];
 		var view_method = req.query['v'];
 
-		var sql = "select plan.name as plan_name, plan.user as user, plan.start_date as start_date, plan.end_date as end_date, datediff(plan.end_date, plan.start_date) as date_diff, plan.isPublic as isPublic, visit.start_time as start_time, visit.end_time as end_time, weather, poi.name as name, poi.id as id, city.name as city, place_id, website, phone_number, address, poi_type, poi.latitude as latitude, poi.longitude as longitude from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id where plan.id = ? and plan.isActive = 1 and visit.isActive = 1 order by start_time";
+		var sql = "select plan.name as plan_name, plan.user as user, plan.start_date as start_date, plan.end_date as end_date, datediff(plan.end_date, plan.start_date) as date_diff, plan.isPublic as isPublic, plan.num_viewers as num_viewers, visit.start_time as start_time, visit.end_time as end_time, weather, poi.name as name, poi.id as id, city.name as city, place_id, website, phone_number, address, poi_type, poi.latitude as latitude, poi.longitude as longitude from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id where plan.id = ? and plan.isActive = 1 and visit.isActive = 1 order by start_time";
 		var parameters = [plan_id];
 
 		if(view_method == 'full'){
@@ -2063,6 +2200,7 @@ app.get('/plan', function(req,res){
 		        var date_diff = 0;
 		        var isPublic = 0;
 		        var source;
+		        var num_viewers = 0;
 
 		        var dates = [];
 		        if(result.length > 0){
@@ -2106,6 +2244,8 @@ app.get('/plan', function(req,res){
 		        		source = "author";
 		        	else
 		        		source = "viewer";
+
+		        	num_viewers = result[0].num_viewers;
 
 		        }
 
@@ -2192,10 +2332,61 @@ app.get('/plan', function(req,res){
 					        	suggested_hotels.push(visit);
 					        }
 
-					        if(isPublic == "1" || source == "author")
-					        	res.render(path.join(__dirname+'/templates/full-plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic});
-					        else
-					        	res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
+					        var sql4 = "select user.name as user, user.picture as picture, review_text, review_rating, review_timestamp from review_plan join (review join user on review.user_id = user.id ) on review_plan.review_id = review.id WHERE plan_id = ? order by review_timestamp desc";
+
+							con.query(sql4, plan_id, function (err, result, fields) {
+						    	if (err) throw err;
+
+						    	var reviews = [];
+
+						    	for(var i=0 ; i < result.length; i++){
+						    		var review = new Object();
+						    		review["text"] = result[i].review_text
+						    		review["rating"] = result[i].review_rating;
+						    		review["user"] = result[i].user;
+						    		review["user_pic"] = result[i].picture;
+						    		review["date"] = getReviewDate(result[i].review_timestamp);
+						    		reviews.push(review);
+						    	}
+
+						    	var sql5 = "select avg(review_rating) as rating, count(*) as num_reviews from review_plan where plan_id = ?";
+						        var parameters5 = [plan_id];
+
+						        con.query(sql5, parameters5, function (err, result, fields) {
+					        		if (err) throw err;
+
+					        		var rating = "0.0";
+					        		var num_reviews = 0;
+
+					        		if(result.length > 0){
+					        			num_reviews = result[0].num_reviews;
+					        			if(result[0].rating != null)
+					        				rating = result[0].rating.toFixed(1);
+					        		}
+
+
+				        		 	var sql6 = "select count(*) as num_plans from plan where parent_plan = ?";
+							        var parameters6 = [plan_id];
+
+							        con.query(sql6, parameters6, function (err, result, fields) {
+						        		if (err) throw err;
+
+						        		var num_plans = 0;
+
+						        		if(result.length > 0)
+						        			num_plans = result[0].num_plans;
+
+
+								        if(isPublic == "1" || source == "author")
+								        	res.render(path.join(__dirname+'/templates/full-plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, num_reviews: num_reviews, num_plans: num_plans});
+								        else
+								        	res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
+
+							        });
+
+							    });
+
+					        });
 				        
 
 				        });
@@ -2222,6 +2413,7 @@ app.get('/plan', function(req,res){
 		        var date_diff = 0;
 		        var isPublic = 0;
 		        var source;
+		        var num_viewers = 0;
 
 		        var dates = [];
 		        if(result.length > 0){
@@ -2265,6 +2457,8 @@ app.get('/plan', function(req,res){
 		        		source = "author";
 		        	else
 		        		source = "viewer";
+
+		        	num_viewers = result[0].num_viewers;
 
 		        }
 
@@ -2306,13 +2500,12 @@ app.get('/plan', function(req,res){
 					var sql = "select distinct city from plan where id = ?";
 					var values = [plan_id];
 				    var result = connection.query(sql, [values]);
-				    connection.end();
-
 			    	return result;
+			    	
 				}).then(function(result){
 					var city_id = result[0].city;
 
-					var sql2 = "select id, place_id, name from poi where city = ? and id not in (select poi_id from visit where plan_id = ?) order by num_reviews desc";
+					var sql2 = "select id, place_id, name, latitude, longitude, address, website, phone_number, poi_type from poi where city = ? and id not in (select poi_id from visit where plan_id = ?) order by num_reviews desc";
 		        	var parameters2 = [city_id, plan_id];
 
 			        con.query(sql2, parameters2, function (err, result, fields) {
@@ -2320,7 +2513,7 @@ app.get('/plan', function(req,res){
 
 			        	var suggested_visits = [];
 
-			        	var length = 3;
+			        	var length = 10;
 			        	if(result.length < length)
 			        		length = result.length;
 
@@ -2329,10 +2522,15 @@ app.get('/plan', function(req,res){
 				        	visit["id"] = result[i].id;
 				        	visit["name"] = result[i].name;
 				        	visit["place_id"] = result[i].place_id;
+				        	visit["address"] = result[i].address;
+				        	visit["coordinates"] = result[i].latitude + ", " + result[i].longitude;
+				        	visit["website"] = result[i].website;
+				        	visit["phone_number"] = result[i].phone_number;
+				        	visit["poi_type"] = result[i].poi_type;
 				        	suggested_visits.push(visit);
 				        }
 
-				        var sql3 = "select id, place_id, name from poi where city = ? and poi_type = 'Hotel' and id not in (select poi_id from visit where plan_id = ?)  order by num_reviews desc";
+				        var sql3 = "select id, place_id, name, latitude, longitude, address, website, phone_number, poi_type from poi where city = ? and poi_type = 'Hotel' and id not in (select poi_id from visit where plan_id = ?)  order by num_reviews desc";
 				        var parameters3 = [city_id, plan_id];
 
 				        con.query(sql3, parameters3, function (err, result, fields) {
@@ -2340,7 +2538,7 @@ app.get('/plan', function(req,res){
 
 				        	var suggested_hotels = [];
 
-				        	var length = 3;
+				        	var length = 10;
 				        	if(result.length < length)
 				        		length = result.length;
 
@@ -2349,18 +2547,55 @@ app.get('/plan', function(req,res){
 				        		visit["id"] = result[i].id;
 					        	visit["name"] = result[i].name;
 					        	visit["place_id"] = result[i].place_id;
+					        	visit["address"] = result[i].address;
+					        	visit["coordinates"] = result[i].latitude + ", " + result[i].longitude;
+					        	visit["website"] = result[i].website;
+					        	visit["phone_number"] = result[i].phone_number;
+					        	visit["poi_type"] = result[i].poi_type;
 					        	suggested_hotels.push(visit);
 					        }
 
-					        if(isPublic == "1" || source == "author")
-					        	res.render(path.join(__dirname+'/templates/map.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic});
-					        else
-					        	res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
 
-					        
+					        var sql4 = "select avg(review_rating) as rating, count(*) as num_reviews from review_plan where plan_id = ?";
+					        var parameters4 = [plan_id];
+
+					        con.query(sql4, parameters4, function (err, result, fields) {
+				        		if (err) throw err;
+
+				        		var rating = "0.0";
+				        		var num_reviews = 0;
+
+				        		if(result.length > 0){
+				        			num_reviews = result[0].num_reviews;
+				        			if(result[0].rating != null)
+				        				rating = result[0].rating.toFixed(1);
+				        		}
+
+
+			        		 	var sql5 = "select count(*) as num_plans from plan where parent_plan = ?";
+						        var parameters5 = [plan_id];
+
+						        con.query(sql5, parameters5, function (err, result, fields) {
+					        		if (err) throw err;
+
+					        		var num_plans = 0;
+
+					        		if(result.length > 0)
+					        			num_plans = result[0].num_plans;
+
+
+							        if(isPublic == "1" || source == "author")
+							        	res.render(path.join(__dirname+'/templates/map.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0});
+							        else
+							        	res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
+
+
+					        	});
+				        	});
 				        });
 
 	        		});
+
 				}).then(function(result){
 					sql = "update plan set num_viewers = num_viewers + 1 where id = ?";
 					values = [plan_id];
@@ -2385,6 +2620,7 @@ app.get('/plan', function(req,res){
 		        var date_diff = 0;
 		        var isPublic = 0;
 		        var source;
+		        var num_viewers = 0;
 
 		        var dates = [];
 		        if(result.length > 0){
@@ -2428,6 +2664,8 @@ app.get('/plan', function(req,res){
 		        		source = "author";
 		        	else
 		        		source = "viewer";
+
+		        	num_viewers = result[0].num_viewers;
 
 		        }
 
@@ -2465,7 +2703,7 @@ app.get('/plan', function(req,res){
 				}).then(function(conn){
 					connection = conn;
 
-					var sql = "select distinct city from plan where id = ?";
+					var sql = "select city from plan where id = ?";
 					var values = [plan_id];
 				    var result = connection.query(sql, [values]);
 
@@ -2473,7 +2711,7 @@ app.get('/plan', function(req,res){
 				}).then(function(result){
 					var city_id = result[0].city;
 
-					var sql2 = "select id, place_id, name from poi where city = ? and id not in (select poi_id from visit where plan_id = ?) order by num_reviews desc";
+					var sql2 = "select id, place_id, name, latitude, longitude, address, website, phone_number, poi_type from poi where city = ? and id not in (select poi_id from visit where plan_id = ?) order by num_reviews desc";
 		        	var parameters2 = [city_id, plan_id];
 
 			        con.query(sql2, parameters2, function (err, result, fields) {
@@ -2481,7 +2719,7 @@ app.get('/plan', function(req,res){
 
 			        	var suggested_visits = [];
 
-			        	var length = 3;
+			        	var length = 10;
 			        	if(result.length < length)
 			        		length = result.length;
 
@@ -2490,10 +2728,15 @@ app.get('/plan', function(req,res){
 				        	visit["id"] = result[i].id;
 				        	visit["name"] = result[i].name;
 				        	visit["place_id"] = result[i].place_id;
+				        	visit["address"] = result[i].address;
+				        	visit["coordinates"] = result[i].latitude + ", " + result[i].longitude;
+				        	visit["website"] = result[i].website;
+				        	visit["phone_number"] = result[i].phone_number;
+				        	visit["poi_type"] = result[i].poi_type;
 				        	suggested_visits.push(visit);
 				        }
 
-				        var sql3 = "select id, place_id, name from poi where city = ? and poi_type = 'Hotel' and id not in (select poi_id from visit where plan_id = ?) order by num_reviews desc";
+				        var sql3 = "select id, place_id, name, latitude, longitude, address, website, phone_number, poi_type from poi where city = ? and poi_type = 'Hotel' and id not in (select poi_id from visit where plan_id = ?)  order by num_reviews desc";
 				        var parameters3 = [city_id, plan_id];
 
 				        con.query(sql3, parameters3, function (err, result, fields) {
@@ -2501,7 +2744,7 @@ app.get('/plan', function(req,res){
 
 				        	var suggested_hotels = [];
 
-				        	var length = 3;
+				        	var length = 10;
 				        	if(result.length < length)
 				        		length = result.length;
 
@@ -2510,14 +2753,69 @@ app.get('/plan', function(req,res){
 				        		visit["id"] = result[i].id;
 					        	visit["name"] = result[i].name;
 					        	visit["place_id"] = result[i].place_id;
+					        	visit["address"] = result[i].address;
+					        	visit["coordinates"] = result[i].latitude + ", " + result[i].longitude;
+					        	visit["website"] = result[i].website;
+					        	visit["phone_number"] = result[i].phone_number;
+					        	visit["poi_type"] = result[i].poi_type;
 					        	suggested_hotels.push(visit);
 					        }
 
-					        if(isPublic == "1" || source == "author")
-					        	res.render(path.join(__dirname+'/templates/plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic});
-					        else
-					        	res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
+					        var sql4 = "select user.name as user, user.picture as picture, review_text, review_rating, review_timestamp from review_plan join (review join user on review.user_id = user.id ) on review_plan.review_id = review.id WHERE plan_id = ? order by review_timestamp desc";
 
+							con.query(sql4, plan_id, function (err, result, fields) {
+						    	if (err) throw err;
+
+						    	var reviews = [];
+
+						    	for(var i=0 ; i < result.length; i++){
+						    		var review = new Object();
+						    		review["text"] = result[i].review_text
+						    		review["rating"] = result[i].review_rating;
+						    		review["user"] = result[i].user;
+						    		review["user_pic"] = result[i].picture;
+						    		review["date"] = getReviewDate(result[i].review_timestamp);
+						    		reviews.push(review);
+						    	}
+
+						    	var sql5 = "select avg(review_rating) as rating, count(*) as num_reviews from review_plan where plan_id = ?";
+						        var parameters5 = [plan_id];
+
+						        con.query(sql5, parameters5, function (err, result, fields) {
+					        		if (err) throw err;
+
+					        		var rating = "0.0";
+					        		var num_reviews = 0;
+
+					        		if(result.length > 0){
+					        			num_reviews = result[0].num_reviews;
+					        			if(result[0].rating != null)
+					        				rating = result[0].rating.toFixed(1);
+					        		}
+
+
+				        		 	var sql6 = "select count(*) as num_plans from plan where parent_plan = ?";
+							        var parameters6 = [plan_id];
+
+							        con.query(sql6, parameters6, function (err, result, fields) {
+						        		if (err) throw err;
+
+						        		var num_plans = 0;
+
+						        		if(result.length > 0)
+						        			num_plans = result[0].num_plans;
+
+
+								        if(isPublic == "1" || source == "author")
+								        	res.render(path.join(__dirname+'/templates/plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, num_reviews: num_reviews, num_plans: num_plans});
+								        else
+								        	res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
+
+								    });
+
+							    });
+
+					        });
 					        
 				        });
 
@@ -2729,7 +3027,7 @@ app.get('/plan-m', function(req,res){
 				        	suggested_hotels.push(visit);
 				        }
 
-				        res.render(path.join(__dirname+'/templates/full-plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels});
+				        res.render(path.join(__dirname+'/templates/full-plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, isManual: 1});
 
 			        });
 
@@ -2758,7 +3056,7 @@ app.get('/trips', function(req, res){
 
 		var user_id = req.query['id'];
 
-		var sql = "select distinct plan.name as name, city.name as city, plan.start_date as start, plan.end_date as end, plan.id as plan_id, plan.isPublic as isPublic from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id where plan.user = ? and plan.isActive = 1";
+		var sql = "select distinct plan.name as name, city.name as city, plan.start_date as start, plan.end_date as end, plan.id as plan_id, plan.isPublic as isPublic, plan.photo as photo from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id where plan.user = ? and plan.isActive = 1 and plan.isArchived = 0";
 		var parameters = [user_id];
 
 		con.query(sql, parameters, function (err, result, fields) {
@@ -2780,6 +3078,8 @@ app.get('/trips', function(req, res){
 	        	plan["city"] = result[i].city;
 
 	        	plan["isPublic"] = result[i].isPublic[0];
+
+	        	plan["photo"] = result[i].photo;
 
 	        	var month = new Array();
 				month[0] = "January";
@@ -2825,8 +3125,6 @@ app.get('/trips', function(req, res){
 
 
 });
-
-
 
 
 
@@ -2998,8 +3296,8 @@ app.post('/register', upload.single('photo'), function (req, res, next){
 				con.beginTransaction(function(err) {
   					if (err) { throw err; }
 
-					var sql = "insert into user (username, name, picture) values (?)";
-					var values = [req.body.email, req.body.fname + " " + req.body.lname, req.file.filename];
+					var sql = "insert into user (username, name, picture, type_use) values (?)";
+					var values = [req.body.email, req.body.fname + " " + req.body.lname, req.file.filename, req.body.type_use];
 
 					con.query(sql, [values], function(err, result) {
     					if (err) { 
@@ -3019,12 +3317,12 @@ app.post('/register', upload.single('photo'), function (req, res, next){
 
 							if(req.body.phone != undefined){
 								sql = "insert into user_e values (?) ";
-								values = [user_id, birthday, req.body.gender, req.body.country, req.body.phone, req.body.type_use, password];
+								values = [user_id, birthday, req.body.gender, req.body.country, req.body.phone, password];
 							}
 
 							else{
-								sql = "insert into user_e (birthday, gender, country, type_use, password) values (?) ";
-								values = [user_id, birthday, req.body.gender, req.body.country, req.body.type_use, password];
+								sql = "insert into user_e (birthday, gender, country, password) values (?) ";
+								values = [user_id, birthday, req.body.gender, req.body.country, password];
 
 							}
 
@@ -3134,12 +3432,12 @@ app.post('/register', upload.single('photo'), function (req, res, next){
 
 						if(req.body.phone != undefined){
 							sql = "insert into user_e values (?) ";
-							values = [user_id, birthday, req.body.gender, req.body.country, req.body.phone, req.body.type_use, password];
+							values = [user_id, birthday, req.body.gender, req.body.country, req.body.phone, password];
 						}
 
 						else{
-							sql = "insert into user_e (birthday, gender, country, type_use, password) values (?) ";
-							values = [user_id, birthday, req.body.gender, req.body.country, req.body.type_use, password];
+							sql = "insert into user_e (birthday, gender, country, password) values (?) ";
+							values = [user_id, birthday, req.body.gender, req.body.country, password];
 
 						}
 
@@ -3210,6 +3508,8 @@ app.get('/help', function(req, res){
 });
 
 
+
+
 app.post('/review-poi', function(req, res){
 	var connection;
 
@@ -3250,28 +3550,48 @@ app.post('/review-poi', function(req, res){
 });
 
 
-app.post('/share-plan', upload_plan.single('picture'), function (req, res, next){
 
-	var sql = "update plan set isPublic = 1, photo = ?, description = ? where id = ? and user = ? and isActive = 1";
-	var values = [req.file.filename, req.body.description, req.body.plan, req.body.user];
+app.post('/add-description-poi', function(req, res){
+	
+	var sql = "update poi set description = ? where id = ?";
+	var values = [req.body.description, req.body.poi];
 
 	con.query(sql, values, function (err, result, fields) {
-		if (err) throw err;
+		if (err){
+			throw err;
+			res.send(JSON.stringify('error'));
+		}
 
-	}); 
-
-
-	res.redirect('http://localhost:8080/trips?id='+ req.body.user);
-
-
-
+		else{
+			res.send(JSON.stringify('success'));
+		}
+	});
 });
+
+
+
+
+
+
 
 
 
 app.get('/discover', function(req, res){
 
-	var sql = "select plan.id, plan.name, plan.description, plan.photo, plan.plan_timestamp, plan.num_viewers, user.name as user, city.name as city from plan join user on plan.user = user.id join city on plan.city = city.id  where isPublic = 1;";
+	var sql = "select * from \
+	((select plan.id as id, plan.name, plan.description, plan.photo, plan.plan_timestamp, plan.num_viewers, user.name as user, user.type_use as type, city.name as city, avg(review_rating) as rating \
+	from plan join user on plan.user = user.id join city on plan.city = city.id left outer join review_plan on plan.id = review_plan.plan_id \
+	where isPublic = 1 group by id) \
+	union distinct \
+	(select plan.id as id, plan.name, plan.description, plan.photo, plan.plan_timestamp, plan.num_viewers, user.name as user, user.type_use as type, city.name as city, review_rating as rating \
+	from plan join user on plan.user = user.id join city on plan.city = city.id left outer join review_plan on plan.id = review_plan.plan_id \
+	where isPublic = 1 and review_rating is null)) t1 \
+	left outer join \
+	(select plan.id as id2, count(plan2.id) as num_plans \
+	from plan join user on plan.user = user.id join city on plan.city = city.id join plan as plan2 on plan.id = plan2.parent_plan \
+	where plan.isPublic = 1 group by id2) t2 \
+	on t1.id = t2.id2;"; 
+
 	con.query(sql, function (err, result, fields) {
 		if (err) throw err;
 
@@ -3287,7 +3607,22 @@ app.get('/discover', function(req, res){
 			trip["num_viewers"] = result[i].num_viewers;
 			trip["author"] = result[i].user;
 			trip["city"] = result[i].city;
-			trip["isPremium"] = 0;
+
+			if(result[i].type == "Premium")
+				trip["isPremium"] = 1;
+
+			else
+				trip["isPremium"] = 0;
+
+			if(result[i].rating == null)
+				trip["rating"] = "0.0";
+			else
+				trip["rating"] = result[i].rating.toFixed(1);
+
+			if(result[i].num_plans == null)
+				trip["num_plans"] = 0;
+			else
+				trip["num_plans"] = result[i].num_plans;
 
 			trips.push(trip);
 		}
@@ -3734,8 +4069,6 @@ function parsePoiOpeningHours(poi_op_hours){
 
 	var poi_hours = {};
 
-	console.log(poi_op_hours);
-
 	for(var i=0; i<poi_op_hours.length;i++){
         var weekday = poi_op_hours[i].split(':')[0];
         var opening_hours = poi_op_hours[i].substring(poi_op_hours[i].indexOf(':')+1);
@@ -3766,6 +4099,7 @@ function parsePoiOpeningHours(poi_op_hours){
 	}
 
 	console.log(poi_hours);
+
 
 
 }

@@ -9,16 +9,22 @@ var day;
 var place_info = [];
 
 var places = {};
+var suggested_places = {};
+var hotels = {};
 
 var markers = [];
 var marker_list = [];
 
-var colors = ['#ac48db', '#74bb82', '#f7c12e', '#ea7419']
-
+var visits_color = '#74bb82';
+var suggested_visits_color = '#ac48db';
+var hotels_color = '#2079d8';
 
 /* load map */
 function initMap(city) {
     var coordinates;
+
+    if(city == "Barcelona")
+        city = "Barcelona, Spain";
 
     // show map in the city specified 
     var geocoder = new google.maps.Geocoder();
@@ -49,8 +55,18 @@ function initMap(city) {
 
             google.maps.event.addListenerOnce(map, 'idle', function () {
                 for(var key in places){
-                    data = {color: '#ac48db', icon: 'fas fa-monument'};
-                    createMarker(places[key]['coordinates'], places[key]['name'], data);
+                    data = {color: visits_color, icon: getIcon(places[key]["poi_type"])};
+                    createMarker(places[key]['coordinates'], places[key]['name'], data, "visits");
+                }
+
+                for(var key in suggested_places){
+                    data = {color: suggested_visits_color, icon: getIcon(suggested_places[key]["poi_type"])};
+                    createMarker(suggested_places[key]['coordinates'], suggested_places[key]['name'], data, "suggestions");
+                }
+
+                for(var key in hotels){
+                    data = {color: hotels_color, icon: getIcon(hotels[key]["poi_type"])};
+                    createMarker(hotels[key]['coordinates'], hotels[key]['name'], data, "hotels");
                 }
 
             /* Markers clustering */
@@ -72,7 +88,7 @@ function initMap(city) {
 }
 
 
-function createMarker(local, name, data){
+function createMarker(local, name, data, type){
     if(marker_list.includes(name))
       return;
     
@@ -92,9 +108,31 @@ function createMarker(local, name, data){
       map_icon_label: '<i class="'+data.icon+'"></i>'
     });
 
-    marker.addListener('click', function () {
-        viewPOI(places[this.title]);
-    });
+    if(type == "visits"){
+        marker.addListener('click', function () {
+            viewPOI(places[this.title]);
+            $("#add-remove-visit-btn").attr("class","btn btn-danger");
+            $("#add-remove-visit-btn").html('<i class="fas fa-trash-alt"></i><span style="padding-left: 10px;">Remove from plan</span>');
+        });
+    }
+
+    else if(type == "suggestions"){
+        marker.addListener('click', function () {
+            viewPOI(suggested_places[this.title]);
+            $("#add-remove-visit-btn").attr("class","btn btn-success");
+            $("#add-remove-visit-btn").html('<i class="fas fa-calendar-alt"></i><span style="padding-left: 10px;">Add to plan</span>');
+        });
+    }
+
+    else if(type == "hotels"){
+        marker.addListener('click', function () {
+            viewPOI(hotels[this.title]);
+            $("#add-remove-visit-btn").attr("class","btn btn-success");
+            $("#add-remove-visit-btn").html('<i class="fas fa-calendar-alt"></i><span style="padding-left: 10px;">Book hotel</span>');
+        });
+
+    }
+
     
     markers.push(marker);
     marker_list.push(marker.title);
@@ -119,13 +157,34 @@ function loadPlan(plan_array, days){
     for(var j=0 ; j < plan.length ; j++){
         p = JSON.parse(plan[j]);
 
-        places[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number};
+        places[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number, 'poi_type': p.poi_type};
 
         if(p.day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
             visits.push(p);
         }
     }
 }
+
+function loadSuggestions(suggested_visits){
+
+    for(var j=0 ; j < suggested_visits.length ; j++){
+        p = JSON.parse(suggested_visits[j]);
+
+        suggested_places[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number, 'poi_type': p.poi_type};
+    }
+}
+
+function loadHotels(suggested_hotels){
+
+    for(var j=0 ; j < suggested_hotels.length ; j++){
+        p = JSON.parse(suggested_hotels[j]);
+
+        hotels[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number, 'poi_type': p.poi_type};
+    }
+}
+
+
+
 
 function loadCityImage(city){
   var request = {
@@ -173,7 +232,8 @@ function viewPOI(place_dict){
     document.getElementById("sidebar-1").style.display = "none";
     document.getElementById("sidebar-2").style.display = "block";
 
-    if($('#sidebar').className == 'active'){
+    if($('#sidebar').attr("class") == 'active'){
+
         $('#sidebar').toggleClass('active');
         $('#full-map').toggleClass('active');
         $('#sidebarCollapse').toggleClass('active');
@@ -193,7 +253,7 @@ function viewPOI(place_dict){
 
     document.getElementById("poi-info").style.visibility = 'visible';
     document.getElementById("poi-opening-hours").style.visibility = 'visible';
-    document.getElementById("add-remove-btn").style.visibility = 'visible';
+    document.getElementById("add-remove-visit-btn").style.visibility = 'visible';
 
 
     document.getElementById('poi-address').innerHTML = place_dict['address'];
@@ -294,6 +354,64 @@ function changeView(view){
 
     else if(view == 'map'){
         window.location.href = url + "&v=map";
+    }
+
+}
+
+function getIcon(type){
+
+    type = type.toLowerCase();
+
+    if(type == 'park'){
+        return "fas fa-tree";
+    }
+
+    else if(type == 'castle'){
+        return "fas fa-chess-rook";
+    }
+
+    else if (type == 'tower' || type == 'museum'){
+        return "fas fa-archway";
+    }
+
+    else if (type == 'church'){
+        return "fas fa-church";
+    }
+
+    else if (type == 'restaurant'){
+        return "fas fa-utensils";
+    }
+
+    else if (type == 'hotel'){
+        return "fas fa-bed";
+    }
+
+    else if (type == 'natural feature'){
+        return "fas fa-umbrella-beach";
+    }
+
+    else if (type == 'aquarium'){
+        return "fas fa-fish";
+    }
+
+    else if (type == 'zoo'){
+        return "fas fa-hippo";
+    }
+
+    else if (type == 'place of worship'){
+        return "fas fa-place-of-worship";
+    }
+
+    else if (type == 'amusement park'){
+        return "fas fa-child";
+    }
+
+    else if (type == 'stadium'){
+        return "fas fa-futbol";
+    }
+
+    else if (type == 'train station'){
+        return "fas fa-train";
     }
 
 }

@@ -50,7 +50,7 @@
                   <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+                    <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -112,18 +112,41 @@
 
             <div class="row cont">
                 <div class="col-md-8">
-                    <div class="card">
-                        <img id="place-image" class="card-img-top">
+                    <div class="slideshow-container" id="slideshow-div">
+
+                        <!-- Next and previous buttons -->
+                        <button class="slideshow-prev" onclick="plusSlides(-1)">&#10094;</button>
+                        <button class="slideshow-next" onclick="plusSlides(1)">&#10095;</button>
+
+                    </div>
+                    
+                    <br>
+
+                    <!-- The dots/circles -->
+                    <div style="text-align:center" id="dots-div">
                     </div>
 
                     <br>
                     
                     <div class="card" >
                         <div class="card-body" id="place-description">
+                            <% if(description == "" || description == place) { %>
+                                <div class="text-right">
+                                    <button class="btn btn-success btn-add-description-modal" data-toggle="modal" data-target="#add-description-modal" data-title="<%= place %>"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Add description</span></button>
+                                </div>
+                            <% } else { %>
+                                <div class="text-right">
+                                    <button class="btn btn-success btn-add-description-modal" data-toggle="modal" data-target="#add-description-modal" data-title="<%= place %>" data-description="<%= description %>"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Update description</span></button>
+                                </div>
+                            <% } %>
+
+                            <br>
+
                             <p class="card-text"><%= description %></p>
-                            <div class="text-right">
+
+                            <!--<div class="text-right">
                                 <p><i class="fab fa-wikipedia-w" style="padding-left: 10px;"></i></p>
-                            </div>
+                            </div>-->
                         </div>
                     </div>
 
@@ -426,6 +449,30 @@
             </div>
         </div>
 
+        <!-- Add Description Modal -->
+        <div class="modal fade" id="add-description-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add description for <span id="modal-add-description-title" style="font-weight: bold;"></span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <label for="add-description-text">Description:</label>
+                        <textarea class="form-control" rows="10" id="add-description-text"></textarea>  
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
+                        <button type="button" onclick="addDescription();" class="btn btn-success" data-dismiss="modal"><i class="fas fa-check"></i><span style="padding-left: 10px;">Submit</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <br><br><br><br>
 
@@ -455,6 +502,11 @@
   
     <!-- Scripts -->
     <script>startGoogleSignIn();</script>
+
+    <script>
+        var place_id = "<%= place_id %>";
+        getPlaceDetails(place_id);
+    </script>
 
     <script>
         var fromPlan = '<%= (fromPlan) %>';

@@ -1,22 +1,32 @@
 
-function getCityImage(city, dest){
+function getCityImage(city, dest, image){
 
-    var request = {
-        query: city,
-    };
+    if(image != undefined && image != "")
+        document.getElementById(dest).src = "/img/plans/" + image;
 
-    var service = new google.maps.places.PlacesService(document.createElement('places-map'));
+    else{
+        if(city == "Barcelona" || city == "Madrid")
+            city = city + ", Spain";
 
-    service.textSearch(request, function(results, status){
-        if (status == google.maps.places.PlacesServiceStatus.OK) {
-            var place = results[0];
 
-            if(place.photos != undefined)
-                document.getElementById(dest).src = place.photos[0].getUrl();
-            else
-                document.getElementById(dest).src = "";
-        }
-    });
+        var request = {
+            query: city,
+        };
+
+        var service = new google.maps.places.PlacesService(document.createElement('places-map'));
+
+        service.textSearch(request, function(results, status){
+            if (status == google.maps.places.PlacesServiceStatus.OK) {
+                var place = results[0];
+
+                if(place.photos != undefined)
+                    document.getElementById(dest).src = place.photos[0].getUrl();
+                else
+                    document.getElementById(dest).src = "";
+            }
+        });
+
+    }
 }
 
 $(function () {
@@ -39,6 +49,15 @@ $(function () {
     });
 });
 
+$(function () {
+    $('.btn-archive-modal').on('click', function () {
+        $('#archive-modal-title').text($(this).data('name'));
+    
+        document.getElementById('confirm-archive-btn').setAttribute( "onClick", "javascript: archiveTrip("+$(this).data('id')+");");
+
+    });
+});
+
 
 $(function () {
     $('.btn-share-modal').on('click', function () {
@@ -46,6 +65,12 @@ $(function () {
 
         $('#share-modal-plan-id').val($(this).data('id'));
         $('#share-modal-user').val(getUserCookie());
+
+        if($(this).data('src') == "past")
+            $("#are-you-sure-share-msg").css("display", "none");
+        else
+            $("#are-you-sure-share-msg").css("display", "block");
+
 
        // document.getElementById('confirm-public-btn').setAttribute( "onClick", "javascript: makePublic("+$(this).data('id')+");");
 
@@ -96,24 +121,15 @@ function renameTrip(trip_id){
 
 }
 
-function makePublic(trip_id){
-    var user = getUserCookie();
-
-    var description = document.getElementById("inputDescription").value;
-    var picture = document.getElementById("plan-picture").value;
-
-    if(user != null){
-        $.post("/make-plan-public", {plan: trip_id, user: user, description: description, picture: picture}, function(result){
-
-            console.log(result);
+function archiveTrip(trip_id){
+    $.post("/archive-plan", {plan: trip_id}, function(result){
     
-            if(result.result == 'error'){
-            }
-            
-            else{
-              window.location.reload();
-            }
-        })    
-    }
-
+        if(result.result == 'error'){
+        }
+        
+        else{
+            window.location.reload();
+        }
+    })    
 }
+

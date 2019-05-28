@@ -57,7 +57,7 @@
                   <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+                    <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -152,10 +152,9 @@
                 </div>
 
                 
-                <div class="cont text-center form-group" id="add-remove-btn">
-                <!-- <button class="btn btn-success"><i class="far fa-calendar-alt"></i><span style="padding-left: 10px;">Add to the trip</span></button>-->
+                <div class="cont text-center form-group">
                     <button class="btn btn-success" onclick="backToPlan();"><i class="fas fa-undo-alt"></i><span style="padding-left: 10px;">Back to plan</span></button>
-                    <button class="btn btn-danger"><i class="fas fa-trash-alt"></i><span style="padding-left: 10px;">Remove from plan</span></button>
+                    <button class="btn btn-danger" id="add-remove-visit-btn"></button>
                 </div>
 
 
@@ -272,13 +271,24 @@
     <script>startGoogleSignIn();</script>
     <script>
         var plan = [];
+        var suggested_visits = [];
+        var suggested_hotels = [];
         
         '<% plan.forEach(function(visit) { %>'
             plan.push('<%- JSON.stringify(visit) %>');
+        '<% }); %>'
 
+        '<% suggested_visits.forEach(function(visit) { %>'
+            suggested_visits.push('<%- JSON.stringify(visit) %>');
+        '<% }); %>'
+
+        '<% suggested_hotels.forEach(function(hotel) { %>'
+            suggested_hotels.push('<%- JSON.stringify(hotel) %>');
         '<% }); %>'
 
         loadPlan(plan, '<%= days %>');
+        loadSuggestions(suggested_visits);
+        loadHotels(suggested_hotels);
     
     </script>
         

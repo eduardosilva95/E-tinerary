@@ -51,7 +51,7 @@
                   <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+                    <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -101,12 +101,12 @@
 
                 <br><br>
 
-                <form autocomplete="off" id="search-form" >
+                <form autocomplete="off" id="search-form" action="/create-plan" method="POST">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group autocomplete fg">
                                 <label class="mr-2" for="inputDestination" style="color: #ffc107; font-weight: bold;">Destination</label>
-                                <input type="text" class="form-control" id="inputDestination" placeholder="Enter your destination">
+                                <input type="text" class="form-control" id="inputDestination" name="destination" placeholder="Enter your destination">
                             </div>
                             <script>
                                 var cities = "<%= cities %>";
@@ -117,8 +117,8 @@
                             <div class="form-group fg">
                                 <div class="row">
                                     <div class="col-sm-6">
-                                        <label class="mr-2" for="inlineFormCustomSelectPref" style="color: #ffc107; font-weight: bold;">Adults</label>
-                                        <select class="custom-select mr-sm-2" id="inlineFormCustomSelectPref">
+                                        <label class="mr-2" for="select-adults" style="color: #ffc107; font-weight: bold;">Adults</label>
+                                        <select class="custom-select mr-sm-2" id="select-adults" name="no-adults">
                                         <option selected value="1">1</option>
                                         <option value="2">2</option>
                                         <option value="3">3</option>
@@ -130,9 +130,9 @@
                                         </select>
                                     </div>
                                     <div class="col-sm-6">
-                                        <label class="my-1 mr-2" for="inlineFormCustomSelectPref" style="color: #ffc107; font-weight: bold;">Children (< 12 years)</label>
-                                        <select class="custom-select mr-sm-2" id="inlineFormCustomSelectPref">
-                                        <option selected value="0">0</optsion>
+                                        <label class="my-1 mr-2" for="select-children" style="color: #ffc107; font-weight: bold;">Children (< 12 years)</label>
+                                        <select class="custom-select mr-sm-2" id="select-children" name="no-children">
+                                        <option selected value="0">0</option>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
                                         <option value="3">3</option>
@@ -151,45 +151,47 @@
                                     <div class='col-sm-6'>
                                         <div class="input-group date ">
                                         <label class="mr-2" for="arrival-date" style="color: #ffc107; font-weight: bold;">Dates</label>
-                                        <input type="text" class="form-control" placeholder="Arrival" id="arrival-date" required>
+                                        <input type="text" class="form-control" placeholder="Arrival" id="arrival-date" name="arrival" required>
                                         <script>
                                             $('#arrival-date').datepicker({
                                                 uiLibrary: 'bootstrap4',
                                                 format: 'dd/mm/yyyy',
+                                                minDate: new Date()
                                             });
                                         </script>
                                         </div>
                                     </div>
                 
                                     <br>
+
                                     <div class='col-sm-6' >
                                         <div class="input-group date" >
                                             <label class="mr-2" for="departure-date" style="color: #ffc107; font-weight: bold; visibility: hidden;">Dates</label>
-                                            <input type="text" class="form-control" placeholder="Departure" id="departure-date" required>
+                                            <input type="text" class="form-control" placeholder="Departure" id="departure-date" name="departure" required>
                                             <script>
                                             $('#departure-date').datepicker({
                                                 uiLibrary: 'bootstrap4',
                                                 format: 'dd/mm/yyyy',
+                                                minDate: new Date()
                                             });
                                             </script>
                                         </div>
                                     </div>
-                                        
                                 </div>
                             </div>
 
                             <div class="form-group fg">
                                 <legend style="color: #ffc107; font-size: 1rem; font-weight: bold; padding-top: .375rem;">Budget: </legend>
                                 <div class="custom-control custom-radio custom-control-inline my-1 mr-sm-2">
-                                    <input type="radio" name="radioBudget" class="custom-control-input" id="radioBudgetNo"  value="option1" onclick="disableBudgetBox()" checked>
+                                    <input type="radio" name="radio-budget" class="custom-control-input" id="radio-budget-no"  value="No" onclick="disableBudgetBox()" checked>
                                     <label class="custom-control-label" for="radioBudgetNo" style="color: white; font-size: 1rem;">No</label>
                                 </div>
                                 <div class="custom-control custom-radio custom-control-inline my-1 mr-sm-2">
-                                    <input type="radio" name="radioBudget" class="custom-control-input" id="radioBudgetYes" value="option2" onclick="enableBudgetBox()">
+                                    <input type="radio" name="radio-budget" class="custom-control-input" id="radio-budget-yes" value="Yes" onclick="enableBudgetBox()">
                                     <label class="custom-control-label" for="radioBudgetYes" style="color: white; font-size: 1rem;">Yes</label>
                                 </div>
                                 <div class="custom-control custom-control-inline mr-sm-2 float-right">
-                                    <input type="text" class="form-control" id="inputBudget" placeholder="Budget (€)" disabled>
+                                    <input type="text" class="form-control" id="input-budget" name="budget" placeholder="Budget (€)" disabled>
                                 </div>
                             </div>
 
@@ -199,23 +201,23 @@
                     <div class="form-group fg">
                         <legend style="color: #ffc107; font-size: 1rem; font-weight: bold;">How to move: </legend>
                         <div class="custom-control custom-checkbox custom-control-inline">
-                            <input type="checkbox" class="custom-control-input" id="check-move-car">
+                            <input type="checkbox" class="custom-control-input" id="check-move-car" name="move-car">
                             <label class="custom-control-label" for="check-move-car" style="color: white; font-size: 1rem;"><i class="fas fa-car"></i><span style="padding-left: 10px;">Car</span></label>
                         </div>
 
                         <div class="custom-control custom-checkbox custom-control-inline">
-                            <input type="checkbox" class="custom-control-input" id="check-move-foot">
+                            <input type="checkbox" class="custom-control-input" id="check-move-foot" name="move-foot">
                             <label class="custom-control-label" for="check-move-foot" style="color: white; font-size: 1rem;"><i class="fas fa-walking"></i><span style="padding-left: 10px;">On foot</span></label>
                         </div>
 
                         <div class="custom-control custom-checkbox custom-control-inline">
-                            <input type="checkbox" class="custom-control-input" id="check-move-public">
+                            <input type="checkbox" class="custom-control-input" id="check-move-public" name="move-public">
                             <label class="custom-control-label" for="check-move-public" style="color: white; font-size: 1rem;"><i class="fas fa-bus"></i><span style="padding-left: 10px;">Public Transportations</span></label>
                         </div>
 
                         <div class="custom-control custom-checkbox custom-control-inline">
-                            <input type="checkbox" class="custom-control-input" id="check-move-other">
-                            <label class="custom-control-label" for="check-move-other" style="color: white; font-size: 1rem;"><i class="fas fa-bicycle"></i><span style="padding-left: 10px;">Bicycle</span></label>
+                            <input type="checkbox" class="custom-control-input" id="check-move-bike" name="move-bike">
+                            <label class="custom-control-label" for="check-move-bike" style="color: white; font-size: 1rem;"><i class="fas fa-bicycle"></i><span style="padding-left: 10px;">Bicycle</span></label>
                         </div>
 
                     </div>
@@ -228,45 +230,50 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-museums">
+                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-museums" name="interests-museum">
                                     <label class="custom-control-label" for="checkbox-interests-museums">Museums</label>
                                 </div>
                                 <br>
                                 <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-recreation">
+                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-recreation" name="interests-recreation">
                                     <label class="custom-control-label" for="checkbox-interests-recreation">Recreation</label>
                                 </div>
                             </div>
                             
                             <div class="col-md-3">
                                 <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-theaters">
+                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-theaters" name="interests-theaters">
                                     <label class="custom-control-label" for="checkbox-interests-theaters">Theaters</label>
                                 </div>
                                 <br>
                                 <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-nature">
+                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-nature" name="interests-nature">
                                     <label class="custom-control-label" for="checkbox-interests-nature">Nature Places</label>
                                 </div>
                             </div>
 
                             <div class="col-md-3">
                                 <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-shopping">
+                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-shopping" name="interests-shopping">
                                     <label class="custom-control-label" for="checkbox-interests-shopping">Shopping</label>
                                 </div>
                                 <br>
                                 <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-history">
+                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-history" name="interests-history">
                                     <label class="custom-control-label" for="checkbox-interests-history">Historic Places</label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="float-right">
-                        <button type="submit" class="btn btn-success" style="color: white; font-weight: bold;">Create plan</button>
+
+                    <div class="float-md-right float-sm-none">
+                        <button type="submit" value="submit" class="btn btn-success" style="color: white; font-weight: bold;">Create plan</button>
                     </div>
+
+                    <div class="float-md-left float-sm-none">
+                        <a class="btn btn-warning" href="/create-plan">Create your plan manually</a>
+                    </div>
+                    
 
                 </form>
               </div>

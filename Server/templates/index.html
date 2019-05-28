@@ -97,17 +97,13 @@
                 <br><br>
                 <form autocomplete="off" action="/create-plan" method="POST">
                     <div class="form-group autocomplete">
-                      <input type="text" class="form-control" id="inputDestination" aria-describedby="emailHelp" name="destination" placeholder="Enter your destination" required>
+                      <input type="text" class="form-control" id="inputDestination" name="destination" placeholder="Enter your destination" required>
                     </div>
                     <script>
                       var cities = "<%= cities %>";
                       var list_cities = cities.split(',');
                       autocomplete(document.getElementById("inputDestination"), list_cities);
                     </script>
-
-                    <div class="form-group" style="display: none">
-                      <input type="text" class="form-control" id="user-id" aria-describedby="emailHelp" name="user" style="display: none">
-                    </div>
                     
                     <div class="row">
                       <div class='col-sm-6'>
@@ -137,14 +133,14 @@
                             </script>
                           </div>
                       </div>
-                        
                     </div>
+
                     <br>
 
                     <div class="row">
                       <div class="col-sm-6">
                         <label class="my-1 mr-2" for="select-adults" style="color: white; font-weight: bold;">Adults</label>
-                        <select class="custom-select my-1 mr-sm-2" id="select-adults">
+                        <select class="custom-select my-1 mr-sm-2" id="select-adults" name="no-adults">
                           <option selected value="1">1</option>
                           <option value="2">2</option>
                           <option value="3">3</option>
@@ -152,7 +148,7 @@
                       </div>
                       <div class="col-sm-6">
                         <label class="my-1 mr-2" for="select-children" style="color: white; font-weight: bold;">Children <sup id="input-children-info"><i class="fas fa-question-circle" title="Children to 12 years old"></i></sup></label>
-                        <select class="custom-select my-1 mr-sm-2" id="select-children">
+                        <select class="custom-select my-1 mr-sm-2" id="select-children" name="no-children">
                           <option selected value="0">0</optsion>
                           <option value="1">1</option>
                           <option value="2">2</option>

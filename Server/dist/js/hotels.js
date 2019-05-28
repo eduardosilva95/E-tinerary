@@ -13,6 +13,9 @@ var hotels = {};
 function initMap(city) {
     var coordinates;
 
+    if(city == "Barcelona")
+        city = "Barcelona, Spain";
+
     // show map in the city specified 
     var geocoder = new google.maps.Geocoder();
     geocoder.geocode({

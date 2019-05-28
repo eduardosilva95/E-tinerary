@@ -10,16 +10,23 @@ var day;
 var place_info = [];
 
 var places = {};
+var suggested_places = {};
+var hotels = {};
 
 var markers = [];
 var marker_list = [];
 
-var colors = ['#ac48db', '#74bb82', '#f7c12e', '#ea7419']
+var visits_color = '#74bb82';
+var suggested_visits_color = '#ac48db';
+var hotels_color = '#2079d8';
 
 
 /* load map */
 function initMap(city) {
     var coordinates;
+
+    if(city == "Barcelona")
+        city = "Barcelona, Spain";
 
     // show map in the city specified 
     var geocoder = new google.maps.Geocoder();
@@ -50,8 +57,18 @@ function initMap(city) {
 
             google.maps.event.addListenerOnce(map, 'idle', function () {
                 for(var key in places){
-                    data = {color: '#ac48db', icon: 'fas fa-monument'};
-                    createMarker(places[key]['coordinates'], places[key]['name'], data);
+                    data = {color: visits_color, icon: getIcon(places[key]["poi_type"])};
+                    createMarker(places[key]['coordinates'], places[key]['name'], data, "visits");
+                }
+
+                for(var key in suggested_places){
+                    data = {color: suggested_visits_color, icon: getIcon(suggested_places[key]["poi_type"])};
+                    createMarker(suggested_places[key]['coordinates'], suggested_places[key]['name'], data, "suggestions");
+                }
+
+                for(var key in hotels){
+                    data = {color: hotels_color, icon: getIcon(hotels[key]["poi_type"])};
+                    createMarker(hotels[key]['coordinates'], hotels[key]['name'], data, "hotels");
                 }
 
             /* Markers clustering */
@@ -67,13 +84,16 @@ function initMap(city) {
     });
 
     infoWindow = new google.maps.InfoWindow;
-
     loadNavbar();
 
+    var myPath = window.location.href;
+    var plan_id = /id=([^&]+)/.exec(location.search)[1];
+
+    document.cookie = "plan=" + plan_id + ";path=" + myPath;
 }
 
 
-function createMarker(local, name, data){
+function createMarker(local, name, data, type){
     if(marker_list.includes(name))
       return;
     
@@ -93,11 +113,31 @@ function createMarker(local, name, data){
       map_icon_label: '<i class="'+data.icon+'"></i>'
     });
 
-    marker.addListener('click', function () {
-        loadModalInMap(places[this.title])
-        $("#info-modal").modal();
-      });
-      
+
+    if(type == "visits"){
+        marker.addListener('click', function () {
+            loadModalInMap(places[this.title]);
+            $("#info-modal").modal();
+            $("#add-visit-btn").css("display", "none");
+        });
+    }
+
+    else if(type == "suggestions"){
+        marker.addListener('click', function () {
+            loadModalInMap(suggested_places[this.title]);
+            $("#info-modal").modal();
+            $("#add-visit-btn").css("display", "block");
+        });
+    }
+
+    else if(type == "hotels"){
+        marker.addListener('click', function () {
+            viewPOI(hotels[this.title]);
+            $("#info-modal").modal();
+            $("#add-visit-btn").css("display", "none");
+        });
+
+    }      
     
     markers.push(marker);
     marker_list.push(marker.title);
@@ -125,7 +165,7 @@ function loadPlan(plan_array, days){
     for(var j=0 ; j < plan.length ; j++){
         p = JSON.parse(plan[j]);
 
-        places[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number};
+        places[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number, 'poi_type': p.poi_type};
 
         visits.push(p); 
     }
@@ -142,6 +182,24 @@ function loadPlan(plan_array, days){
 
 }
 
+function loadSuggestions(suggested_visits){
+
+    for(var j=0 ; j < suggested_visits.length ; j++){
+        p = JSON.parse(suggested_visits[j]);
+
+        suggested_places[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number, 'poi_type': p.poi_type};
+    }
+}
+
+function loadHotels(suggested_hotels){
+
+    for(var j=0 ; j < suggested_hotels.length ; j++){
+        p = JSON.parse(suggested_hotels[j]);
+
+        hotels[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number, 'poi_type': p.poi_type};
+    }
+}
+
 
 function loadBottomNavbar(){
 
@@ -150,14 +208,13 @@ function loadBottomNavbar(){
 
     if(now >= start){
         $("#add-visit-div").css("display", "none");
-    }
-    else{
-        $(".btn-share-modal").css("display", "none");
+        $("#save_plan_btn").css("display", "none");
+        $("#are-you-sure-share-msg").css("display", "none");
+        
     }
 
 
 }
-
 
 
 function nextDay(){
@@ -416,7 +473,7 @@ $(function () {
 
 
 function addVisit(city){
-    var plan_id = /id=([^&]+)/.exec(location.search)[1]
+    var plan_id = /id=([^&]+)/.exec(location.search)[1];
 
     var queryString = "?dest=" + city + "&plan=" + plan_id;
     window.location.href = "./places" + queryString;
@@ -485,8 +542,25 @@ function savePlan(){
 }
 
 $(function () {
-    $('.btn-rate-modal').on('click', function () {
-        $('#modal-rate-title').text($(this).data('title'));
+    $('.btn-view-reviews-modal').on('click', function () {
+        $('#modal-view-reviews-title').text($(this).data('title'));
+        $('#view-reviews-title').text($(this).data('title'));
+        $('#create-review-btn').data("title", $(this).data('title'));
+    });
+});
+
+$(function () {
+    $('.btn-create-review-modal').on('click', function () {
+
+        $('#modal-review-title').text($(this).data('title'));
+    });
+  });
+
+
+
+$(function () {
+    $('.btn-stats-modal').on('click', function () {
+        $('#modal-stats-title').text($(this).data('title'));
     });
 });
 
@@ -496,6 +570,20 @@ $(function () {
         $('#modal-use-plan-title').text($(this).data('title'));
     });
   });
+
+$(function () {
+    $('.btn-share-modal').on('click', function () {
+        $('#share-modal-title').text($(this).data('name'));
+        $('#are-you-sure-plan-name').text($(this).data('name'));
+
+        $('#share-modal-plan-id').val($(this).data('id'));
+        $('#share-modal-user').val(getUserCookie());
+
+       // document.getElementById('confirm-public-btn').setAttribute( "onClick", "javascript: makePublic("+$(this).data('id')+");");
+
+    });
+});
+
 
 $(function () {
     $("#arrival-date").datepicker({ 
@@ -533,4 +621,156 @@ function usePlan(){
         }
     
     });
+}
+
+
+function getRatingValue(){
+    var value = 0;
+  
+    if(document.getElementById('star5').checked)
+      value = 5;
+    else if(document.getElementById('star4').checked)
+      value = 4;
+    else if(document.getElementById('star3').checked)
+      value = 3;
+    else if(document.getElementById('star2').checked)
+      value = 2;
+    else if(document.getElementById('star1').checked)
+      value = 1;
+  
+    return value;
+  }
+
+
+function submitReview(){
+    var plan_id = /id=([^&]+)/.exec(location.search)[1];
+
+    var review = document.getElementById("review-text").value;
+
+    var rating = parseInt(getRatingValue());
+
+    if(rating < 1 || rating > 5){
+        alert("Please submit a valid rating  !!");
+        return;
+    }
+
+    $.post("/review-plan", {plan: plan_id, review: review, rating: rating}, function(result){
+        window.location.reload();
+    });
+}
+
+function loadReviewRating(rating, review){
+    console.log(rating,review);
+
+    rating = parseInt(rating);
+
+    var count = 0;
+
+    while(count < rating){
+      document.getElementById(review).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #ffc107;"></i>';
+      count = count + 1;
+    }
+
+    while(count < 5){
+      document.getElementById(review).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #d0cfd1;"></i>';
+      count = count + 1;
+    }
+}
+
+
+$(function () {
+    $('#submit-review-btn').attr('disabled','disabled');
+    $('#star1').change(function(){
+        var rating = parseInt(getRatingValue());
+        if(rating > 0 && rating < 6){
+            $('#submit-review-btn').removeAttr('disabled');
+        }
+    });
+
+    $('#star2').change(function(){
+        var rating = parseInt(getRatingValue());
+        if(rating > 0 && rating < 6){
+            $('#submit-review-btn').removeAttr('disabled');
+        }
+    });
+
+    $('#star3').change(function(){
+        var rating = parseInt(getRatingValue());
+        if(rating > 0 && rating < 6){
+            $('#submit-review-btn').removeAttr('disabled');
+        }
+    });
+
+    $('#star4').change(function(){
+        var rating = parseInt(getRatingValue());
+        if(rating > 0 && rating < 6){
+            $('#submit-review-btn').removeAttr('disabled');
+        }
+    });
+
+    $('#star5').change(function(){
+        var rating = parseInt(getRatingValue());
+        if(rating > 0 && rating < 6){
+            $('#submit-review-btn').removeAttr('disabled');
+        }
+    });
+});
+
+
+function getIcon(type){
+
+    type = type.toLowerCase();
+
+    if(type == 'park'){
+        return "fas fa-tree";
+    }
+
+    else if(type == 'castle'){
+        return "fas fa-chess-rook";
+    }
+
+    else if (type == 'tower' || type == 'museum'){
+        return "fas fa-archway";
+    }
+
+    else if (type == 'church'){
+        return "fas fa-church";
+    }
+
+    else if (type == 'restaurant'){
+        return "fas fa-utensils";
+    }
+
+    else if (type == 'hotel'){
+        return "fas fa-bed";
+    }
+
+    else if (type == 'natural feature'){
+        return "fas fa-umbrella-beach";
+    }
+
+    else if (type == 'aquarium'){
+        return "fas fa-fish";
+    }
+
+    else if (type == 'zoo'){
+        return "fas fa-hippo";
+    }
+
+    else if (type == 'place of worship'){
+        return "fas fa-place-of-worship";
+    }
+
+    else if (type == 'amusement park'){
+        return "fas fa-child";
+    }
+
+    else if (type == 'stadium'){
+        return "fas fa-futbol";
+    }
+
+    else if (type == 'train station'){
+        return "fas fa-train";
+    }
+
 }

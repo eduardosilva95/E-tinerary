@@ -56,7 +56,7 @@
                     <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+                    <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -204,30 +204,36 @@
             <div class="card card-body bg-light">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="dropdown" id="add-visit-div">
-                            <button class="btn btn-info dropdown-toggle" type="button" id="add-visit-dropdown-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-plus"></i><span style="padding-left: 10px;">Add visit</span>
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <button class="dropdown-item" onclick="addVisit('<%= city %>');" style="cursor: pointer;">Add new visit or activity</button>
-                                <a class="dropdown-item" href="#">Book an hotel</a>
+                        <% if(isPublic == 0) { %>
+                            <div class="dropdown" id="add-visit-div">
+                                <button class="btn btn-info dropdown-toggle" type="button" id="add-visit-dropdown-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-plus"></i><span style="padding-left: 10px;">Add visit</span>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <button class="dropdown-item" onclick="addVisit('<%= city %>');" style="cursor: pointer;">Add new visit or activity</button>
+                                    <a class="dropdown-item" href="#">Book an hotel</a>
+                                </div>
                             </div>
-                        </div>
+                        <% } %>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group text-right">
                             <% if(source == "author") { %>
-                                <button type="button" class="btn btn-success"><i class="fas fa-comment"></i><span style="padding-left: 10px;">Comment Plan</span></button>
-                                <button type="button" class="btn btn-success btn-rate-modal" data-toggle="modal" data-target="#rate-modal" data-title="<%= name %>"><i class="fas fa-star"></i><span style="padding-left: 10px;">Rate Plan</span></button>
+                                <button type="button" class="btn btn-success btn-stats-modal" data-toggle="modal" data-target="#stats-modal" data-title="<%= name %>"><i class="fas fa-chart-bar"></i><span style="padding-left: 10px;">View Stats</span></button>
+                                <button type="button" class="btn btn-success btn-view-reviews-modal" data-toggle="modal" data-target="#view-reviews-modal" data-title="<%= name %>"><i class="fas fa-comment"></i><span style="padding-left: 10px;">View Reviews</span></button>
                                 <% if(isPublic == 0) { %>
-                                    <button type="button" class="btn btn-success btn-share-modal"><i class="fas fa-share-alt"></i><span style="padding-left: 10px;">Share Plan</span></button>
+                                    <button type="button" class="btn btn-success btn-share-modal" data-toggle="modal" data-target="#share-modal" data-name="<%= name %>"><i class="fas fa-share-alt"></i><span style="padding-left: 10px;">Share Plan</span></button>
                                 <% } else { %> 
                                     <button type="button" style="background-color: #dcf2e2; color: black;" class="btn btn-success btn-share-modal" disabled><i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Shared plan</span></button>
                                 <% } %>
-                                <a id="save_plan_btn" href="#"><button type="button" class="btn btn-success"><i class="fas fa-save"></i><span style="padding-left: 10px;">Save Plan</span></button></a>
+
+                                <% if(isManual == 1) { %>
+                                    <a id="save_plan_btn" href="#"><button type="button" class="btn btn-success"><i class="fas fa-save"></i><span style="padding-left: 10px;">Save Plan</span></button></a>
+                                <% } %>
+
                             <% } else { %>
-                                <button type="button" class="btn btn-success"><i class="fas fa-comment"></i><span style="padding-left: 10px;">Comment Plan</span></button>
-                                <button type="button" class="btn btn-success btn-rate-modal" data-toggle="modal" data-target="#rate-modal" data-title="<%= name %>"><i class="fas fa-star"></i><span style="padding-left: 10px;">Rate Plan</span></button>
+                                <button type="button" class="btn btn-success btn-stats-modal" data-toggle="modal" data-target="#stats-modal" data-title="<%= name %>"><i class="fas fa-chart-bar"></i><span style="padding-left: 10px;">View Stats</span></button>
+                                <button type="button" class="btn btn-success btn-view-reviews-modal" data-toggle="modal" data-target="#view-reviews-modal" data-title="<%= name %>"><i class="fas fa-comment"></i><span style="padding-left: 10px;">View Reviews</span></button>
                                 <button type="button" class="btn btn-success btn-use-plan-modal" data-toggle="modal" data-target="#use-plan-modal" data-title="<%= name %>"><i class="fas fa-save"></i><span style="padding-left: 10px;">Use this Plan</span></button>
                             <% } %>                        
                         </div>
@@ -323,7 +329,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button id="modal-find-more-btn" type="submit" class="btn btn-warning" style="color: white;" data-dismiss="modal"><i class="fas fa-search"></i><span style="padding-left: 10px;">Find out more</span></button>
+                        <button id="modal-find-more-btn" type="button" class="btn btn-warning" style="color: white;" data-dismiss="modal"><i class="fas fa-search"></i><span style="padding-left: 10px;">Find out more</span></button>
+                        <button id="add-visit-btn" type="button" class="btn btn-success" style="color: white; display: none;" data-dismiss="modal"><i class="fas fa-calendar-alt"></i><span style="padding-left: 10px;">Add to the trip</span></button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Close</span></button>
                     </div>
                 </div>
@@ -441,20 +448,93 @@
                 </div>
             </div>
         </div>
-        
 
-        <!-- Rate Modal -->
-        <div class="modal fade" id="rate-modal" role="dialog">
-            <div class="modal-dialog">
+        <!-- View Reviews Modal -->
+        <div class="modal fade bd-example-modal-lg" id="view-reviews-modal" role="dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Rate <span id="modal-rate-title" style="font-weight: bold;"></span></h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Reviews made for <span id="modal-view-reviews-title" style="font-weight: bold;"></span></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     
                     <div class="modal-body">
+                        <% if(reviews.length == 0) { %>
+                            <div class="text-center" style="margin: auto;">
+                                <i class="fas fa-comment-slash fa-3x" style="color: #dddddd;"></i>
+                            </div>
+                            <div class="card-body text-center empty-review">
+                                <p class="mb-1">No reviews made for <span id="view-reviews-title"></span></p> 
+                                <p class="mb-1" style="font-size: 12px;">Be the first to make one</p>     
+                            </div>
+                        
+                        <% } else { %>
+
+                            <% count = 0 %>
+                            <% reviews.forEach(function(review) { %>
+
+                                <div class="card" style="height: 150px;">
+                                    <div class="row">
+                                        <div class="col-md-3 text-center" style="margin: auto;">
+                                            <img src="<%= review.user_pic %>" class="img-fluid review-img">
+                                        </div>
+                                        <div class="col-md-9">
+                                            <div class="card-body">
+                                                <div class="text-right">
+                                                    <small><%= review.date %></small>
+                                                </div>
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <h5 class="mb-1"><%= review.user %></h5>
+                                                </div>
+                                                <p class="mb-1"><%= review.text %></p>                                                                        
+                                                
+                                                <div class="text-right" id="review-<%= count %>-rating">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <br>
+
+                                <script>
+                                    loadReviewRating("<%= review.rating %>", "review-<%= count %>-rating");
+                                </script>
+
+                                <% count = count + 1 %>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Close</span></button>
+                        <button class="btn btn-success btn-create-review-modal" id="create-review-btn" data-dismiss="modal" data-toggle="modal" data-target="#review-modal"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Make Review</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Review Modal -->
+        <div class="modal fade" id="review-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><span id="modal-review-title" style="font-weight: bold;"></span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <label for="review-text">Review:</label>
+                        <textarea class="form-control" rows="5" id="review-text"></textarea>  
+                        
+                        <br>
+                        
+                        <label>Rate:</label>
                         <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
                             <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 star">5</label>
                             <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 star">4</label>
@@ -466,8 +546,98 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
-                        <button type="button" onclick="submitRate();" class="btn btn-success" data-dismiss="modal"><i class="fas fa-check"></i><span style="padding-left: 10px;">Submit</span></button>
+                        <button type="button" onclick="submitReview();" class="btn btn-success" id="submit-review-btn" data-dismiss="modal"><i class="fas fa-check"></i><span style="padding-left: 10px;">Submit</span></button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Modal -->
+        <div class="modal fade" id="stats-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><span id="modal-stats-title" style="font-weight: bold;"></span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+
+                        <ul>
+                            <li><i class="fas fa-eye"></i><strong style="padding-left: 10px;">Viewers: </strong><p><%= num_viewers %></p></li>
+                            <li><i class="fas fa-comment"></i><strong style="padding-left: 10px;">Reviews: </strong><p><%= num_reviews %></p></li>
+                            <li><i class="fas fa-retweet"></i><strong style="padding-left: 10px;">Plans: </strong><p><%= num_plans %></p></li>
+                            <li><i class="fas fa-star"></i><strong style="padding-left: 10px;">Rating: </strong><p><%= rating %> / 5.0</p></li>
+                        </ul>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Close</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Share Modal -->
+        <div class="modal fade" id="share-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Share <span id="share-modal-title" style="font-weight: bold;"></span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="share-plan-form" action="/share-plan" method="POST" enctype="multipart/form-data">
+                        <div class="modal-body">
+
+                            <div class="alert alert-warning" id="are-you-sure-share-msg" role="alert">
+                                <i class="fas fa-exclamation-triangle"></i><span style="padding-left: 10px;">Are you sure that you want to share <span id="are-you-sure-plan-name" style="font-weight: bold;"></span> ?</span>
+                                <p>After the plan is shared, you will not be able to make changes on it.</p>
+                            </div>
+    
+                            <label for="inputName">Enter a description for the plan</label>
+                            <textarea type="text" id="inputDescription" class="form-control" name="description" required></textarea>
+
+                            <br>
+
+                            <div class="form-group">
+                                <label for="select-category-plan">Category for you plan</label>
+                                <select class="form-control" id="select-category-plan" name="category">
+                                    <option selected>Overall</option>
+                                    <option>Nature</option>
+                                    <option>History</option>
+                                    <option>Culture</option>
+                                    <option>Sports</option>
+                                </select>
+                            </div>
+                            
+                            <br>
+
+                            <label>Rate your plan:</label>
+                            <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
+                                <input type="radio" id="share-rating-star5" name="rating" value="5" /><label for="share-rating-star5" title="5 star">5</label>
+                                <input type="radio" id="share-rating-star4" name="rating" value="4" /><label for="share-rating-star4" title="4 star">4</label>
+                                <input type="radio" id="share-rating-star3" name="rating" value="3" /><label for="share-rating-star3" title="3 star">3</label>
+                                <input type="radio" id="share-rating-star2" name="rating" value="2" /><label for="share-rating-star2" title="2 star">2</label>
+                                <input type="radio" id="share-rating-star1" name="rating" value="1" /><label for="share-rating-star1" title="1 star">1</label>
+                            </div>
+
+                            <br>
+    
+                            <label for="plan-picture">Submit a picture for the plan</label>
+                            <input type="file" class="form-control-file" accept="image/*" id="plan-picture" name="picture" required>
+
+                            
+    
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
+                            <button type="submit" value="upload" id="submit-share-plan-btn" class="btn btn-success"><i class="fas fa-check"></i><span style="padding-left: 10px;">Share</span></button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -499,13 +669,24 @@
     <script>startGoogleSignIn();</script>
     <script>
         var plan = [];
+        var suggested_visits = [];
+        var suggested_hotels = [];
         
         '<% plan.forEach(function(visit) { %>'
             plan.push('<%- JSON.stringify(visit) %>');
+        '<% }); %>'
 
+        '<% suggested_visits.forEach(function(visit) { %>'
+            suggested_visits.push('<%- JSON.stringify(visit) %>');
+        '<% }); %>'
+
+        '<% suggested_hotels.forEach(function(hotel) { %>'
+            suggested_hotels.push('<%- JSON.stringify(hotel) %>');
         '<% }); %>'
 
         loadPlan(plan, '<%= days %>');
+        loadSuggestions(suggested_visits);
+        loadHotels(suggested_hotels);
     
     </script>
 

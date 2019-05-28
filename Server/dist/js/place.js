@@ -1,6 +1,8 @@
 
 var open_slots = {};
 
+var slideIndex = 1;
+
 $(window).on('load', function() {
     var coordinates = document.getElementById("place-coordinates").innerText;
 
@@ -85,13 +87,35 @@ function getPlaceDetails(place_id){
     service.getDetails(request, function(place, status) {
       if (status === google.maps.places.PlacesServiceStatus.OK) {
 
-        if(place.photos != undefined)
-          document.getElementById("place-image").src = place.photos[0].getUrl();
-        else
-          document.getElementById("place-image").src = "";
-
         if(place.opening_hours != null){
           createOpeningHoursTable(place.opening_hours.weekday_text);
+        }
+
+        if(place.photos != undefined){
+
+          for(var i=0; i<place.photos.length;i++){
+
+            console.log("image " + i);
+
+            var img_div = document.createElement("DIV");
+            img_div.className = "mySlides slideshow-fade";
+
+            var img = document.createElement("IMG");
+            img.src = place.photos[i].getUrl();
+            img.style.width = "100%";
+
+            img_div.appendChild(img);
+
+            document.getElementById("slideshow-div").appendChild(img_div);
+
+            var dot = document.createElement("SPAN");
+            dot.className = "dot";
+            dot.setAttribute( "onClick", "javascript: currentSlide(" + (i+1) + ");" );
+
+            document.getElementById("dots-div").appendChild(dot);
+
+          }
+          showSlides(slideIndex);
         }
 
       }
@@ -164,6 +188,18 @@ function getPlaceDetails(place_id){
   });
 
   $(function () {
+    $('.btn-add-description-modal').on('click', function () {
+        $('#modal-add-description-title').text($(this).data('title'));
+
+        if($(this).data('description') != undefined){
+          $('#add-description-text').val($(this).data('description'));
+        }
+
+    });
+  });
+
+
+  $(function () {
     $("#radio-choose-schedule-man").change(function() {
       $('.dr').slideUp();
       if ($(this).is(':checked')) {
@@ -218,6 +254,22 @@ function getPlaceDetails(place_id){
         window.location.reload();
       });
     }
+  }
+
+  function addDescription(){
+    var poi_id = /id=([^&]+)/.exec(location.search)[1];
+
+    if(document.getElementById("add-description-text").value == ''){
+      alert("The review can't be empty");
+      return;
+    }
+
+    var description = document.getElementById("add-description-text").value;
+
+    $.post("/add-description-poi", {poi: poi_id, description: description}, function(result){
+        window.location.reload();
+    });
+
   }
 
   
@@ -281,6 +333,30 @@ function getPlaceDetails(place_id){
 
       }
     }
+
+    else{
+
+      $('#schedule-error').css("display", "none");
+  
+      $.post("/add-visit", {plan: plan, poi: poi_id}, function(result){
+        
+        if(result.result == 'error'){
+          if(result.msg == 'schedule error'){
+            $('#add-visit-error').css("display", "block");
+            $('#add-visit-error-msg').text("Could not find a schedule for the visit in this plan")
+          }
+        }
+        
+        else{
+          if(result.isManual == true)
+            window.location.href = "/plan-m?id=" + plan;
+          else
+            window.location.href = "/plan?id=" + plan;
+        
+        }
+      });
+  
+    }
   }
   
   $(function () {
@@ -298,3 +374,36 @@ function getPlaceDetails(place_id){
   
     });
   });
+
+
+
+
+// Next/previous controls
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+// Thumbnail image controls
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  var i;
+  var slides = document.getElementsByClassName("mySlides");
+  var dots = document.getElementsByClassName("dot");
+
+  if (n > slides.length) {slideIndex = 1} 
+  if (n < 1) {slideIndex = slides.length}
+
+  for (i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none"; 
+  }
+
+  for (i = 0; i < dots.length; i++) {
+      dots[i].className = dots[i].className.replace(" slideshow-active", "");
+  }
+
+  slides[slideIndex-1].style.display = "block"; 
+  dots[slideIndex-1].className += " slideshow-active";
+}

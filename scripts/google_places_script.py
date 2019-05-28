@@ -238,6 +238,25 @@ def getDetails(place_id):
 
 	return name, lat, lon, address, website, phone_number, rating, num_reviews
 
+
+def getAddressFromPlace(place_id):
+
+	url = 'https://maps.googleapis.com/maps/api/place/details/json?placeid=' + place_id +'&key=' + API_KEY + '&fields=formatted_address'
+
+	response = urllib.request.urlopen(url)
+	jsonRaw = response.read()
+	jsonData = json.loads(jsonRaw)
+
+	address = ""
+
+	if 'result' in jsonData:
+		jsonData = jsonData['result']
+		address = jsonData['formatted_address']
+
+	return address
+
+
+
 def getInfoFromWikipedia(city):
 	return wikipedia.summary(city)
 
@@ -428,6 +447,45 @@ if __name__== "__main__":
 		except:
 			pass
 
+
+	#update da DB
+	elif len(sys.argv) == 2 and sys.argv[1] == 'db':
+		sql = """SELECT id, name, place_id FROM poi where id > 5064""";
+
+		mycursor.execute(sql)
+
+		data = mycursor.fetchall()
+
+		for poi in data:
+			poi_id = poi[0]
+			poi_name = poi[1]
+			poi_place_id = poi[2]
+
+			address = getAddressFromPlace(poi_place_id)
+
+			description = ""
+			try:
+				description = getInfoFromWikipedia(poi_name)
+			except:
+				description = ""
+
+			try:
+				sql = """UPDATE POI SET address = '%s' WHERE id = '%s'""" % (address, poi_id)
+
+				mycursor.execute(sql)
+				mydb.commit()
+
+				sql = """UPDATE POI SET description = '%s' WHERE id = '%s'""" % (description, poi_id)
+
+				mycursor.execute(sql)
+				mydb.commit()
+
+				print(poi_name, " updated")
+
+			except Exception as ex:
+				print(ex)
+
+
 	#request para todas as cidades de um ficheiro
 	elif len(sys.argv) == 1:
 		for city in readCitiesFromFile():
@@ -443,3 +501,4 @@ if __name__== "__main__":
 
 			except:
 				pass
+
