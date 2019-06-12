@@ -22,14 +22,14 @@
     <script type="text/javascript" src="js/places.js"></script>
     <script type="text/javascript" src="js/login.js"></script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcM_AepOJRN1QIx96d2n0FOfOcGfZYfck&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     
   </head>
   <body onload="loadPage();">
         <!-- header navbar -->
         <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
-            <a class="navbar-brand" href="./">HomePage</a>
+            <a class="navbar-brand" href="./"><img src="img/logo-3.png" style="height: 40px"></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
@@ -41,7 +41,7 @@
                   </li>
                 
                 <li class="nav-item">
-                  <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                  <a class="nav-link active" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
@@ -66,9 +66,9 @@
                       <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
                     </div>
                     <div id="profile" class="dropleft" style="display: none;">
-                      <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <img id="user-profile-pic">
-                      </a>
+                        <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img id="user-profile-pic" class="rounded-circle border border-light">
+                        </a>
                       <div class="dropdown-menu" aria-labelledby="profile-btn">
                         <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
                         <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
@@ -124,7 +124,7 @@
                         Sort
                         </button>
                         <div class="dropdown-menu" aria-labelledby="sortDropdownMenu">
-                            <a class="dropdown-item" href="#"><i class="fab fa-amilia"></i><span style="padding-left: 10px;">Alphabetically (A-Z)</span></a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-sort-alpha-down"></i><span style="padding-left: 10px;">Alphabetically (A-Z)</span></a>
                             <a class="dropdown-item" href="#"><i class="fas fa-eye"></i><span style="padding-left: 10px;">Number of reviews</span></a>
                             <a class="dropdown-item" href="#"><i class="fas fa-star"></i><span style="padding-left: 10px;">Rating</span></a>
                         </div>

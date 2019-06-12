@@ -24,7 +24,7 @@
     <script type="text/javascript" src="js/hotels.js"></script>
     <script type="text/javascript" src="js/login.js"></script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcM_AepOJRN1QIx96d2n0FOfOcGfZYfck&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
     <script type="text/javascript" src="js/map-font-icons.js"></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 
@@ -33,7 +33,7 @@
   <body onload="initMap('<%= city %>')">
         <!-- header navbar -->
         <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
-            <a class="navbar-brand" href="./">HomePage</a>
+            <a class="navbar-brand" href="./"><img src="img/logo-3.png" style="height: 40px"></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -48,7 +48,7 @@
                     <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+                    <a class="nav-link active" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
@@ -70,8 +70,8 @@
                         <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
                     </div>
                     <div id="profile" class="dropleft" style="display: none;">
-                        <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <img id="user-profile-pic">
+                        <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img id="user-profile-pic" class="rounded-circle border border-light">
                         </a>
                         <div class="dropdown-menu" aria-labelledby="profile-btn">
                         <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
@@ -119,7 +119,7 @@
                                                 
                                                 <div class="text-right view-offer">
                                                     <img src="img/booking-logo.png" height="32px" width="100px">
-                                                    <button class="btn btn-success booking-btn">100 €</button>
+                                                    <button class="btn btn-success booking-btn" id="hotel-<%= count %>-price"></button>
                                                 </div>
                                             </div>
                                         </div>
@@ -215,15 +215,53 @@
                             <img id="info-modal-img" height="200px;">
                         </div>
                         <br><br>
-                        <div id="place-info"> 
-                            <ul>
-                                <li><strong>City: </strong><p id="modal-info-city"></p></li>
-                                <li><strong>Address: </strong><p id="modal-info-addr"></p></li>
-                                <li><strong>Coordinates: </strong><p id="modal-info-coord"></p></li>
-                                <li><strong>Phone number: </strong><p id="modal-info-phone"></p></li>
-                                <li><strong>Website: </strong><br><a id="modal-info-website" target="_blank"></a></li>
-                            </ul>
+
+                        <nav class="nav nav-pills flex-column flex-sm-row" >
+                            <a class="flex-sm-fill text-sm-center nav-link tab active" id="pills-place-info-tab" data-toggle="pill" href="#place-info" role="tab" aria-controls="place-info" aria-selected="true">General Information</a>
+                            <a class="flex-sm-fill text-sm-center nav-link tab" id="pills-place-services-tab" data-toggle="pill" href="#place-services" role="tab" aria-controls="place-services" aria-selected="false">Services</a>
+                        </nav>
+
+                        <br>
+
+                        <div class="tab-content" id="pills-tabContent">
+                            <div class="tab-pane fade show active" id="place-info" role="tabpanel" aria-labelledby="pills-place-info-tab">
+        
+                                <ul>
+                                    <li><strong>City: </strong><p id="modal-info-city"></p></li>
+                                    <li><strong>Address: </strong><p id="modal-info-addr"></p></li>
+                                    <li><strong>Coordinates: </strong><p id="modal-info-coord"></p></li>
+                                    <li><strong>Phone number: </strong><p id="modal-info-phone"></p></li>
+                                    <li><strong>Website: </strong><br><a id="modal-info-website" target="_blank"></a></li>
+                                </ul>
+                            </div>
+                        
+                            <div class="tab-pane fade" id="place-services" role="tabpanel" aria-labelledby="pills-place-services-tab">
+                                <ul>
+                                    <li>
+                                            <strong>Services: </strong>
+                                            <div class="row" >
+                                                <div class="col-md-4">
+                                                    <p><i class="fas fa-wifi"></i><span style="padding-left: 10px;">Free Wi-Fi</span></p>
+                                                    <p><i class="fas fa-snowflake"></i><span style="padding-left: 10px;">Air-conditioned</span></p>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <p><i class="fas fa-parking"></i><span style="padding-left: 10px;">Free Parking</span></p>
+                                                    <p><i class="fas fa-swimmer"></i><span style="padding-left: 10px;">Indoor pool</span></p>
+                                                    
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <p><i class="fas fa-coffee"></i><span style="padding-left: 10px;">Breakfast</span></p>
+                                                    <p><i class="fas fa-glass-martini"></i><span style="padding-left: 10px;">Bar</span></p>
+                                                    
+                                                </div>
+                                            </div>
+                                        </li>
+                                </ul>
+                            </div>
                         </div>
+                        
+
+                        
                     </div>
                     <div class="modal-footer">
                         <button id="modal-find-more-btn" type="submit" class="btn btn-warning" style="color: white;" data-dismiss="modal"><i class="fas fa-search"></i><span style="padding-left: 10px;">Find out more</span></button>
@@ -264,6 +302,7 @@
         '<% hotels.forEach(function(hotel) { %>'
             hotels_list.push('<%- JSON.stringify(hotel) %>');
         '<% }); %>'
+
 
         loadHotels(hotels_list);
     

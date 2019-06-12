@@ -17,7 +17,7 @@
     
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
 
     <script type="text/javascript" src="js/login.js"></script>
     <script type="text/javascript" src="js/search.js"></script>
@@ -30,258 +30,263 @@
 
   
   </head>
-  <body onload="loadNavbar();">
-        <!-- header navbar -->
-        <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
-            <a class="navbar-brand" href="./">HomePage</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-              <ul class="navbar-nav ml-auto">
-                
-                  <li class="nav-item">
-                    <a class="nav-link" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
-                  </li>
-                
-                <li class="nav-item">
-                  <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
-                      <a class="dropdown-item" href="./about-us">Aplicacao</a>
-                      <a class="dropdown-item" href="./help">Help</a>
-                    </div>
-                </li>
-              </ul>
-              <ul class="navbar-nav ml-auto">
-                <li>
-                  <div id="login-user">
-                    <div id="login" style="display: none;">
-                      <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
-                    </div>
-                    <div id="profile" class="dropleft" style="display: none;">
-                      <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <img id="user-profile-pic">
-                      </a>
-                      <div class="dropdown-menu" aria-labelledby="profile-btn">
-                        <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                        <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
-                      </div>   
-                    </div>        
-                  </div>
-                </li>
-              </ul>
-            </div>
-        </nav>
+  <body onload="loadNavbar();" style="background-image: url('/img/home-image.jpg');">
+    <!-- header navbar -->
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark navbar-transparent bg-dark justify-content-between">
+        <a class="navbar-brand" href="./"><img src="img/logo-3.png" style="height: 40px"></a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            
+            <li class="nav-item">
+                <a class="nav-link active" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+            </li>
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
+                </a>
+                <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
+                  <a class="dropdown-item" href="./about-us">Aplicacao</a>
+                  <a class="dropdown-item" href="./help">Help</a>
+                </div>
+            </li>
+          </ul>
+          <ul class="navbar-nav ml-auto">
+            <li>
+              <div id="login-user">
+                <div id="login" style="display: none;">
+                  <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                </div>
+                <div id="profile" class="dropleft" style="display: none;">
+                  <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <img id="user-profile-pic" class="rounded-circle border border-light">
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="profile-btn">
+                    <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                    <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                  </div>   
+                </div>        
+              </div>
+            </li>
+          </ul>
+        </div>
+    </nav>
 
         
 
-        <div class="container-fluid cont" style="background-color: #343a40; background-image: url('/img/home-image.jpg');">
+    <div class="container-fluid cont" >
 
-            <div class="row">
-              <div class="col-md-1 col-sm-1"></div>
-              <div class="col-md-8 col-sm-8  search-box" >
-                <br>
+        <div class="row">
+            <div class="col-md-1 col-sm-1"></div>
+            <div class="col-md-8 col-sm-8  search-box" >
+            <br>
 
-                <div class="text-center">
-                    <h2 style="color: #ffc107; font-weight: bold;">Let us plan your trip</h2>
+            <div class="text-center">
+                <h2 style="color: #ffc107; font-weight: bold;">Let us plan your trip</h2>
+            </div>
+
+            <br><br>
+
+            <form autocomplete="off" id="search-form" action="/create-plan" method="POST">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group autocomplete fg">
+                            <label class="mr-2" for="inputDestination" style="color: #ffc107; font-weight: bold;">Destination</label>
+                            <input type="text" class="form-control" id="inputDestination" name="destination" placeholder="Enter your destination">
+                        </div>
+                        <script>
+                            var cities = "<%= cities %>";
+                            var list_cities = cities.split(',');
+                            autocomplete(document.getElementById("inputDestination"), list_cities);
+                        </script>
+
+                        <div class="form-group fg">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="mr-2" for="select-adults" style="color: #ffc107; font-weight: bold;">Adults</label>
+                                    <select class="custom-select mr-sm-2" id="select-adults" name="no-adults">
+                                    <option selected value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="my-1 mr-2" for="select-children" style="color:#ffc107; font-weight: bold;">Children <sup id="input-children-info"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Children to 12 years old"></i></sup></label>
+                                    <select class="custom-select mr-sm-2" id="select-children" name="no-children">
+                                    <option selected value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                
+                    <div class="col-md-6">
+                        <div class="form-group fg">
+                            <div class="row">
+                                <div class='col-sm-6'>
+                                    <div class="input-group date ">
+                                    <label class="mr-2" for="arrival-date" style="color: #ffc107; font-weight: bold;">Dates</label>
+                                    <input type="text" class="form-control" placeholder="Arrival" id="arrival-date" name="arrival" required>
+                                    <script>
+                                        $('#arrival-date').datepicker({
+                                            uiLibrary: 'bootstrap4',
+                                            format: 'dd/mm/yyyy',
+                                            minDate: new Date()
+                                        });
+                                    </script>
+                                    </div>
+                                </div>
+            
+                                <br>
+
+                                <div class='col-sm-6' >
+                                    <div class="input-group date" >
+                                        <label class="mr-2" for="departure-date" style="color: #ffc107; font-weight: bold; visibility: hidden;">Dates</label>
+                                        <input type="text" class="form-control" placeholder="Departure" id="departure-date" name="departure" required>
+                                        <script>
+                                        $('#departure-date').datepicker({
+                                            uiLibrary: 'bootstrap4',
+                                            format: 'dd/mm/yyyy',
+                                            minDate: new Date()
+                                        });
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group fg">
+                            <legend style="color: #ffc107; font-size: 1rem; font-weight: bold; padding-top: .375rem;">Budget: </legend>
+                            <div class="custom-control custom-radio custom-control-inline my-1 mr-sm-2">
+                                <input type="radio" name="radio-budget" class="custom-control-input" id="radio-budget-no"  value="No" onclick="disableBudgetBox()" checked>
+                                <label class="custom-control-label" for="radioBudgetNo" style="color: white; font-size: 1rem;">No</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline my-1 mr-sm-2">
+                                <input type="radio" name="radio-budget" class="custom-control-input" id="radio-budget-yes" value="Yes" onclick="enableBudgetBox()">
+                                <label class="custom-control-label" for="radioBudgetYes" style="color: white; font-size: 1rem;">Yes</label>
+                            </div>
+                            <div class="custom-control custom-control-inline mr-sm-2 float-right">
+                                <input type="text" class="form-control" id="input-budget" name="budget" placeholder="Budget (€)" disabled>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
+
+                <div class="form-group fg">
+                    <legend style="color: #ffc107; font-size: 1rem; font-weight: bold;">How to move: </legend>
+                    <div class="custom-control custom-checkbox custom-control-inline">
+                        <input type="checkbox" class="custom-control-input" id="check-move-car" name="move-car">
+                        <label class="custom-control-label" for="check-move-car" style="color: white; font-size: 1rem;"><i class="fas fa-car"></i><span style="padding-left: 10px;">Car</span></label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox custom-control-inline">
+                        <input type="checkbox" class="custom-control-input" id="check-move-foot" name="move-foot">
+                        <label class="custom-control-label" for="check-move-foot" style="color: white; font-size: 1rem;"><i class="fas fa-walking"></i><span style="padding-left: 10px;">On foot</span></label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox custom-control-inline">
+                        <input type="checkbox" class="custom-control-input" id="check-move-public" name="move-public">
+                        <label class="custom-control-label" for="check-move-public" style="color: white; font-size: 1rem;"><i class="fas fa-bus"></i><span style="padding-left: 10px;">Public Transportations</span></label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox custom-control-inline">
+                        <input type="checkbox" class="custom-control-input" id="check-move-bike" name="move-bike">
+                        <label class="custom-control-label" for="check-move-bike" style="color: white; font-size: 1rem;"><i class="fas fa-bicycle"></i><span style="padding-left: 10px;">Bicycle</span></label>
+                    </div>
+
+                </div>
+
+                <button type="button" class="btn btn-interests-down"><i class="fas fa-chevron-down" id="btn-interests-icon"></i><span style="padding-left: 10px;">Interests</span></button>
 
                 <br><br>
 
-                <form autocomplete="off" id="search-form" action="/create-plan" method="POST">
+                <div class="form-group fg form-interests" id="interests-div">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group autocomplete fg">
-                                <label class="mr-2" for="inputDestination" style="color: #ffc107; font-weight: bold;">Destination</label>
-                                <input type="text" class="form-control" id="inputDestination" name="destination" placeholder="Enter your destination">
+                        <div class="col-md-3">
+                            <div class="form-group custom-control custom-checkbox" style="color: white;">
+                                <input type="checkbox" class="custom-control-input" id="checkbox-interests-museums" name="interests-museum">
+                                <label class="custom-control-label" for="checkbox-interests-museums">Museums</label>
                             </div>
-                            <script>
-                                var cities = "<%= cities %>";
-                                var list_cities = cities.split(',');
-                                autocomplete(document.getElementById("inputDestination"), list_cities);
-                            </script>
-
-                            <div class="form-group fg">
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <label class="mr-2" for="select-adults" style="color: #ffc107; font-weight: bold;">Adults</label>
-                                        <select class="custom-select mr-sm-2" id="select-adults" name="no-adults">
-                                        <option selected value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <label class="my-1 mr-2" for="select-children" style="color: #ffc107; font-weight: bold;">Children (< 12 years)</label>
-                                        <select class="custom-select mr-sm-2" id="select-children" name="no-children">
-                                        <option selected value="0">0</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        </select>
-                                    </div>
-                                </div>
+                            <br>
+                            <div class="form-group custom-control custom-checkbox" style="color: white;">
+                                <input type="checkbox" class="custom-control-input" id="checkbox-interests-recreation" name="interests-recreation">
+                                <label class="custom-control-label" for="checkbox-interests-recreation">Recreation</label>
                             </div>
-                            
                         </div>
-                    
-                        <div class="col-md-6">
-                            <div class="form-group fg">
-                                <div class="row">
-                                    <div class='col-sm-6'>
-                                        <div class="input-group date ">
-                                        <label class="mr-2" for="arrival-date" style="color: #ffc107; font-weight: bold;">Dates</label>
-                                        <input type="text" class="form-control" placeholder="Arrival" id="arrival-date" name="arrival" required>
-                                        <script>
-                                            $('#arrival-date').datepicker({
-                                                uiLibrary: 'bootstrap4',
-                                                format: 'dd/mm/yyyy',
-                                                minDate: new Date()
-                                            });
-                                        </script>
-                                        </div>
-                                    </div>
+                        
+                        <div class="col-md-3">
+                            <div class="form-group custom-control custom-checkbox" style="color: white;">
+                                <input type="checkbox" class="custom-control-input" id="checkbox-interests-theaters" name="interests-theaters">
+                                <label class="custom-control-label" for="checkbox-interests-theaters">Theaters</label>
+                            </div>
+                            <br>
+                            <div class="form-group custom-control custom-checkbox" style="color: white;">
+                                <input type="checkbox" class="custom-control-input" id="checkbox-interests-nature" name="interests-nature">
+                                <label class="custom-control-label" for="checkbox-interests-nature">Nature Places</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group custom-control custom-checkbox" style="color: white;">
+                                <input type="checkbox" class="custom-control-input" id="checkbox-interests-shopping" name="interests-shopping">
+                                <label class="custom-control-label" for="checkbox-interests-shopping">Shopping</label>
+                            </div>
+                            <br>
+                            <div class="form-group custom-control custom-checkbox" style="color: white;">
+                                <input type="checkbox" class="custom-control-input" id="checkbox-interests-history" name="interests-history">
+                                <label class="custom-control-label" for="checkbox-interests-history">Historic Places</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="float-md-right float-sm-none">
+                    <button type="submit" value="submit" class="btn btn-success" style="color: white; font-weight: bold;">Create plan</button>
+                </div>
+
+                <div class="float-md-left float-sm-none">
+                    <a class="btn btn-warning" href="/create-plan">Create your plan manually</a>
+                </div>
                 
-                                    <br>
 
-                                    <div class='col-sm-6' >
-                                        <div class="input-group date" >
-                                            <label class="mr-2" for="departure-date" style="color: #ffc107; font-weight: bold; visibility: hidden;">Dates</label>
-                                            <input type="text" class="form-control" placeholder="Departure" id="departure-date" name="departure" required>
-                                            <script>
-                                            $('#departure-date').datepicker({
-                                                uiLibrary: 'bootstrap4',
-                                                format: 'dd/mm/yyyy',
-                                                minDate: new Date()
-                                            });
-                                            </script>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group fg">
-                                <legend style="color: #ffc107; font-size: 1rem; font-weight: bold; padding-top: .375rem;">Budget: </legend>
-                                <div class="custom-control custom-radio custom-control-inline my-1 mr-sm-2">
-                                    <input type="radio" name="radio-budget" class="custom-control-input" id="radio-budget-no"  value="No" onclick="disableBudgetBox()" checked>
-                                    <label class="custom-control-label" for="radioBudgetNo" style="color: white; font-size: 1rem;">No</label>
-                                </div>
-                                <div class="custom-control custom-radio custom-control-inline my-1 mr-sm-2">
-                                    <input type="radio" name="radio-budget" class="custom-control-input" id="radio-budget-yes" value="Yes" onclick="enableBudgetBox()">
-                                    <label class="custom-control-label" for="radioBudgetYes" style="color: white; font-size: 1rem;">Yes</label>
-                                </div>
-                                <div class="custom-control custom-control-inline mr-sm-2 float-right">
-                                    <input type="text" class="form-control" id="input-budget" name="budget" placeholder="Budget (€)" disabled>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="form-group fg">
-                        <legend style="color: #ffc107; font-size: 1rem; font-weight: bold;">How to move: </legend>
-                        <div class="custom-control custom-checkbox custom-control-inline">
-                            <input type="checkbox" class="custom-control-input" id="check-move-car" name="move-car">
-                            <label class="custom-control-label" for="check-move-car" style="color: white; font-size: 1rem;"><i class="fas fa-car"></i><span style="padding-left: 10px;">Car</span></label>
-                        </div>
-
-                        <div class="custom-control custom-checkbox custom-control-inline">
-                            <input type="checkbox" class="custom-control-input" id="check-move-foot" name="move-foot">
-                            <label class="custom-control-label" for="check-move-foot" style="color: white; font-size: 1rem;"><i class="fas fa-walking"></i><span style="padding-left: 10px;">On foot</span></label>
-                        </div>
-
-                        <div class="custom-control custom-checkbox custom-control-inline">
-                            <input type="checkbox" class="custom-control-input" id="check-move-public" name="move-public">
-                            <label class="custom-control-label" for="check-move-public" style="color: white; font-size: 1rem;"><i class="fas fa-bus"></i><span style="padding-left: 10px;">Public Transportations</span></label>
-                        </div>
-
-                        <div class="custom-control custom-checkbox custom-control-inline">
-                            <input type="checkbox" class="custom-control-input" id="check-move-bike" name="move-bike">
-                            <label class="custom-control-label" for="check-move-bike" style="color: white; font-size: 1rem;"><i class="fas fa-bicycle"></i><span style="padding-left: 10px;">Bicycle</span></label>
-                        </div>
-
-                    </div>
-
-                    <button type="button" class="btn btn-interests-down"><i class="fas fa-chevron-down" id="btn-interests-icon"></i><span style="padding-left: 10px;">Interests</span></button>
-
-                    <br><br>
-
-                    <div class="form-group fg form-interests" id="interests-div">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-museums" name="interests-museum">
-                                    <label class="custom-control-label" for="checkbox-interests-museums">Museums</label>
-                                </div>
-                                <br>
-                                <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-recreation" name="interests-recreation">
-                                    <label class="custom-control-label" for="checkbox-interests-recreation">Recreation</label>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-3">
-                                <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-theaters" name="interests-theaters">
-                                    <label class="custom-control-label" for="checkbox-interests-theaters">Theaters</label>
-                                </div>
-                                <br>
-                                <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-nature" name="interests-nature">
-                                    <label class="custom-control-label" for="checkbox-interests-nature">Nature Places</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3">
-                                <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-shopping" name="interests-shopping">
-                                    <label class="custom-control-label" for="checkbox-interests-shopping">Shopping</label>
-                                </div>
-                                <br>
-                                <div class="form-group custom-control custom-checkbox" style="color: white;">
-                                    <input type="checkbox" class="custom-control-input" id="checkbox-interests-history" name="interests-history">
-                                    <label class="custom-control-label" for="checkbox-interests-history">Historic Places</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="float-md-right float-sm-none">
-                        <button type="submit" value="submit" class="btn btn-success" style="color: white; font-weight: bold;">Create plan</button>
-                    </div>
-
-                    <div class="float-md-left float-sm-none">
-                        <a class="btn btn-warning" href="/create-plan">Create your plan manually</a>
-                    </div>
-                    
-
-                </form>
-              </div>
-              <div class="col-md-3 col-sm-3"></div>
-          </div>
-
-          <br><br>
+            </form>
+            </div>
+            <div class="col-md-3 col-sm-3"></div>
         </div>
+
+        <br><br>
+    </div>
 
 
 

@@ -3,6 +3,9 @@
 @import url('//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 
 
+@import url('https://fonts.googleapis.com/css?family=Englebert');
+
+
 html, body {
    height:100%;
    width:100%;
@@ -10,6 +13,19 @@ html, body {
    margin:0;
    background-color: #fafafa;
 }
+
+.logo-letters {
+  font-family: 'Englebert';
+  color: #e78200;
+  font-weight: normal;
+}
+
+.logo-letters-2 {
+  font-family: 'Englebert';
+  color: #ffc107;
+  font-weight: normal;
+}
+
 
 .cont {
 	padding-top: 25px;
@@ -40,6 +56,21 @@ hr {
   width: 80%;
 }
 
+.hr-categories {
+  border-top: 3px solid #fff;
+  opacity: .7;
+  width: 140px;
+  margin: 0px;
+}
+
+.hr-profile {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+
 
 .dr {
   display: none;
@@ -48,6 +79,49 @@ hr {
 .fa-placeholder {
   font-family: 'Helvetica Neue', FontAwesome, sans-serif;
 }
+
+.modal{
+  font-family: Roboto, Arial, sans-serif;
+}
+
+.nav-link.header {
+  color: #fff !important;
+  opacity: .8;
+}
+
+.nav-link.header:hover {
+  color: #fff !important;
+  opacity: .6;
+}
+
+.nav-link.header.active {
+  color: #ffc107 !important;
+  border-bottom: 3px solid #ffc107;
+  opacity: 1;
+}
+
+.nav-link.tab {
+  background-color: white !important;
+  color: #ffc107 !important;  
+}
+
+.nav-link.tab.active {
+  color: #ffc107 !important;
+  border-bottom: 3px solid #ffc107;
+}
+
+
+
+.navbar-transparent {
+  background-color: transparent !important;
+}
+
+
+.navbar.scrolled {
+  background-color: #263238 !important;
+  transition: background-color 200ms linear;
+}
+
 
 
 /* SCROLLBAR */
@@ -76,7 +150,13 @@ hr {
 
 .home-image {
   background-repeat: no-repeat; 
-  height: 550px;
+  height: 610px;
+  background-size: cover;
+}
+
+.discover-image {
+  background-repeat: no-repeat; 
+  height: 500px;
   background-size: cover;
 }
 
@@ -132,25 +212,33 @@ hr {
   font-weight: bold;
 }
 
+
 #profile-btn {
     display: block;
     height: 40px;
     padding: 0;
     margin: 0;
     width: 40px;
-    border-radius: 50%;
 }
 
-#profile-btn img{
-  height: 100%;
-  width: 100%;
-  border-radius: 50%;
-  border-color: gold;
-}
 
 #profile-btn::before {
   display:none;
 }
+
+#profile-btn:hover {
+  opacity: 0.7;
+}
+
+#user-profile-pic{
+  display: block;
+  height: 40px;
+  padding: 0;
+  margin: 0;
+  width: 40px;
+}
+
+
 
 
 .card-home-link:hover{
@@ -406,8 +494,9 @@ hr {
 }
 
 .input-group-append {
-    background-color: #ffc107;
-    border-right: 2px solid #ffc107;
+    background-color: white;
+    opacity: .7;
+    /*border-right: 2px solid #ffc107;*/
     border-radius: .25rem;
 }
 
@@ -770,6 +859,42 @@ hr {
 { color: #ffca08 ;  } /* Set yellow color when star hover */
 
 
+
+
+.pricerating > input {display: none;}  /* Remove radio buttons */
+
+.pricerating > label:before { 
+  content: "\f153"; /* Euro */
+  margin: 5px;
+  font-size: 2em;
+  font-family: FontAwesome;
+  display: inline-block; 
+}
+
+.pricerating > label
+{
+  color: #343a40; /* Start color when not clicked */
+}
+
+.pricerating > input:checked ~ label
+{ color: #ffca08 ; } /* Set yellow color when star checked */
+
+.pricerating > input:hover ~ label
+{ color: #ffca08 ;  } /* Set yellow color when star hover */
+
+
+
+.visit-loaded {
+  opacity: 0;
+}
+
+
+
+
+
+
+
+
 #sideb, #map {
   display:table-cell;
   bottom:0;
@@ -943,6 +1068,91 @@ table tr td a{
   pointer-events: none;
   color: white;
 }
+
+/* ---------------------------------- PROFILE ------------------------------ */
+
+.profile-nav{
+  color: #ffc107 !important;
+  font-weight: bold;
+}
+
+.profile-nav.active{
+  color: #495057 !important;
+}
+
+.profile-text{
+  letter-spacing: .00625em;
+  font-family: Roboto,Arial,sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+
+#edit-profile-modal .modal-header {
+  background-color: white !important;
+  color: black !important;
+}
+
+#edit-profile-modal .modal-header .modal-title{
+  font-family: 'Google Sans',Roboto,Arial,sans-serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+
+.input-file-container {
+  position: relative;
+  width: 225px;
+} 
+
+.js .input-file-trigger {
+  display: block;
+  padding: 14px 45px;
+  background: #ffc107;
+  color: #fff;
+  font-size: 1em;
+  transition: all .4s;
+  cursor: pointer;
+}
+.js .input-file {
+  position: absolute;
+  top: 0; left: 0;
+  width: 225px;
+  opacity: 0;
+  padding: 14px 0;
+  cursor: pointer;
+}
+
+.js .input-file:hover + .input-file-trigger,
+.js .input-file:focus + .input-file-trigger,
+.js .input-file-trigger:hover,
+.js .input-file-trigger:focus {
+  background: #34495E;
+  color: #ffc107;
+}
+
+.file-return {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+}
+.file-return:not(:empty) {
+  margin: 1em 0;
+}
+.js .file-return {
+  font-style: italic;
+  font-size: .9em;
+  font-weight: bold;
+}
+.js .file-return:not(:empty):before {
+  content: "Selected file: ";
+  font-style: normal;
+  font-weight: normal;
+}
+
+
 
 
 

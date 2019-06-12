@@ -6,13 +6,15 @@ var urlencodedParser = bodyParser.urlencoded({ extended: true });
 var mysql = require('mysql');
 var http = require('http');
 var https = require('https');
+var request = require('request');
 var cookieParser = require('cookie-parser');
 var url = require('url');
 var md5 = require('md5');
 var multer = require('multer');
 var fs = require('fs');
 
-var GOOGLE_API_KEY = 'AIzaSyCcM_AepOJRN1QIx96d2n0FOfOcGfZYfck';
+var GOOGLE_API_KEY = 'AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw';
+var OPEN_WEATHER_API_KEY = '8271fd206ceeef12df4e7bb6063241c3';
 
 
 var storage = multer.diskStorage({
@@ -1065,7 +1067,7 @@ app.get('/hotels', function(req,res){
 
 		con.query(sql, parameters, function (err, result, fields) {
 	        if (err) throw err;
-	        var list_places = []
+	        var list_hotels = []
 
 	        var city = destination;
 	        var country = 'Portugal';
@@ -1078,34 +1080,24 @@ app.get('/hotels', function(req,res){
 
 	        for(var i =0 ; i < result.length; i++){
 
-	        	var place = new Object();
-	        	place["id"] = result[i].id;
-	        	place["place_id"] = result[i].place_id;
-	            place["name"] = result[i].place;
-	            place["type"] = result[i].poi_type.charAt(0).toUpperCase() + result[i].poi_type.slice(1);
-	            place["description"] = result[i].description;
-	            place["address"] = result[i].address;
-	            place["rating"] = result[i].rating;
+	        	var hotel = new Object();
+	        	hotel["id"] = result[i].id;
+	        	hotel["place_id"] = result[i].place_id;
+	            hotel["name"] = result[i].place;
+	            hotel["city"] = result[i].city;
+	            hotel["type"] = result[i].poi_type.charAt(0).toUpperCase() + result[i].poi_type.slice(1);
+	            hotel["description"] = result[i].description;
+	            hotel["address"] = result[i].address;
+	            hotel["rating"] = result[i].rating;
+	        	hotel["coordinates"] = result[i].latitude + ", " + result[i].longitude;
+	        	hotel["website"] = result[i].website;
+	        	hotel["phone_number"] = result[i].phone;
 
-	        	list_places.push(place);
+	        	list_hotels.push(hotel);
 	        }
 
+	        res.render(path.join(__dirname+'/templates/hotels.html'), {hotels: list_hotels, city: city, country: country});
 
-	        var sql_num = "SELECT count(*) as number_results FROM poi JOIN city ON poi.city = city.id WHERE city.name = ? AND poi.name LIKE ? ORDER BY poi.num_reviews DESC";
-	        var parameters_2 = [destination, query]
-			
-	        con.query(sql_num, parameters_2, function (err, result, fields) {
-	        	if (err) throw err;
-
-	        	var count = 0;
-
-	        	if(result.length)
-	        		count = result[0].number_results;
-        		
-
-				res.render(path.join(__dirname+'/templates/hotels.html'), {places: list_places, city: city, country: country, number_results: count});
-
-	        });
 
 		});
 
@@ -2292,7 +2284,7 @@ app.get('/plan', function(req,res){
 				}).then(function(result){
 					var city_id = result[0].city;
 
-					var sql2 = "select id, place_id, name from poi where city = ? and id not in (select poi_id from visit where plan_id = ?) order by num_reviews desc";
+					var sql2 = "select id, place_id, name from poi where city = ? and poi_type != 'Hotel' id not in (select poi_id from visit where plan_id = ?) order by num_reviews desc";
 		        	var parameters2 = [city_id, plan_id];
 
 			        con.query(sql2, parameters2, function (err, result, fields) {
@@ -2505,7 +2497,7 @@ app.get('/plan', function(req,res){
 				}).then(function(result){
 					var city_id = result[0].city;
 
-					var sql2 = "select id, place_id, name, latitude, longitude, address, website, phone_number, poi_type from poi where city = ? and id not in (select poi_id from visit where plan_id = ?) order by num_reviews desc";
+					var sql2 = "select id, place_id, name, latitude, longitude, address, website, phone_number, poi_type from poi where city = ? and poi_type != 'Hotel' and id not in (select poi_id from visit where plan_id = ?) order by num_reviews desc";
 		        	var parameters2 = [city_id, plan_id];
 
 			        con.query(sql2, parameters2, function (err, result, fields) {
@@ -2683,6 +2675,9 @@ app.get('/plan', function(req,res){
 
 		        	visit["start_time"] = start_time.getHours() + ":" + (start_time.getMinutes()<10?'0':'') + start_time.getMinutes();
 		        	visit["end_time"] = end_time.getHours() + ":" + (end_time.getMinutes()<10?'0':'') + end_time.getMinutes();
+
+		        	
+
 		        	visit["weather"] = result[i].weather;
 		        	visit["address"] = result[i].address;
 		        	visit["coordinates"] = result[i].latitude + ", " + result[i].longitude;
@@ -2692,7 +2687,14 @@ app.get('/plan', function(req,res){
 		        	visit["city"] = result[i].city; 
 
 		        	plan.push(visit);
+
+
+
+
+
 		        }
+
+		        //console.log(getWeather(plan[0].coordinates.split(',')[0], plan[0].coordinates.split(',')[1], plan[0].day));
 
 				promise.createConnection({
 	    			host: 'localhost',
@@ -2711,7 +2713,7 @@ app.get('/plan', function(req,res){
 				}).then(function(result){
 					var city_id = result[0].city;
 
-					var sql2 = "select id, place_id, name, latitude, longitude, address, website, phone_number, poi_type from poi where city = ? and id not in (select poi_id from visit where plan_id = ?) order by num_reviews desc";
+					var sql2 = "select id, place_id, name, latitude, longitude, address, website, phone_number, poi_type from poi where city = ? and poi_type != 'Hotel' and  id not in (select poi_id from visit where plan_id = ?) order by num_reviews desc";
 		        	var parameters2 = [city_id, plan_id];
 
 			        con.query(sql2, parameters2, function (err, result, fields) {
@@ -3027,7 +3029,7 @@ app.get('/plan-m', function(req,res){
 				        	suggested_hotels.push(visit);
 				        }
 
-				        res.render(path.join(__dirname+'/templates/full-plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, isManual: 1});
+				        res.render(path.join(__dirname+'/templates/full-plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: "author", isPublic: 0, isManual: 1, reviews: [], num_viewers: 0, rating: 0, num_reviews: 0, num_plans: 0});
 
 			        });
 
@@ -3492,6 +3494,10 @@ app.post('/register', upload.single('photo'), function (req, res, next){
 
 });
 
+
+app.get('/profile', function(req, res){
+	res.render(path.join(__dirname+'/templates/profile.html'),);
+});
 
 
 app.get('/recover', function(req, res){
@@ -4033,6 +4039,60 @@ function getAllOpenSlotsAvailable(plan){
 }
 
 
+function getWeather(lat, lon, date){
+
+	console.log(date); // 31 May 2019
+
+	var url = "https://api.openweathermap.org/data/2.5/forecast?lat=" + parseFloat(lat) + "&lon=" + parseFloat(lon) + "&appid=" + OPEN_WEATHER_API_KEY + "&units=metric";
+
+	/*request(url, function (err, response, body) {
+	  if(err){
+	    console.log('error:', error);
+	  } else {
+
+	  	var info = body["list"];
+
+	  	//for(var i=0; i < info.length; i++){
+
+
+
+	  		// encontrar o info[i]["dt_txt"] mais próximo do horario da visita
+
+	  		// sacar temperatura -> info[i]["main"]["temp"] 
+	  		// sacar previsão de tempo -> info[i]["weather"][0]["main"]
+
+	  	//}
+
+
+
+	    //console.log('body:', body);
+	  }
+	});*/
+
+	https.get(url, (res) => { // <- this is a function that is called when there's a response. Waiting for a response is as easy as writing code inside this function (or use async await)
+	  	var body ='';
+		res.on('data', function(chunk) {
+	  		body += chunk;
+		});
+
+		res.on('end', function() {
+			body = JSON.parse(body);
+
+			var info = body["list"];
+
+			return info[0]["dt_txt"];
+
+		});
+
+	  
+
+	}).on('error', (e) => { //the https.get function returns a request that can emit an error event. this is an eventlistener for that. try an invalid url to test this branch of your code
+	  console.error(e);
+	});
+
+
+
+}
 
 
 

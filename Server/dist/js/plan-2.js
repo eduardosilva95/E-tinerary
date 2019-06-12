@@ -774,3 +774,7 @@ function getIcon(type){
     }
 
 }
+
+$(function () {
+    $('.visit-loaded').delay(100).animate({ opacity: 1 }, 700);
+});

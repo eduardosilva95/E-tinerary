@@ -7,9 +7,12 @@ function loadNavbar(){
       picture = 'img/login.png';
     }
 
-    if(document.getElementById("user-id") != null){
+    if(document.getElementById("user-id") != null)
       document.getElementById("user-id").value = user_id;
-    }
+
+    if(document.getElementById("my-profile-img") != null)
+      document.getElementById("my-profile-img").src = picture;
+
       
     document.getElementById("user-profile-pic").src = picture;
     document.getElementById("profile-trips").href = "/trips?id=" + user_id;
@@ -42,8 +45,10 @@ function attachSignin(element) {
   auth2.attachClickHandler(element, {},
       function(googleUser) {
         var profile = googleUser.getBasicProfile();
+
+        console.log(profile);
           
-        $.post("/login-g", {google_id: profile.getId(), name: profile.getName(), username: profile.getEmail(), picture: profile.getImageUrl()}, function(result){
+        $.post("/login-g", {google_id: profile.getId(), name: profile.getName(), username: profile.getEmail(), picture: profile.getImageUrl() + "?sz=250"}, function(result){
           
           setUserCookie(result.user_id, result.picture);
           window.location.reload();

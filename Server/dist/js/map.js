@@ -7,6 +7,7 @@ var weekdays = [];
 var plan_days = [];
 var day;
 var place_info = [];
+var visits;
 
 var places = {};
 var suggested_places = {};
@@ -18,6 +19,9 @@ var marker_list = [];
 var visits_color = '#74bb82';
 var suggested_visits_color = '#ac48db';
 var hotels_color = '#2079d8';
+
+var directionsService;
+var directionsDisplay;
 
 /* load map */
 function initMap(city) {
@@ -38,8 +42,12 @@ function initMap(city) {
                 zoom: 12,
                 center: new google.maps.LatLng(Lat, Lng)
             };
+            directionsService = new google.maps.DirectionsService();
+            directionsDisplay = new google.maps.DirectionsRenderer();
 
             map = new google.maps.Map(document.getElementById('full-map'), coordinatesFromAddress);
+
+            directionsDisplay.setMap(map);
 
             // Apply new JSON when the user chooses to hide/show features.
             var styles = {
@@ -74,6 +82,10 @@ function initMap(city) {
             {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 
             });
+
+
+            loadItinerary(visits, weekdays[day], plan_days[day]);
+
         } 
 
         else {
@@ -138,6 +150,40 @@ function createMarker(local, name, data, type){
     marker_list.push(marker.title);
   }
 
+function renderDirections(result) { 
+    var directionsRenderer = new google.maps.DirectionsRenderer(); 
+    directionsRenderer.setMap(map); 
+    directionsRenderer.setDirections(result); 
+}     
+
+
+function calcRoute(start, end, waypts) {
+    console.log("calcRoute " + start + end);
+
+    var request = {
+        origin: {
+            placeId: start
+        },
+        destination: {
+            placeId: end
+        },     
+        waypoints: waypts, 
+        optimizeWaypoints: true,  
+        travelMode: 'DRIVING'
+    };
+
+    console.log(request);
+    
+    directionsService.route(request, function(result, status) {
+      if (status == 'OK') {
+        console.log(result);
+        directionsDisplay.setDirections(result);
+      }
+    });
+  }
+
+
+
 
 
 function loadPlan(plan_array, days){
@@ -153,7 +199,7 @@ function loadPlan(plan_array, days){
         weekdays.push(days[i] + days[i+1]);
     }
 
-    var visits = [];
+    visits = [];
     for(var j=0 ; j < plan.length ; j++){
         p = JSON.parse(plan[j]);
 
@@ -163,7 +209,35 @@ function loadPlan(plan_array, days){
             visits.push(p);
         }
     }
+
 }
+
+
+function loadItinerary(visits, day, checkDay){
+    var visits_tmp = [];
+    for(var i=0 ; i < visits.length; i++){
+        if(visits[i].day.replace(/\s/g, '') == checkDay.replace(/\s/g, '')){
+            
+            visits_tmp.push(visits[i]);
+
+        }
+
+    }
+
+    var waypoints = [];
+    for(var i=1; i < visits_tmp.length - 1; i++){
+        waypoints.push({ stopover: true, location: { placeId: visits[i].place_id } });
+    }
+
+    calcRoute(visits_tmp[0].place_id, visits_tmp[visits_tmp.length-1].place_id, waypoints);
+
+
+
+
+}
+
+
+
 
 function loadSuggestions(suggested_visits){
 

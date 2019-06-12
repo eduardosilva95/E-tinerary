@@ -2,6 +2,14 @@
 var slide = 0;
 
 $(function () {
+  $(document).scroll(function () {
+    var $nav = $(".navbar");
+    $nav.toggleClass('scrolled', $(this).scrollTop() > $nav.height());
+  });
+});
+
+
+$(function () {
     $(".btn-interests-down").click(function() {
         $("#interests-div").slideToggle();
         if(slide == 0){
@@ -120,3 +128,7 @@ function autocomplete(inp, arr) {
       closeAllLists(e.target);
   });
   }
+
+  $(function () {
+    $('[data-toggle="popover"]').popover()
+  });

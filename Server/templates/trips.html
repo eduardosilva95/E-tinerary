@@ -24,9 +24,10 @@
     <script type="text/javascript" src="js/myscript.js"></script>
     <script type="text/javascript" src="js/trips.js"></script>
     <script type="text/javascript" src="js/login.js"></script>
+
     
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcM_AepOJRN1QIx96d2n0FOfOcGfZYfck&libraries=places"></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
   
   </head>
   <body onload="loadNavbar();">
@@ -69,8 +70,8 @@
                     <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
                   </div>
                   <div id="profile" class="dropleft" style="display: none;">
-                    <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img id="user-profile-pic">
+                    <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img id="user-profile-pic" class="rounded-circle border border-light">
                     </a>
                     <div class="dropdown-menu" aria-labelledby="profile-btn">
                       <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
@@ -314,67 +315,117 @@
         </div>
 
 
-      <!-- Share Modal -->
-      <div class="modal fade" id="share-modal" role="dialog">
-          <div class="modal-dialog">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalLabel">Share <span id="share-modal-title" style="font-weight: bold;"></span></h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                      </button>
-                  </div>
-                  <form id="share-plan-form" action="/share-plan" method="POST" enctype="multipart/form-data">
-                      <div class="modal-body">
+        <!-- Share Modal -->
+        <div class="modal fade" id="share-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Share <span id="share-modal-title" style="font-weight: bold;"></span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="share-plan-form" action="/share-plan" method="POST" enctype="multipart/form-data">
+                        <div class="modal-body">
 
-                          <div class="alert alert-warning" id="are-you-sure-share-msg" role="alert">
-                              <i class="fas fa-exclamation-triangle"></i><span style="padding-left: 10px;">Are you sure that you want to share <span id="are-you-sure-plan-name" style="font-weight: bold;"></span> ?</span>
-                              <p>After the plan is shared, you will not be able to make changes on it.</p>
-                          </div>
-  
-                          <label for="inputName">Enter a description for the plan</label>
-                          <textarea type="text" id="inputDescription" class="form-control" name="description" required></textarea>
+                            <nav class="nav nav-pills flex-column flex-sm-row">
+                                <a class="flex-sm-fill text-sm-center nav-link active" id="pills-general-info-tab" data-toggle="pill" href="#share-modal-general-info" role="tab" aria-controls="share-plan-general-info" aria-selected="true">General Information</a>
+                                <a class="flex-sm-fill text-sm-center nav-link" id="pills-more-info-tab" data-toggle="pill" href="#share-modal-more-info" role="tab" aria-controls="share-plan-more-info" aria-selected="false">Help us improve</a>
+                            </nav>
 
-                          <br>
+                            <br>
 
-                          <div class="form-group">
-                              <label for="select-category-plan">Category for you plan</label>
-                              <select class="form-control" id="select-category-plan" name="category">
-                                  <option selected>Overall</option>
-                                  <option>Nature</option>
-                                  <option>History</option>
-                                  <option>Culture</option>
-                                  <option>Sports</option>
-                              </select>
-                          </div>
-                          
-                          <br>
+                            <div class="alert alert-warning" id="are-you-sure-share-msg" role="alert">
+                                <i class="fas fa-exclamation-triangle"></i><span style="padding-left: 10px;">Are you sure that you want to share <span id="are-you-sure-plan-name" style="font-weight: bold;"></span> ?</span>
+                                <p>After the plan is shared, you will not be able to change it.</p>
+                            </div>
 
-                          <label>Rate your plan:</label>
-                          <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
-                              <input type="radio" id="share-rating-star5" name="rating" value="5" /><label for="share-rating-star5" title="5 star">5</label>
-                              <input type="radio" id="share-rating-star4" name="rating" value="4" /><label for="share-rating-star4" title="4 star">4</label>
-                              <input type="radio" id="share-rating-star3" name="rating" value="3" /><label for="share-rating-star3" title="3 star">3</label>
-                              <input type="radio" id="share-rating-star2" name="rating" value="2" /><label for="share-rating-star2" title="2 star">2</label>
-                              <input type="radio" id="share-rating-star1" name="rating" value="1" /><label for="share-rating-star1" title="1 star">1</label>
-                          </div>
+                            <div class="tab-content" id="pills-tabContent">
+                            <div class="tab-pane fade show active" id="share-modal-general-info" role="tabpanel" aria-labelledby="pills-general-info-tab">
+    
+                                <label for="inputName">Enter a description for the plan</label>
+                                <textarea type="text" id="inputDescription" class="form-control" name="description" required></textarea>
 
-                          <br>
-  
-                          <label for="plan-picture">Submit a picture for the plan</label>
-                          <input type="file" class="form-control-file" accept="image/*" id="plan-picture" name="picture" required>
+                                <br>
 
-                          
-  
-                      </div>
-                      <div class="modal-footer">
-                          <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
-                          <button type="submit" value="upload" id="submit-share-plan-btn" class="btn btn-success"><i class="fas fa-check"></i><span style="padding-left: 10px;">Share</span></button>
-                      </div>
-                  </form>
-              </div>
-          </div>
-      </div>
+                                <div class="form-group">
+                                    <label for="select-category-plan">Category for you plan</label>
+                                    <select class="form-control" id="select-category-plan" name="category">
+                                        <option selected>Overall</option>
+                                        <option>Nature</option>
+                                        <option>History</option>
+                                        <option>Culture</option>
+                                        <option>Sports</option>
+                                    </select>
+                                </div>
+                                
+                                <br>
+
+                                <label>Rate your plan:</label>
+                                <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
+                                    <input type="radio" id="share-rating-star5" name="rating" value="5" /><label for="share-rating-star5" title="5 star">5</label>
+                                    <input type="radio" id="share-rating-star4" name="rating" value="4" /><label for="share-rating-star4" title="4 star">4</label>
+                                    <input type="radio" id="share-rating-star3" name="rating" value="3" /><label for="share-rating-star3" title="3 star">3</label>
+                                    <input type="radio" id="share-rating-star2" name="rating" value="2" /><label for="share-rating-star2" title="2 star">2</label>
+                                    <input type="radio" id="share-rating-star1" name="rating" value="1" /><label for="share-rating-star1" title="1 star">1</label>
+                                </div>
+
+                                <br>
+
+                                
+        
+                                <label for="plan-picture">Submit a picture for the plan</label>
+                                <input type="file" class="form-control-file" accept="image/*" id="plan-picture" name="picture" required>
+
+                            </div>
+
+                            <div class="tab-pane fade" id="share-modal-more-info" role="tabpanel" aria-labelledby="pills-more-info-tab">
+
+                                <label>Accessibility:</label>
+                                <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
+                                    <input type="radio" id="share-rating-access-star5" name="accessibility" value="5" /><label for="share-rating-access-star5" title="5 star">5</label>
+                                    <input type="radio" id="share-rating-access-star4" name="accessibility" value="4" /><label for="share-rating-access-star4" title="4 star">4</label>
+                                    <input type="radio" id="share-rating-access-star3" name="accessibility" value="3" /><label for="share-rating-access-star3" title="3 star">3</label>
+                                    <input type="radio" id="share-rating-access-star2" name="accessibility" value="2" /><label for="share-rating-access-star2" title="2 star">2</label>
+                                    <input type="radio" id="share-rating-access-star1" name="accessibility" value="1" /><label for="share-rating-access-star1" title="1 star">1</label>
+                                </div>
+
+                                <br>
+
+                                <label>Security:</label>
+                                <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
+                                    <input type="radio" id="share-rating-security-star5" name="security" value="5" /><label for="share-rating-security-star5" title="5 star">5</label>
+                                    <input type="radio" id="share-rating-security-star4" name="security" value="4" /><label for="share-rating-security-star4" title="4 star">4</label>
+                                    <input type="radio" id="share-rating-security-star3" name="security" value="3" /><label for="share-rating-security-star3" title="3 star">3</label>
+                                    <input type="radio" id="share-rating-security-star2" name="security" value="2" /><label for="share-rating-security-star2" title="2 star">2</label>
+                                    <input type="radio" id="share-rating-security-star1" name="security" value="1" /><label for="share-rating-security-star1" title="1 star">1</label>
+                                </div>
+
+                                <br>
+
+                                <label>Price:</label>
+                                <div class="pricerating risingstar d-flex justify-content-center flex-row-reverse">
+                                    <input type="radio" id="share-rating-price5" name="price-rating" value="5" /><label for="share-rating-price5" title="5 star">5</label>
+                                    <input type="radio" id="share-rating-price4" name="price-rating" value="4" /><label for="share-rating-price4" title="4 star">4</label>
+                                    <input type="radio" id="share-rating-price3" name="price-rating" value="3" /><label for="share-rating-price3" title="3 star">3</label>
+                                    <input type="radio" id="share-rating-price2" name="price-rating" value="2" /><label for="share-rating-price2" title="2 star">2</label>
+                                    <input type="radio" id="share-rating-price1" name="price-rating" value="1" /><label for="share-rating-price1" title="1 star">1</label>
+                                </div>
+
+                            </div>
+                            </div>
+
+                            
+    
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
+                            <button type="submit" value="upload" id="submit-share-plan-btn" class="btn btn-success"><i class="fas fa-check"></i><span style="padding-left: 10px;">Share</span></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
 
         <!-- Archive Modal -->
@@ -396,7 +447,94 @@
                     </div>
                 </div>
             </div>
-          </div>
+        </div>
+
+
+
+        <!-- Review Modal -->
+        <div class="modal fade" id="review-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><span id="modal-review-title" style="font-weight: bold;"></span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+
+                        <nav class="nav nav-pills flex-column flex-sm-row">
+                            <a class="flex-sm-fill text-sm-center nav-link active" id="pills-general-info-tab" data-toggle="pill" href="#share-modal-general-info" role="tab" aria-controls="share-plan-general-info" aria-selected="true">General Information</a>
+                            <a class="flex-sm-fill text-sm-center nav-link" id="pills-more-info-tab" data-toggle="pill" href="#share-modal-more-info" role="tab" aria-controls="share-plan-more-info" aria-selected="false">Help us improve</a>
+                        </nav>
+
+                        <br>
+
+                        <div class="tab-content" id="pills-tabContent">
+                            <div class="tab-pane fade show active" id="share-modal-general-info" role="tabpanel" aria-labelledby="pills-general-info-tab">
+            
+                                <label for="review-text">Review:</label>
+                                <textarea class="form-control" rows="5" id="review-text"></textarea>  
+                                
+                                <br>
+                                
+                                <label>Rate:</label>
+                                <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
+                                    <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 star">5</label>
+                                    <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 star">4</label>
+                                    <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 star">3</label>
+                                    <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 star">2</label>
+                                    <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">1</label>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="share-modal-more-info" role="tabpanel" aria-labelledby="pills-more-info-tab">
+
+                                <label>Accessibility:</label>
+                                <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
+                                    <input type="radio" id="share-rating-access-star5" name="accessibility" value="5" /><label for="share-rating-access-star5" title="5 star">5</label>
+                                    <input type="radio" id="share-rating-access-star4" name="accessibility" value="4" /><label for="share-rating-access-star4" title="4 star">4</label>
+                                    <input type="radio" id="share-rating-access-star3" name="accessibility" value="3" /><label for="share-rating-access-star3" title="3 star">3</label>
+                                    <input type="radio" id="share-rating-access-star2" name="accessibility" value="2" /><label for="share-rating-access-star2" title="2 star">2</label>
+                                    <input type="radio" id="share-rating-access-star1" name="accessibility" value="1" /><label for="share-rating-access-star1" title="1 star">1</label>
+                                </div>
+
+                                <br>
+
+                                <label>Security:</label>
+                                <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
+                                    <input type="radio" id="share-rating-security-star5" name="security" value="5" /><label for="share-rating-security-star5" title="5 star">5</label>
+                                    <input type="radio" id="share-rating-security-star4" name="security" value="4" /><label for="share-rating-security-star4" title="4 star">4</label>
+                                    <input type="radio" id="share-rating-security-star3" name="security" value="3" /><label for="share-rating-security-star3" title="3 star">3</label>
+                                    <input type="radio" id="share-rating-security-star2" name="security" value="2" /><label for="share-rating-security-star2" title="2 star">2</label>
+                                    <input type="radio" id="share-rating-security-star1" name="security" value="1" /><label for="share-rating-security-star1" title="1 star">1</label>
+                                </div>
+
+                                <br>
+
+                                <label>Price:</label>
+                                <div class="pricerating risingstar d-flex justify-content-center flex-row-reverse">
+                                    <input type="radio" id="share-rating-price5" name="price-rating" value="5" /><label for="share-rating-price5" title="5 star">5</label>
+                                    <input type="radio" id="share-rating-price4" name="price-rating" value="4" /><label for="share-rating-price4" title="4 star">4</label>
+                                    <input type="radio" id="share-rating-price3" name="price-rating" value="3" /><label for="share-rating-price3" title="3 star">3</label>
+                                    <input type="radio" id="share-rating-price2" name="price-rating" value="2" /><label for="share-rating-price2" title="2 star">2</label>
+                                    <input type="radio" id="share-rating-price1" name="price-rating" value="1" /><label for="share-rating-price1" title="1 star">1</label>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
+                        <button type="button" onclick="submitReview();" class="btn btn-success" id="submit-review-btn" data-dismiss="modal"><i class="fas fa-check"></i><span style="padding-left: 10px;">Submit</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
 
 

@@ -55,11 +55,17 @@ CREATE TABLE Review_Plan (
     plan_id INT NOT NULL,
     review_text TEXT,
     review_rating INT NOT NULL,
+    review_rating_accessibility INT,
+    review_rating_security INT,
+    review_rating_price INT,
     review_timestamp TIMESTAMP NOT NULL,
     PRIMARY KEY (review_id),
     FOREIGN KEY (review_id) REFERENCES Review(id),
     FOREIGN KEY (plan_id) REFERENCES Plan(id),
-    CHECK(review_rating > 0 and review_rating < 6)
+    CHECK(review_rating > 0 and review_rating < 6),
+    CHECK(review_rating_accessibility > 0 and review_rating_accessibility < 6),
+    CHECK(review_rating_security > 0 and review_rating_security < 6),
+    CHECK(review_rating_price > 0 and review_rating_price < 6)
 );
 
 

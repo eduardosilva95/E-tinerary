@@ -1,4 +1,12 @@
 
+$(function () {
+  $(document).scroll(function () {
+    var $nav = $(".navbar");
+    $nav.toggleClass('scrolled', $(this).scrollTop() > $nav.height());
+  });
+});
+
+
 function autocomplete(inp, arr) {
     /*the autocomplete function takes two arguments,
     the text field element and an array of possible autocompleted values:*/
@@ -118,3 +126,9 @@ function autocomplete(inp, arr) {
     });
 
   }
+
+
+  $(function () {
+    $('[data-toggle="popover"]').popover()
+  })
+

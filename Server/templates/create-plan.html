@@ -17,7 +17,7 @@
     
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
 
     <script type="text/javascript" src="js/login.js"></script>
     <script type="text/javascript" src="js/search.js"></script>
@@ -41,7 +41,7 @@
               <ul class="navbar-nav ml-auto">
                 
                   <li class="nav-item">
-                    <a class="nav-link" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+                    <a class="nav-link active" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
                   </li>
                 
                 <li class="nav-item">
@@ -54,8 +54,8 @@
                     <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
+                    <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img id="user-profile-pic" class="rounded-circle border border-light">
                     </a>
                     <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
                       <a class="dropdown-item" href="./about-us">Aplicacao</a>
@@ -123,25 +123,25 @@
                                     <div class="col-sm-6">
                                         <label class="mr-2" for="select-adults" style="color: #ffc107; font-weight: bold;">Adults</label>
                                         <select class="custom-select mr-sm-2" id="select-adults">
-                                        <option selected value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
+                                            <option selected value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
                                         </select>
                                     </div>
                                     <div class="col-sm-6">
-                                        <label class="my-1 mr-2" for="select-children" style="color: #ffc107; font-weight: bold;">Children (< 12 years)</label>
+                                        <label class="my-1 mr-2" for="select-children" style="color:#ffc107; font-weight: bold;">Children <sup id="input-children-info"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Children to 12 years old"></i></sup></label>
                                         <select class="custom-select mr-sm-2" id="select-children">
-                                        <option selected value="0">0</optsion>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
+                                            <option selected value="0">0</optsion>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
                                         </select>
                                     </div>
                                 </div>

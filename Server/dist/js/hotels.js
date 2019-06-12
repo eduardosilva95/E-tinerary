@@ -46,7 +46,7 @@ function initMap(city) {
             google.maps.event.addListenerOnce(map, 'idle', function () {
 
                 for(var key in hotels){
-                    data = {color: '#ac48db', icon: 'fas fa-monument'};
+                    data = {color: '#ac48db', icon: 'fas fa-bed'};
                     createMarker(hotels[key]['coordinates'], hotels[key]['name'], data);
                 }
 
@@ -103,7 +103,12 @@ function createMarker(local, name, data){
 function loadHotels(hotels_list){
 
     for(var i=0 ; i < hotels_list.length ; i++){
+
+        console.log(hotels_list[i]);
+
         hotel = JSON.parse(hotels_list[i]);
+
+        hotel["price"] = Math.floor((Math.random() * 150) + 30) + " €";
 
         hotels[hotel.name] = hotel;
 
@@ -113,9 +118,10 @@ function loadHotels(hotels_list){
         document.getElementById('hotel-' + i + '-name').title = hotel.name;
 
         loadImage(hotel.place_id, 'hotel-' + i + '-img');
+
+        document.getElementById('hotel-' + i + '-price').innerText = hotel.price;
     
     }
-
 }
 
 

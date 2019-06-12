@@ -18,7 +18,7 @@
     
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="/js/home.js"></script>
     <script type="text/javascript" src="/js/login.js"></script>
     
@@ -26,14 +26,14 @@
     <link href="https://unpkg.com/gijgo@1.9.11/css/gijgo.min.css" rel="stylesheet" type="text/css" />
 
     <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcM_AepOJRN1QIx96d2n0FOfOcGfZYfck&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
     
   
   </head>
-  <body onload="loadNavbar();">
+  <body onload="loadNavbar();" style="background-image: url('/img/home-image.jpg');">
         <!-- header navbar -->
-        <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
-            <a class="navbar-brand" href="./">HomePage</a>
+        <nav class="navbar sticky-top navbar-expand-lg navbar-dark navbar-transparent bg-dark justify-content-between">
+            <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
@@ -70,11 +70,11 @@
                       <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
                     </div>
                     <div id="profile" class="dropleft" style="display: none;">
-                      <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <img id="user-profile-pic">
+                      <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <img id="user-profile-pic" class="rounded-circle border border-light">
                       </a>
-                      <div class="dropdown-menu" aria-labelledby="profile-btn">
-                        <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                      <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
+                        <a class="dropdown-item" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
                         <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
@@ -87,7 +87,7 @@
         </nav>
 
 
-        <div class="container-fluid home-image" style=" background-image: url('/img/home-image.jpg'); ">
+        <div class="container-fluid home-image" >
           <br><br>
           <div class="row">
               <div class="col-md-1 col-sm-1"></div>
@@ -99,11 +99,6 @@
                     <div class="form-group autocomplete">
                       <input type="text" class="form-control" id="inputDestination" name="destination" placeholder="Enter your destination" required>
                     </div>
-                    <script>
-                      var cities = "<%= cities %>";
-                      var list_cities = cities.split(',');
-                      autocomplete(document.getElementById("inputDestination"), list_cities);
-                    </script>
                     
                     <div class="row">
                       <div class='col-sm-6'>
@@ -128,7 +123,6 @@
                                   uiLibrary: 'bootstrap4',
                                   format: 'dd/mm/yyyy',
                                   minDate: new Date()
-                                  
                               });
                             </script>
                           </div>
@@ -147,7 +141,7 @@
                         </select>
                       </div>
                       <div class="col-sm-6">
-                        <label class="my-1 mr-2" for="select-children" style="color: white; font-weight: bold;">Children <sup id="input-children-info"><i class="fas fa-question-circle" title="Children to 12 years old"></i></sup></label>
+                        <label class="my-1 mr-2" for="select-children" style="color: white; font-weight: bold;">Children <sup id="input-children-info"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Children to 12 years old"></i></sup></label>
                         <select class="custom-select my-1 mr-sm-2" id="select-children" name="no-children">
                           <option selected value="0">0</optsion>
                           <option value="1">1</option>
@@ -168,7 +162,7 @@
 
                     
                     <div class="float-md-right float-sm-none">
-                        <button type="submit" value="submit" class="btn btn-success" >Generate your plan</button>
+                        <button type="submit" value="submit" class="btn btn-success"><b>Generate your plan</b></button>
                     </div>
 
                     <div class="float-md-left float-sm-none">
@@ -177,6 +171,12 @@
 
                  
                   </form>
+                  
+                  <script>
+                    var cities = "<%= cities %>";
+                    var list_cities = cities.split(',');
+                    autocomplete(document.getElementById("inputDestination"), list_cities);
+                  </script>
 
               </div>
               <div class="col-md-6 col-sm-1"></div>
@@ -187,7 +187,7 @@
 
         <div class="container-fluid cont" style="background-color: #343a40; ">
           <div class="container cont text-center">
-              <h2 style="color: white; font-weight: bold;">How to use E-tinerary ? </h2>
+              <h2 style="color: white; font-weight: bold;">How to use <span class="logo-letters">e &bull; t</span><span class="logo-letters-2">inerary</span> ? </h2>
               <p style="color: #fff; font-size: 23px; opacity: .7">Easy to use, get a itinerary for your travel within a few seconds</p>
           </div>
           <br>
