@@ -165,7 +165,7 @@ function loadPlan(plan_array, days){
     for(var j=0 ; j < plan.length ; j++){
         p = JSON.parse(plan[j]);
 
-        places[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number, 'poi_type': p.poi_type};
+        places[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number, 'poi_type': p.poi_type, 'weather': p.weather, 'weather_icon': p.weather_icon};
 
         visits.push(p); 
     }
@@ -289,20 +289,35 @@ function loadVisits(visits, day, checkDay){
     document.getElementById('visit-day').innerText = day;
     for(var i=0 ; i < visits.length ; i++){
         document.getElementById('place-' + i + '-name').innerText = visits[i].name;
+        document.getElementById('place-' + i + '-name').title = visits[i].name;
         document.getElementById('place-' + i + '-type').innerText = visits[i].poi_type;
-        document.getElementById('place-' + i + '-hours').innerText = visits[i].start_time + ' - ' + visits[i].end_time;
+        document.getElementById('place-' + i + '-start-hour').innerText = visits[i].start_time;
+        document.getElementById('place-' + i + '-end-hour').innerText = visits[i].end_time;
+        
+        if(visits[i].weather == null){
 
-        if(visits[i].weather == 'Sunny'){
-            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-sun" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].weather;
         }
 
-        else if(visits[i].weather == 'Rainy'){
-            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-cloud-rain" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].weather;
+        else{
+
+        var weather_icon = "http://openweathermap.org/img/w/" + visits[i].weather_icon + ".png";
+
+        document.getElementById('place-' + i + '-weather').innerHTML = '<img src=' + weather_icon + ' style="width: 54px; height: 45px;"></i>' + visits[i].weather + "ºC";
+        
+        }
+       
+
+        /*else if(visits[i].weather.split(" ")[0] == 'Clear'){
+            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-sun" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].weather + "ºC";
         }
 
-        else if(visits[i].weather == 'Cloudy'){
-            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-cloud" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].weather;
+        else if(visits[i].weather.split(" ")[0] == 'Rain'){
+            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-cloud-rain" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].weather + "ºC";
         }
+
+        else if(visits[i].weather.split(" ")[0] == 'Clouds'){
+            document.getElementById('place-' + i + '-weather').innerHTML = '<i class="fas fa-cloud" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].weather + "ºC";
+        }*/
 
         if(visits[i].poi_type == 'Park'){
             document.getElementById('place-' + i + '-type').innerHTML = '<i class="fas fa-tree" aria-hidden="true" style="padding-right: 10px;"></i>' + visits[i].poi_type;
@@ -778,3 +793,31 @@ function getIcon(type){
 $(function () {
     $('.visit-loaded').delay(100).animate({ opacity: 1 }, 700);
 });
+
+
+function checkInterest(){
+    var plan_id = /id=([^&]+)/.exec(location.search)[1];
+
+    $.post("/user-interested", {plan: plan_id}, function(result){
+        if(result.result == 'error'){
+        }
+        
+        else{
+            window.location.reload();
+        }
+    });
+}
+
+function uncheckInterest(){
+    var plan_id = /id=([^&]+)/.exec(location.search)[1];
+
+    $.post("/user-not-interested", {plan: plan_id}, function(result){
+        if(result.result == 'error'){
+        }
+        
+        else{
+            window.location.reload();
+        }
+    });
+
+}

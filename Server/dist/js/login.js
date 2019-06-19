@@ -10,8 +10,8 @@ function loadNavbar(){
     if(document.getElementById("user-id") != null)
       document.getElementById("user-id").value = user_id;
 
-    if(document.getElementById("my-profile-img") != null)
-      document.getElementById("my-profile-img").src = picture;
+    //if(document.getElementById("my-profile-img") != null)
+     // document.getElementById("my-profile-img").src = picture;
 
       
     document.getElementById("user-profile-pic").src = picture;
@@ -46,8 +46,6 @@ function attachSignin(element) {
       function(googleUser) {
         var profile = googleUser.getBasicProfile();
 
-        console.log(profile);
-          
         $.post("/login-g", {google_id: profile.getId(), name: profile.getName(), username: profile.getEmail(), picture: profile.getImageUrl() + "?sz=250"}, function(result){
           
           setUserCookie(result.user_id, result.picture);
@@ -59,6 +57,8 @@ function attachSignin(element) {
       }, function(error) {
       });
 }
+
+
 
 
 function login(type=null) {
@@ -97,7 +97,6 @@ function login(type=null) {
 
   }
 
-
 }
 
 
@@ -106,7 +105,11 @@ function signOut() {
   var auth2 = gapi.auth2.getAuthInstance();
   auth2.signOut().then(function () {
     deleteUserCookie();
-    window.location.reload();
+
+    if(document.location.pathname == "/profile")
+      window.location.href = "/";
+    else
+      window.location.reload();
   });
 }
 

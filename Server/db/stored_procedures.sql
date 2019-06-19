@@ -12,7 +12,12 @@ DROP PROCEDURE Get_Hotels;
 DROP PROCEDURE Get_IDs_POI_Of_City;
 DROP PROCEDURE Add_Visit_To_Plan;
 DROP PROCEDURE Get_Info_User;
-
+DROP PROCEDURE User_IsInterested;
+DROP PROCEDURE User_IsNotInterested;
+DROP PROCEDURE isUserInterested;
+DROP PROCEDURE makePlanFavorite;
+DROP PROCEDURE unfavoritePlan;
+DROP PROCEDURE reviewPOI;
 
 DELIMITER //
 # obter as N cidades com mais planos criados
@@ -70,7 +75,14 @@ END //
 # obter toda a informação de um POI
 CREATE PROCEDURE Get_Info_POI (poiID INT)
 BEGIN
-	SELECT * FROM poi;
+	SELECT * FROM
+	(SELECT * FROM poi where id = poiID) AS A 
+	LEFT JOIN
+	(SELECT count(*) as no_plans, poi.id as id2 from plan join visit join poi on visit.poi_id = poi.id on plan.id = visit.plan_id where poi.id = poiID) AS B
+	ON A.id = B.id2
+	LEFT JOIN
+	(SELECT avg(review_rating) as rating, avg(review_rating_accessibility) as accessibility, avg(review_rating_security) as security, avg(review_rating_price) as price, avg(review_rating_duration) as duration, poi_id as id3 from review_poi where poi_id = poiID) AS D
+	ON A.id = D.id3;
 END //
 
 # obter todos os reviews feitos de um POI
@@ -114,6 +126,110 @@ BEGIN
 		SELECT * FROM user JOIN user_g ON user.id = user_g.user_id WHERE user.id = userID;
 	ELSE
 		SELECT * FROM user JOIN user_e ON user.id = user_e.user_id WHERE user.id = userID;
+	END IF;
+    
+END //
+
+# utilizador está interessado num plano
+CREATE PROCEDURE User_IsInterested (userID INT, planID INT)
+BEGIN
+	DECLARE existsColumn INT;
+	SELECT COUNT(*) INTO existsColumn FROM user_isinterested_plan WHERE user_id = userID AND plan_id = planID;
+	
+    IF existsColumn = 1 THEN
+		UPDATE user_isinterested_plan SET isInterested = 1 WHERE user_id = userID AND plan_id = planID;
+	ELSE
+		INSERT INTO user_isinterested_plan VALUES (userID, planID, 1);
+	END IF;
+    
+END //
+
+
+# utilizador não está interessado num plano
+CREATE PROCEDURE User_IsNotInterested (userID INT, planID INT)
+BEGIN
+	DECLARE existsColumn INT;
+	SELECT COUNT(*) INTO existsColumn FROM user_isinterested_plan WHERE user_id = userID AND plan_id = planID;
+	
+    IF existsColumn = 1 THEN
+		UPDATE user_isinterested_plan SET isInterested = 0 WHERE user_id = userID AND plan_id = planID;
+	END IF;
+    
+END //
+
+
+# verificar se o utilizador está interessado num plano
+CREATE PROCEDURE isUserInterested (userID INT, planID INT)
+BEGIN
+	DECLARE existsColumn INT;
+    DECLARE interested BIT;
+	SELECT COUNT(*) INTO existsColumn FROM user_isinterested_plan WHERE user_id = userID AND plan_id = planID;
+	
+    IF existsColumn = 1 THEN
+		SELECT isInterested INTO interested FROM user_isinterested_plan WHERE user_id = userID AND plan_id = planID;
+        IF interested = b'1' THEN
+			SELECT 1 AS isInterested;
+		ELSE
+			SELECT 0 AS isInterested;
+		END IF;
+	ELSE
+		SELECT 0 AS isInterested;
+	END IF;
+END //
+
+
+# tornar plano favorito
+CREATE PROCEDURE makePlanFavorite (userID INT, planID INT)
+BEGIN
+	DECLARE planOwner INT;
+	SELECT user INTO planOwner FROM plan WHERE id = planID;
+	
+    IF planOwner = userID THEN
+		UPDATE plan SET isFavorite = 1 WHERE id = planID;
+	END IF;
+END //
+
+# plano deixa de ser favorito
+CREATE PROCEDURE unfavoritePlan (userID INT, planID INT)
+BEGIN
+	DECLARE planOwner INT;
+	SELECT user INTO planOwner FROM plan WHERE id = planID;
+	
+    IF planOwner = userID THEN
+		UPDATE plan SET isFavorite = 0 WHERE id = planID;
+	END IF;
+    
+END //
+
+
+# adicionar uma review a um POI
+CREATE PROCEDURE reviewPOI (userID INT, poiID INT, reviewText TEXT, reviewRating INT, reviewAccess INT, reviewSecurity INT, reviewPrice DECIMAL(10,2), reviewDuration INT)
+BEGIN
+	DECLARE reviewID INT;
+    
+	INSERT INTO review (user_id) values (userID);
+    SET reviewID = LAST_INSERT_ID();
+	
+    INSERT INTO review_poi (review_id, poi_id, review_text) VALUES (reviewID, poiID, reviewText);
+	
+    IF reviewRating is not null THEN
+		UPDATE review_poi SET review_rating = reviewRating WHERE review_id = reviewID;
+	END IF;
+    
+	IF reviewAccess is not null THEN
+		UPDATE review_poi SET review_rating_accessibility = reviewAccess WHERE review_id = reviewID;
+	END IF;
+    
+     IF reviewSecurity is not null THEN
+		UPDATE review_poi SET review_rating_security = reviewSecurity WHERE review_id = reviewID;
+	END IF;
+    
+     IF reviewPrice is not null THEN
+		UPDATE review_poi SET review_rating_price = reviewPrice WHERE review_id = reviewID;
+	END IF;
+    
+     IF reviewDuration is not null THEN
+		UPDATE review_poi SET review_rating_duration = reviewDuration WHERE review_id = reviewID;
 	END IF;
     
 END //

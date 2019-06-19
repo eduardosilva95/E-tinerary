@@ -39,7 +39,7 @@
   <body onload="initMap('<%= city %>')">
         <!-- header navbar -->
         <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
-            <a class="navbar-brand" href="./"><img src="img/logo-3.png" style="height: 40px"></a>
+            <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -80,7 +80,7 @@
                             <img id="user-profile-pic" class="rounded-circle border border-light">
                         </a>
                         <div class="dropdown-menu" aria-labelledby="profile-btn">
-                        <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                        <a class="dropdown-item" href="/profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
                         <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
@@ -161,14 +161,20 @@
                                     </div>
                                     <div class="col-md-8 ">
                                         <div class="card-body row">
-                                            <div class="col-md-8">
+                                            <div class="col-md-7">
                                                 <div class="text-left">
-                                                    <h6 id="place-<%= count %>-name" class="card-title"><b></b></h6>
+                                                    <h6 id="place-<%= count %>-name" class="card-title plan-title" ><b></b></h6>
+
                                                     <span id="place-<%= count %>-type" style="color: #767676;"></span>
-                                                    <span id="place-<%= count %>-hours" class="text-bottom"></span>
+                                                    <p></p>
+
+                                                    <span id="place-<%= count %>-start-hour" class="hours-text"></span>
+                                                    -
+                                                    <span id="place-<%= count %>-end-hour" class="hours-text-2"></span>
+
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-5">
                                                 <div class="text-right">
                                                     <span id="place-<%= count %>-weather" style="padding-left: 10px; color: #767676;"></span>
                                                 </div>
@@ -215,7 +221,24 @@
                                     <a class="dropdown-item" href="#">Book an hotel</a>
                                 </div>
                             </div>
+                        <% } else if (source != "author") { %>
+                            <script>
+                                console.log("<%= isInterested %>");    
+                            </script>
+                            <% if(isInterested == 0) { %>
+                                <button type="button" class="btn btn-interested" onclick="checkInterest()"><i class="far fa-star"></i><span style="padding-left: 10px;">I'm interested</span></button>                        
+                            <% } else { %>
+                                <div class="dropdown" id="interested-div">
+                                    <button class="btn btn-interested checked dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-star"></i><span style="padding-left: 10px;">I'm interested</span>
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <button class="dropdown-item" style="cursor: pointer;" onclick="uncheckInterest()">I'm not interested anymore</button>
+                                    </div>
+                                </div>
+                            <% } %>
                         <% } %>
+
                     </div>
                     <div class="col-md-6">
                         <div class="form-group text-right">

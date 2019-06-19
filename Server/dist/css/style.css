@@ -12,6 +12,7 @@ html, body {
    padding:0;
    margin:0;
    background-color: #fafafa;
+   font-family: Roboto, Arial, sans-serif;
 }
 
 .logo-letters {
@@ -84,14 +85,23 @@ hr {
   font-family: Roboto, Arial, sans-serif;
 }
 
+.dropdown-item.header{
+  font-family: 'Englebert';
+}
+
+
 .nav-link.header {
   color: #fff !important;
   opacity: .8;
+  font-family: 'Englebert';
 }
+
+
 
 .nav-link.header:hover {
   color: #fff !important;
   opacity: .6;
+  
 }
 
 .nav-link.header.active {
@@ -99,6 +109,7 @@ hr {
   border-bottom: 3px solid #ffc107;
   opacity: 1;
 }
+
 
 .nav-link.tab {
   background-color: white !important;
@@ -599,6 +610,11 @@ hr {
 	height: 300px;
 }
 
+.place-etinerary-div{
+  padding-bottom: 1rem;
+}
+
+
 /* ---------------------------------- PLACE SLIDESHOW ------------------------- */
 
 
@@ -883,16 +899,49 @@ hr {
 { color: #ffca08 ;  } /* Set yellow color when star hover */
 
 
+.btn-interested {
+  background: rgba(255, 193, 7, 0.5);
+}
 
-.visit-loaded {
-  opacity: 0;
+.btn-interested:hover{
+  background: rgba(255, 193, 7);
+}
+
+.btn-interested.checked {
+  background: rgba(255, 193, 7);
+  color: white;
+}
+
+.btn-interested.checked:hover {
+  background: rgba(244, 160, 41);
+  color: white;
+}
+
+.hours-text{
+  font-family: Roboto, Arial, sans-serif;
+  font-weight: bold;
+}
+
+.hours-text-2{
+  font-family: Roboto, Arial, sans-serif;
+  opacity: 0.6;
+}
+
+.plan-title{
+  display: -webkit-box; -webkit-line-clamp: 2; 
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  max-height: 2.6em;
+  line-height: 1.3em;
 }
 
 
 
-
-
-
+.visit-loaded {
+  opacity: 0;
+}
 
 
 #sideb, #map {
@@ -975,11 +1024,16 @@ table tr td a{
 
 .review-img {
   border-radius: 50%;
+  height: 120px;
+  width: 120px;
 }
 
 .empty-review p{
   color: #888888;
 }
+
+
+
 
 /* ---------------------------------- CALENDAR ------------------------- */
 
@@ -1102,14 +1156,15 @@ table tr td a{
 
 .input-file-container {
   position: relative;
-  width: 225px;
+  margin: auto;
+  width: 80%;
 } 
 
 .js .input-file-trigger {
   display: block;
   padding: 14px 45px;
   background: #ffc107;
-  color: #fff;
+  color: #34495E;
   font-size: 1em;
   transition: all .4s;
   cursor: pointer;
@@ -1151,6 +1206,64 @@ table tr td a{
   font-style: normal;
   font-weight: normal;
 }
+
+/* ---------------------------------- TRIPS ------------------------------ */
+
+.trips-div{
+  display: block;
+}
+
+
+.trips-div.active {
+  display: block;
+  animation: scale-display .3s;
+}
+
+.trips-div.out {
+  display: none;
+  animation: scale-display--reversed .3s;
+  animation-fill-mode:forwards;
+}
+
+
+
+  
+@keyframes scale-display {
+	0% {
+		opacity: 0;
+		transform: scale(0);
+    -webkit-transform: scale(0);
+	}
+
+	100% {
+		opacity: 1;
+		transform: scale(1);
+    -webkit-transform: scale(1);
+	}
+}
+
+@keyframes scale-display--reversed {
+	0% {
+		display: inline-flex;
+		opacity: 1;
+		transform: scale(1);
+		-webkit-transform: scale(1);
+	}
+	99% {
+		display: inline-flex;
+		opacity: 0;
+		transform: scale(0);
+		-webkit-transform: scale(0);
+	}
+	100% {
+		display: none;
+		opacity: 0;
+		transform: scale(0);
+		-webkit-transform: scale(0);
+	}
+}
+
+
 
 
 

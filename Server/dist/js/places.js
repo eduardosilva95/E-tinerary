@@ -2,9 +2,20 @@ var total_number_pages;
 
 var open_slots = {};
 
+$(function () {
+  $(document).scroll(function () {
+    var $nav = $(".navbar");
+    $nav.toggleClass('scrolled', $(this).scrollTop() > $nav.height());
+  });
+});
+
+
 function loadPage(){
   loadNavbar(); 
   loadPageButtons();
+
+  getCityImage(/dest=([^&]+)/.exec(location.search)[1])
+
 }
 
 function loadPageButtons(){
@@ -144,10 +155,19 @@ function getCityImage(city){
         if (status == google.maps.places.PlacesServiceStatus.OK) {
             var place = results[0];
 
-            if(place.photos != undefined)
+            /*if(place.photos != undefined)
                 document.getElementById("places-header").style.backgroundImage = 'url(' + place.photos[0].getUrl() + ')';
             else
-                document.getElementById("places-header").style.backgroundImage = "";
+                document.getElementById("places-header").style.backgroundImage = "";*/
+
+
+            if(place.photos != undefined){
+              document.body.style.backgroundImage = 'url(' + place.photos[0].getUrl() + ')';
+              document.body.style.backgroundSize = "cover";
+              document.body.style.backgroundPosition = "center";
+              document.body.style.height = "400px";
+            }
+            
         }
       });
 }

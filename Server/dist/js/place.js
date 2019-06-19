@@ -219,7 +219,7 @@ function getPlaceDetails(place_id){
   
   
   function getRatingValue(){
-    var value = 0;
+    var value = null;
   
     if(document.getElementById('star5').checked)
       value = 5;
@@ -235,22 +235,95 @@ function getPlaceDetails(place_id){
     return value;
   }
 
+  function getAccessibilityValue(){
+    var value = null;
+  
+    if(document.getElementById('share-rating-access-star5').checked)
+      value = 5;
+    else if(document.getElementById('share-rating-access-star4').checked)
+      value = 4;
+    else if(document.getElementById('share-rating-access-star3').checked)
+      value = 3;
+    else if(document.getElementById('share-rating-access-star2').checked)
+      value = 2;
+    else if(document.getElementById('share-rating-access-star1').checked)
+      value = 1;
+  
+    return value;
+  }
+
+  function getSecurityValue(){
+    var value = null;
+  
+    if(document.getElementById('share-rating-security-star5').checked)
+      value = 5;
+    else if(document.getElementById('share-rating-security-star4').checked)
+      value = 4;
+    else if(document.getElementById('share-rating-security-star3').checked)
+      value = 3;
+    else if(document.getElementById('share-rating-security-star2').checked)
+      value = 2;
+    else if(document.getElementById('share-rating-security-star1').checked)
+      value = 1;
+  
+    return value;
+
+  }
+
+
+
+  function changeReviewPage(){
+    $('#review-modal-general-info').removeClass('active');
+    $('#pills-review-info-tab').removeClass('active');
+
+    $('#review-modal-more-info').tab('show');
+    $('#pills-more-info-tab').addClass('active');
+
+    $('#change-review-page-btn').css("display", "none");
+    $('#submit-review-btn').css("display", "block");
+    $('#return-review-page-btn').css("display", "block");
+
+  }
+
+  function returnReviewPage(){
+    $('#review-modal-general-info').tab('show');
+    $('#pills-review-info-tab').addClass('active');
+
+    $('#review-modal-more-info').removeClass('active');
+    $('#pills-more-info-tab').removeClass('active');
+
+    $('#change-review-page-btn').css("display", "block");
+    $('#submit-review-btn').css("display", "none");
+    $('#return-review-page-btn').css("display", "none");
+
+  }
+
 
   function submitReview(){
     if(hasUserCookies()){
-      var user_id = getUserCookie();
       var poi_id = /id=([^&]+)/.exec(location.search)[1];
 
       if(document.getElementById("review-text").value == ''){
-        alert("The review can't be empty");
+        $('#review-text').addClass("is-invalid");
+        $('#review-text-error-msg').css("display", "block");
+        returnReviewPage();
         return;
       }
+
       var review = document.getElementById("review-text").value;
 
       var rating = getRatingValue();
+      var accessibility = getAccessibilityValue();
+      var security = getSecurityValue();
 
-      $.post("/review-poi", {poi: poi_id, user: user_id, review: review, rating: rating}, function(result){
+      var price = document.getElementById("review-price").value;
 
+      var duration = $( "#select-visit-duration option:selected" ).text();
+
+      if(duration == "Duration")
+        duration = null;
+
+      $.post("/review-poi", {poi: poi_id, review: review, rating: rating, accessibility: accessibility, security: security, price: price, duration: duration}, function(result){
         window.location.reload();
       });
     }
@@ -273,10 +346,14 @@ function getPlaceDetails(place_id){
   }
 
   
-  function loadReviewRating(rating, review){
-    console.log(rating,review);
+  function loadRating(rating, review){
 
     rating = parseInt(rating);
+
+    if(isNaN(rating)){
+      document.getElementById(review).innerHTML += "No information available";
+      return;
+    }
 
     var count = 0;
 

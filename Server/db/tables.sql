@@ -13,9 +13,15 @@ CREATE TABLE User (
 CREATE TABLE User_G (
 	user_id INT NOT NULL, 
     google_id INT NOT NULL, 
+    birthday DATE, 
+    gender CHAR,
+    country VARCHAR(255),
+    phone_number INT,
+    address VARCHAR(255),
     PRIMARY KEY(user_id),
     FOREIGN KEY (user_id) REFERENCES User(id),
-    UNIQUE(google_id)
+    UNIQUE(google_id),
+	CHECK(gender = 'M' OR gender = 'F')
 );
 
 CREATE TABLE User_E (
@@ -25,6 +31,7 @@ CREATE TABLE User_E (
     country VARCHAR(255),
     phone_number INT,
     password BINARY(128) NOT NULL,
+    address VARCHAR(255),
     PRIMARY KEY (user_id),
     FOREIGN KEY (user_id) REFERENCES User(id),
 	CHECK(gender = 'M' OR gender = 'F')
@@ -43,12 +50,16 @@ CREATE TABLE Review_POI (
     poi_id INT NOT NULL,
     review_text TEXT NOT NULL,
     review_rating INT,
-    review_timestamp TIMESTAMP NOT NULL,
+    review_rating_accessibility INT,
+    review_rating_security INT,
+    review_rating_price DECIMAL(10,2),
+    review_rating_duration INT,
+    review_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (review_id),
     FOREIGN KEY (review_id) REFERENCES Review(id),
     FOREIGN KEY (poi_id) REFERENCES POI(id),
     CHECK(review_rating > 0 and review_rating < 6)
-);*/
+);
 
 CREATE TABLE Review_Plan (
 	review_id INT NOT NULL,
@@ -58,7 +69,7 @@ CREATE TABLE Review_Plan (
     review_rating_accessibility INT,
     review_rating_security INT,
     review_rating_price INT,
-    review_timestamp TIMESTAMP NOT NULL,
+    review_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (review_id),
     FOREIGN KEY (review_id) REFERENCES Review(id),
     FOREIGN KEY (plan_id) REFERENCES Plan(id),
@@ -69,9 +80,6 @@ CREATE TABLE Review_Plan (
 );
 
 
-
-
-/*
 CREATE TABLE Hotel (
 	poi_id INT NOT NULL,
     stars INT,
@@ -79,6 +87,15 @@ CREATE TABLE Hotel (
     FOREIGN KEY (poi_id) REFERENCES Poi(id),
     CHECK(stars > 0 and stars < 6)
 );*/
+
+CREATE TABLE User_isInterested_Plan (
+	user_id INT NOT NULL,
+    plan_id INT NOT NULL,
+	isInterested BIT NOT NULL,
+    PRIMARY KEY (user_id, plan_id),
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (plan_id) REFERENCES Plan(id)
+);
 
 
 

@@ -32,7 +32,7 @@
   <body onload="loadNavbar();">
         <!-- header navbar -->
         <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
-            <a class="navbar-brand" href="./">HomePage</a>
+            <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
@@ -40,20 +40,20 @@
               <ul class="navbar-nav ml-auto">
                 
                   <li class="nav-item">
-                    <a class="nav-link" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+                    <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
                   </li>
                 
                 <li class="nav-item">
-                  <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                  <a class="nav-link header active" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+                  <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+                    <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
                     </a>
                     <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
@@ -73,7 +73,7 @@
                             <img id="user-profile-pic" class="rounded-circle border border-light">
                         </a>
                       <div class="dropdown-menu" aria-labelledby="profile-btn">
-                        <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                        <a class="dropdown-item" href="/profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
                         <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
@@ -97,8 +97,12 @@
 
             <div class="row cont">
                 <div class="col-md-3">
-                    <p><i class="fas fa-star"></i><span style="font-weight: bold; padding-left: 10px;">Rating: </span><span id="rating"> <%= rating %> / 5.0</span></p>                  
+                    <p><i class="fas fa-star"></i><span style="font-weight: bold; padding-left: 10px;">Rating: </span><span id="place-google-rating"></span></p>                  
                 </div> 
+                <script>
+                    loadRating("<%= google_rating %>", "place-google-rating");
+                </script>
+
                 <div class="col-md-3">
                     <p><i id="place_icon" class="fas fa-archway"></i><span style="font-weight: bold; padding-left: 10px;" id="type"><%= type %></span></p>                  
                 </div>
@@ -182,7 +186,7 @@
                                     <div class="card" style="height: 150px;">
                                         <div class="row">
                                             <div class="col-md-3 text-center" style="margin: auto;">
-                                                <img src="<%= review.user_pic %>" class="img-fluid review-img">
+                                                <img src="<%= review.user_pic %>" class="img-fluid review-img" >
                                             </div>
                                             <div class="col-md-9">
                                                 <div class="card-body">
@@ -190,7 +194,7 @@
                                                         <small><%= review.date %></small>
                                                     </div>
                                                     <div class="d-flex w-100 justify-content-between">
-                                                        <h5 class="mb-1"><%= review.user %></h5>
+                                                        <h5 class="mb-1"><b><%= review.user %></b></h5>
                                                     </div>
                                                     <p class="mb-1"><%= review.text %></p>                                                                        
                                                     
@@ -204,7 +208,7 @@
                                     <br>
 
                                     <script>
-                                        loadReviewRating("<%= review.rating %>", "review-<%= count %>-rating");
+                                        loadRating("<%= review.rating %>", "review-<%= count %>-rating");
                                     </script>
 
                                     <% count = count + 1 %>
@@ -251,7 +255,7 @@
                         <div class="card-body">
                             <p class="card-text"><i class="fas fa-phone"></i><span id="place-phone-number" style="padding-left: 10px;"><%= phone_number %></span></p>
                             <p class="card-text"><i class="fas fa-globe-europe"></i><a id="place-website" style="padding-left: 10px; text-decoration: none;" href="<%= website %>" target="_blank"><%= website %></a></p>
-                            <p class="card-text"><span style="font-weight: bold;" >Coordinates: </span><span id="place-coordinates"><%= lat %>, <%= lon %></span></p>
+                            <p class="card-text"><strong >Coordinates: </strong><span id="place-coordinates"><%= lat %>, <%= lon %></span></p>
                         </div>
                     </div>
 
@@ -266,7 +270,35 @@
 
                     <div class="card">
                         <div class="card-body">
-                            <h6 class="card-title"><b><%= place %></b> in <span style="color: #fce107">E-tinerary</span></h6>
+                            <h6 class="card-title"><b><%= place %></b> in <span class="logo-letters">e &bull; t</span><span class="logo-letters-2">inerary</span></h6>
+                            <br>
+                            
+                            <p class="card-text"><i class="fas fa-map-marked-alt"></i><strong style="padding-left: 10px;">Plans: </strong><span id="" style="padding-left: 10px;"><%= no_plans %></span></p>
+                                               
+                            <div class="place-etinerary-div" id="place-rating">
+                                <i class="fas fa-star"></i><strong style="padding-left: 10px;">Rating: </strong>
+                            </div>
+                            <script>
+                                loadRating("<%= rating %>", "place-rating");
+                            </script>
+
+                            <div class="place-etinerary-div" id="place-accessibility">
+                                <i class="fab fa-accessible-icon"></i><strong style="padding-left: 10px;">Accessibility: </strong>
+                            </div>
+                            <script>
+                                loadRating("<%= accessibility %>", "place-accessibility");
+                            </script>
+
+                            <div class="place-etinerary-div" id="place-security">
+                                <i class="fas fa-lock"></i><strong style="padding-left: 10px;">Security: </strong>
+                            </div>
+                            <script>
+                                loadRating("<%= security %>", "place-security");
+                            </script>
+                            
+                             <p class="card-text"><i class="far fa-clock"></i><strong style="padding-left: 10px;">Duration: </strong><span id="" style="padding-left: 10px;"></span><%= duration %></p>
+                            <p class="card-text"><i class="fas fa-euro-sign"></i><strong style="padding-left: 10px;">Price: </strong><span id="" style="padding-left: 10px;"></span><%= price %></p>
+                        
                         </div>
                     </div>
 
@@ -425,8 +457,7 @@
                     </div>
                     
                     <div class="modal-body">
-
-                        <nav class="nav nav-pills flex-column flex-sm-row">
+                        <nav class="nav nav-pills flex-column flex-sm-row" id="myTab" role="tablist">
                             <a class="flex-sm-fill text-sm-center nav-link active" id="pills-review-info-tab" data-toggle="pill" href="#review-modal-general-info" role="tab" aria-controls="review-plan-general-info" aria-selected="true">Review</a>
                             <a class="flex-sm-fill text-sm-center nav-link" id="pills-more-info-tab" data-toggle="pill" href="#review-modal-more-info" role="tab" aria-controls="review-plan-more-info" aria-selected="false">More info</a>
                         </nav>
@@ -437,7 +468,10 @@
                             <div class="tab-pane fade show active" id="review-modal-general-info" role="tabpanel" aria-labelledby="pills-review-info-tab">
         
                                 <label for="review-text">Review:</label>
-                                <textarea class="form-control" rows="5" id="review-text"></textarea>  
+                                <textarea class="form-control" rows="5" id="review-text"></textarea>
+                                <div class="invalid-feedback" id="review-text-error-msg" style="display: none">
+                                    The review can't be empty.
+                                </div>  
                                 
                                 <br>
                                 
@@ -506,7 +540,10 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
-                        <button type="button" onclick="submitReview();" class="btn btn-success" data-dismiss="modal"><i class="fas fa-check"></i><span style="padding-left: 10px;">Submit</span></button>
+                        <button type="button" onclick="changeReviewPage();" class="btn btn-success" id="change-review-page-btn"><i class="far fa-arrow-alt-circle-right"></i><span style="padding-left: 10px;">Next</span></button>
+
+                        <button type="button" onclick="returnReviewPage();" class="btn btn-warning" id="return-review-page-btn" style="display: none; color: white;"><i class="far fa-arrow-alt-circle-left"></i><span style="padding-left: 10px;">Back</span></button>
+                        <button type="button" onclick="submitReview();" class="btn btn-success" id="submit-review-btn" style="display: none;"><i class="fas fa-check"></i><span style="padding-left: 10px;">Submit</span></button>
                     </div>
                 </div>
             </div>

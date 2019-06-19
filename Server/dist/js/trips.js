@@ -133,3 +133,85 @@ function archiveTrip(trip_id){
     })    
 }
 
+$(function (){
+    $(".make-favorite-btn").mouseenter(function(){
+        $('#make-favorite-' + this.id.split('-')[2] + '-icon').attr('class', 'fas fa-star fa-lg');
+    });
+
+    $(".make-favorite-btn").mouseleave(function(){
+        $('#make-favorite-' + this.id.split('-')[2] + '-icon').attr('class', 'far fa-star fa-lg');
+    });
+
+    $(".unfavorite-btn").mouseenter(function(){
+        $('#unfavorite-' + this.id.split('-')[1] + '-icon').attr('class', 'far fa-star fa-lg');
+    });
+
+    $(".unfavorite-btn").mouseleave(function(){
+        $('#unfavorite-' + this.id.split('-')[1] + '-icon').attr('class', 'fas fa-star fa-lg');
+    });
+});
+
+
+function makeTripFavorite(trip_id){
+
+    $.post("/favorite-plan", {plan: trip_id}, function(result){
+        if(result.result == 'error'){
+        }
+        
+        else{
+            window.location.reload();
+        }
+    });
+}
+
+function unfavoriteTrip(trip_id){
+
+    $.post("/unfavorite-plan", {plan: trip_id}, function(result){
+        if(result.result == 'error'){
+        }
+        
+        else{
+            window.location.reload();
+        }
+    });
+
+}
+
+
+$(function (){
+    $('#scheduled-trips-checkbox').on('change', function () {
+        if (!this.checked) {
+            /*$("#scheduled-trips").css("display", "none");*/
+            $('#scheduled-trips').removeClass('active').addClass('out');
+
+			setTimeout(function(){
+				$('#scheduled-trips').hide() 
+            }, 300); //Same time as animation
+            
+        }
+        else{
+           /* $("#scheduled-trips").css("display", "block");*/
+            $('#scheduled-trips').show();
+            $('#scheduled-trips').removeClass('out').addClass('active');
+        }
+    });
+
+
+    $('#past-trips-checkbox').on('change', function () {
+        if (!this.checked) {
+            $('#past-trips').removeClass('active').addClass('out');
+
+			setTimeout(function(){
+				$('#past-trips').hide() 
+            }, 300); //Same time as animation
+            
+        }
+        else{
+            $('#past-trips').show();
+            $('#past-trips').removeClass('out').addClass('active');
+        }
+    });
+
+
+
+});

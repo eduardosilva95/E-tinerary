@@ -19,15 +19,13 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
     
-    <script type="text/javascript" src="js/myscript.js"></script>
     <script type="text/javascript" src="js/trips.js"></script>
     <script type="text/javascript" src="js/login.js"></script>
-
     
     <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
   
   </head>
   <body onload="loadNavbar();">
@@ -74,7 +72,7 @@
                         <img id="user-profile-pic" class="rounded-circle border border-light">
                     </a>
                     <div class="dropdown-menu" aria-labelledby="profile-btn">
-                      <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                      <a class="dropdown-item" href="/profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
                       <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
                       <div class="dropdown-divider"></div>
                       <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
@@ -87,124 +85,177 @@
       </nav>
 
 
-        <div class="container">
+        <div class="container" style="min-height: 100%">
             <div class="cont">
                 <div class="card card-body bg-light">
                     <div class="text-left">
                         <h3><b>My Trips</b></h3>
+                        
+
                     </div>
                 </div>
             </div>
 
-            <div class="cont">
-                <div class="card card-body">
-                    <h5 style="font-weight: bold;">Scheduled Trips</h5>
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="trips-div active" id="scheduled-trips">
+
+                        <div class="cont">
+                            <div class="card card-body">
+                                <h5 style="font-weight: bold;">Scheduled Trips</h5>
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <% count = 0 %>
+                        <% scheduled_trips.forEach(function(trip) { %>
+                        <div class="card" style="height: 150px;">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <img id="sched-trip-<%= count %>-img" class="img-fluid card-img" alt="" style="height: 148px; width: 100%;">
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="card-body row">
+                                        <div class="col-md-8">
+                                            <div class="text-left">
+                                                <a href="/plan?id=<%= trip.id %>" class="trip-link"><span class="card-title"><b><%= trip.name %></b></span></a>
+                                                <button type="button" class="plan-table-btn-icons btn-rename-modal" data-toggle="modal" data-target="#rename-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Rename the trip" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
+                                                <br>
+                                                <span class="text-bottom"><%= trip.start %> - <%= trip.end %></span> 
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="plan-table-icons text-right"> 
+                                                <a class="plan-table-btn-icons" href="/plan?id=<%= trip.id %>"><i title="See plan" class="fas fa-search-location"></i></i></a>
+                                                <button type="button" class="plan-table-btn-icons" disabled><i title="Download plan" class="fas fa-file-download fa-lg" style="padding-left: 10px;"></i></button>
+                                                <% if(trip.isPublic == 0) { %>
+                                                    <button type="button" class="plan-table-btn-icons btn-share-modal" data-toggle="modal" data-target="#share-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>" data-src="scheduled"><i title="Share plan" class="fas fa-share-alt fa-lg" style="padding-left: 10px;"></i></button>
+                                                <% } else { %>
+                                                    <i title="Plan is public" class="fas fa-eye fa-lg" style="padding-left: 10px; color: #4dd658"></i>                              
+                                                <% } %>
+                                                <button type="button" class="plan-table-btn-icons btn-remove-modal" data-toggle="modal" data-target="#remove-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Delete plan" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <script>
+                            var city = "<%= trip.city %>";
+                            getCityImage(city, "sched-trip-<%= count %>-img" , "<%= trip.photo %>");
+                        </script>
+
+                        <% count = count + 1 %>
+                        
+                        <% }); %> 
+                    </div>
+
+                    <div class="trips-div" id="past-trips">
+
+                        <div class="cont">
+                            <div class="card card-body">
+                                <h5 style="font-weight: bold;">Past Trips</h5>
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <% count = 0 %>
+                        <% past_trips.forEach(function(trip) { %>
+
+                        <div class="card" style="height: 150px;">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <img id="past-trip-<%= count %>-img" class="img-fluid card-img" alt="" style="height: 148px; width: 100%;">
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="card-body row">
+                                        <div class="col-md-8">
+                                            <div class="text-left">
+                                                <a href="/plan?id=<%= trip.id %>" class="trip-link"><span class="card-title"><b><%= trip.name %></b></span></a>
+                                                <button type="button" class="plan-table-btn-icons btn-rename-modal" data-toggle="modal" data-target="#rename-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Rename the trip" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
+                                                <br>
+                                                <span class="text-bottom"><%= trip.start %> - <%= trip.end %></span> 
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <% if(trip.isFavorite == 1) { %>
+                                                <div class="text-right" style="color: #ffc107; font-size: 18px;">
+                                                    <span style="padding-right: 10px;">Favorite Trip</span><button type="button" id="unfavorite-<%= count %>" class="plan-table-btn-icons unfavorite-btn" onclick="unfavoriteTrip('<%= trip.id %>');"><i title="Unfavorite" id="unfavorite-<%= count %>-icon" class="fas fa-star fa-lg" style="padding-left: 10px;"></i></button>
+                                                </div>
+                                            <% } else { %>
+                                                <div class="text-right">
+                                                    <button type="button" id="make-favorite-<%= count %>" class="plan-table-btn-icons make-favorite-btn" onclick="makeTripFavorite('<%= trip.id %>');"><i title="Favorite" id="make-favorite-<%= count %>-icon" class="far fa-star fa-lg" style="padding-left: 10px;"></i></button>
+                                                </div>
+                                            <% } %>
+
+                                            
+                                            <div class="plan-table-icons text-right"> 
+                                                <a class="plan-table-btn-icons" href="/plan?id=<%= trip.id %>"><i title="See plan" class="fas fa-search-location"></i></i></a>
+                                                <button type="button" class="plan-table-btn-icons" disabled><i title="Download plan" class="fas fa-file-download fa-lg" style="padding-left: 10px;"></i></button>
+                                                <% if(trip.isPublic == 0) { %>
+                                                <button type="button" class="plan-table-btn-icons btn-share-modal" data-toggle="modal" data-target="#share-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>" data-src="past"><i title="Share plan" class="fas fa-share-alt fa-lg" style="padding-left: 10px;"></i></button>
+                                                <% } else { %>
+                                                <i title="Plan is public" class="fas fa-eye fa-lg" style="padding-left: 10px; color: #4dd658"></i>                              
+                                                <% } %>
+
+                                                <button type="button" class="plan-table-btn-icons btn-archive-modal" data-toggle="modal" data-target="#archive-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Archive plan" class="fas fa-archive fa-lg" style="padding-left: 10px;"></i></button>
+                                            </div>
+
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <br>
+
+                        <script>
+                            var city = "<%= trip.city %>";
+                            getCityImage(city, "past-trip-<%= count %>-img" , "<%= trip.photo %>");
+                        </script>
+
+                        <% count = count + 1 %>
+                        
+                        <% }); %> 
+
+                    </div>
+
                 </div>
-            </div>
 
-            <br>
-
-            <% count = 0 %>
-            <% scheduled_trips.forEach(function(trip) { %>
-              <div class="card" style="height: 150px;">
-                  <div class="row">
-                      <div class="col-md-3">
-                          <img id="sched-trip-<%= count %>-img" class="img-fluid card-img" alt="" style="height: 148px; width: 100%;">
-                      </div>
-                      <div class="col-md-9">
-                          <div class="card-body row">
-                              <div class="col-md-8">
-                                  <div class="text-left">
-                                      <a href="/plan?id=<%= trip.id %>" class="trip-link"><span class="card-title"><b><%= trip.name %></b></span></a>
-                                      <button type="button" class="plan-table-btn-icons btn-rename-modal" data-toggle="modal" data-target="#rename-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Rename the trip" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
-                                      <br>
-                                      <span class="text-bottom"><%= trip.start %> - <%= trip.end %></span> 
-                                  </div>
-                              </div>
-                              <div class="col-md-4">
-                                  <div class="plan-table-icons text-right"> 
-                                      <a class="plan-table-btn-icons" href="/plan?id=<%= trip.id %>"><i title="See plan" class="fas fa-search-location"></i></i></a>
-                                      <button type="button" class="plan-table-btn-icons" disabled><i title="Download plan" class="fas fa-file-download fa-lg" style="padding-left: 10px;"></i></button>
-                                      <% if(trip.isPublic == 0) { %>
-                                        <button type="button" class="plan-table-btn-icons btn-share-modal" data-toggle="modal" data-target="#share-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>" data-src="scheduled"><i title="Share plan" class="fas fa-share-alt fa-lg" style="padding-left: 10px;"></i></button>
-                                      <% } else { %>
-                                        <i title="Plan is public" class="fas fa-eye fa-lg" style="padding-left: 10px; color: #4dd658"></i>                              
-                                      <% } %>
-                                      <button type="button" class="plan-table-btn-icons btn-remove-modal" data-toggle="modal" data-target="#remove-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Delete plan" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-              <br>
-
-              <script>
-                  var city = "<%= trip.city %>";
-                  getCityImage(city, "sched-trip-<%= count %>-img" , "<%= trip.photo %>");
-              </script>
-
-              <% count = count + 1 %>
-            
-            <% }); %> 
-
-            <div class="cont">
-                <div class="card card-body">
-                    <h5 style="font-weight: bold;">Past Trips</h5>
+                <div class="col-md-3">
+                    <div class="cont">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><b>Filter</b></h5>
+                                <br>
+                                <div class="form-group">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" value="Scheduled Trips" id="scheduled-trips-checkbox" checked>
+                                        <label class="custom-control-label" for="scheduled-trips-checkbox">Scheduled Trips</label>                    
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" value="Past Trips" id="past-trips-checkbox" checked>
+                                        <label class="custom-control-label" for="past-trips-checkbox">Past Trips</label>                    
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" value="Favorite Trips" id="favorite-trips-checkbox" checked>
+                                        <label class="custom-control-label" for="favorite-trips-checkbox">Favorite Trips</label>                    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+
             </div>
-
-            <br>
-
-            <% count = 0 %>
-            <% past_trips.forEach(function(trip) { %>
-
-              <div class="card" style="height: 150px;">
-                  <div class="row">
-                      <div class="col-md-3">
-                          <img id="past-trip-<%= count %>-img" class="img-fluid card-img" alt="" style="height: 148px; width: 100%;">
-                      </div>
-                      <div class="col-md-9">
-                          <div class="card-body row">
-                              <div class="col-md-8">
-                                  <div class="text-left">
-                                    <a href="/plan?id=<%= trip.id %>" class="trip-link"><span class="card-title"><b><%= trip.name %></b></span></a>
-                                      <button type="button" class="plan-table-btn-icons btn-rename-modal" data-toggle="modal" data-target="#rename-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Rename the trip" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
-                                      <br>
-                                      <span class="text-bottom"><%= trip.start %> - <%= trip.end %></span> 
-                                  </div>
-                              </div>
-                              <div class="col-md-4">
-                                  <div class="plan-table-icons text-right"> 
-                                      <a class="plan-table-btn-icons" href="/plan?id=<%= trip.id %>"><i title="See plan" class="fas fa-search-location"></i></i></a>
-                                      <button type="button" class="plan-table-btn-icons" disabled><i title="Download plan" class="fas fa-file-download fa-lg" style="padding-left: 10px;"></i></button>
-                                      <% if(trip.isPublic == 0) { %>
-                                        <button type="button" class="plan-table-btn-icons btn-share-modal" data-toggle="modal" data-target="#share-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>" data-src="past"><i title="Share plan" class="fas fa-share-alt fa-lg" style="padding-left: 10px;"></i></button>
-                                      <% } else { %>
-                                        <i title="Plan is public" class="fas fa-eye fa-lg" style="padding-left: 10px; color: #4dd658"></i>                              
-                                      <% } %>
-
-                                      <button type="button" class="plan-table-btn-icons"><i title="Review plan" class="fas fa-comment-alt fa-lg" style="padding-left: 10px;"></i></button>
-                                      <button type="button" class="plan-table-btn-icons btn-archive-modal" data-toggle="modal" data-target="#archive-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Archive plan" class="fas fa-archive fa-lg" style="padding-left: 10px;"></i></button>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              
-              <br>
-
-              <script>
-                  var city = "<%= trip.city %>";
-                  getCityImage(city, "past-trip-<%= count %>-img" , "<%= trip.photo %>");
-              </script>
-
-              <% count = count + 1 %>
-            
-            <% }); %> 
-
 
         </div>
 
