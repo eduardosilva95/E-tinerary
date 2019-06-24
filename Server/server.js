@@ -12,6 +12,7 @@ var url = require('url');
 var md5 = require('md5');
 var multer = require('multer');
 var fs = require('fs');
+const mkdirp = require('mkdirp')
 
 var GOOGLE_API_KEY = 'AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw';
 var OPEN_WEATHER_API_KEY = '8271fd206ceeef12df4e7bb6063241c3';
@@ -35,10 +36,26 @@ var storage_plan = multer.diskStorage({
   }
 });
 
+var storage_poi = multer.diskStorage({
+  destination: function (req, file, cb) {
+  	var dir;
+  	if(req.body.poi == undefined)
+  		dir = path.join(__dirname, 'dist/img/poi/tmp');
+	else
+ 		dir = path.join(__dirname, 'dist/img/poi/' + req.body.poi);
+
+  	mkdirp(dir, err => cb(err, dir))
+  },
+
+  filename: function (req, file, cb) {
+    cb(null, Date.now() +  '_' + Math.random().toString(36).substring(2) + path.extname(file.originalname)) //Appending extension
+  }
+});
+
 
 var upload = multer({storage: storage});
 var upload_plan = multer({storage: storage_plan});
-
+var upload_poi = multer({storage: storage_poi});
 
 var promise = require('promise-mysql');
  
@@ -183,7 +200,29 @@ app.get('/search-places',function(req,res){
         for(var i =0 ; i < result.length; i++){
         	list_cities.push(result[i].name);
         }
-        res.render(path.join(__dirname+'/templates/search-places.html'), {cities: list_cities});
+
+        con.query("call Get_Top_Cities(?)", 4, function (err, result, fields) {
+        	if (err) throw err;
+
+        	result = result[0];
+
+        	var top_dest = [];
+        	for(var i=0; i<result.length;i++){
+        		var dest = new Object();
+        		dest.name = result[i].name;
+        		dest.plans = result[i].plans;
+        		top_dest.push(dest);
+        	}
+
+        	res.render(path.join(__dirname+'/templates/search-places.html'), {cities: list_cities, top_dest: top_dest});
+
+
+    	});
+
+
+
+
+        
     });
 });
 
@@ -212,7 +251,7 @@ app.get('/places', function (req, res){
 
 		query = "%" + query + "%"
 
-		var sql = "SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.rating AS rating, poi.poi_type AS poi_type, poi.description as description FROM poi JOIN city ON poi.city = city.id WHERE city.name = ? AND poi.name LIKE ? ORDER BY poi.num_reviews DESC LIMIT ?, ?";
+		var sql = "SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description FROM poi JOIN city ON poi.city = city.id WHERE city.name = ? AND poi.name LIKE ? ORDER BY poi.num_reviews DESC LIMIT ?, ?";
 		var parameters = [destination, query, limit_inf, total_results];
 
 		con.query(sql, parameters, function (err, result, fields) {
@@ -458,7 +497,7 @@ app.get('/places', function (req, res){
 
 		destination = req.query['dest'];
 
-		var sql = "SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.rating AS rating, poi.poi_type AS poi_type, poi.description as description FROM poi JOIN city ON poi.city = city.id WHERE city.name = ? ORDER BY poi.num_reviews DESC LIMIT ?, ?";
+		var sql = "SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description FROM poi JOIN city ON poi.city = city.id WHERE city.name = ? ORDER BY poi.num_reviews DESC LIMIT ?, ?";
 		var parameters = [destination, limit_inf, total_results];
 
 		con.query(sql, parameters, function (err, result, fields) {
@@ -776,9 +815,8 @@ app.get('/place', function(req,res){
 			else
 				duration = ((parseInt(duration) / 60)<10?'0':'') + (parseInt(duration) / 60)  + ":" + ((parseInt(duration) % 60)<10?'0':'') + (parseInt(duration) % 60);
 
-			var sql2 = "call Get_POI_Reviews(?)";
 
-			con.query(sql2, poi_id, function (err, result, fields) {
+			con.query("call Get_POI_Reviews(?)", poi_id, function (err, result, fields) {
 		    	if (err) throw err;
 
 		    	result = result[0];
@@ -795,7 +833,21 @@ app.get('/place', function(req,res){
 		    		reviews.push(review);
 		    	}
 
-				res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, no_plans: no_plans, rating: rating, accessibility: accessibility, security: security, price: price, duration: duration, reviews: reviews, fromPlan: false, openslots: []});
+		    	con.query("call getPOIPhotos(?)", poi_id, function (err, result, fields) {
+		    		if (err) throw err;
+
+		    		result = result[0];
+
+		    		var photos = [];
+
+		    		for(var i=0 ; i < result.length; i++){
+		    			photo = result[i].photo_url.replace(/\\/g,"/");
+		    			photos.push(photo);
+		    		}
+
+					res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, no_plans: no_plans, rating: rating, accessibility: accessibility, security: security, price: price, duration: duration, reviews: reviews, fromPlan: false, openslots: [], photos: photos});
+
+				});
 
 			});
 
@@ -971,9 +1023,7 @@ app.get('/place', function(req,res){
 					else
 						duration = ((parseInt(duration) / 60)<10?'0':'') + (parseInt(duration) / 60)  + ":" + ((parseInt(duration) % 60)<10?'0':'') + (parseInt(duration) % 60);
 
-					var sql2 = "call Get_POI_Reviews(?)";
-
-					con.query(sql2, poi_id, function (err, result, fields) {
+					con.query("call Get_POI_Reviews(?)", poi_id, function (err, result, fields) {
 				    	if (err) throw err;
 
 				    	result = result[0];
@@ -990,8 +1040,21 @@ app.get('/place', function(req,res){
 				    		reviews.push(review);
 				    	}
 
-						res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, no_plans: no_plans, rating: rating, accessibility: accessibility, security: security, price: price, duration: duration, reviews: reviews, fromPlan: true, inPlan: inPlan, days: days, openslots: openslots});
+				    	con.query("call getPOIPhotos(?)", poi_id, function (err, result, fields) {
+				    		if (err) throw err;
 
+				    		result = result[0];
+
+				    		var photos = [];
+
+				    		for(var i=0 ; i < result.length; i++){
+				    			photo = result[i].photo_url.replace(/\\/g,"/");
+				    			photos.push(photo);
+				    		}
+
+							res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, no_plans: no_plans, rating: rating, accessibility: accessibility, security: security, price: price, duration: duration, reviews: reviews, fromPlan: true, inPlan: inPlan, days: days, openslots: openslots, photos: photos});
+
+						});
 					});
 
 				});
@@ -1128,9 +1191,8 @@ app.get('/place', function(req,res){
 				else
 					duration = ((parseInt(duration) / 60)<10?'0':'') + (parseInt(duration) / 60)  + ":" + ((parseInt(duration) % 60)<10?'0':'') + (parseInt(duration) % 60);
 
-				var sql2 = "call Get_POI_Reviews(?)";
 
-				con.query(sql2, poi_id, function (err, result, fields) {
+				con.query("call Get_POI_Reviews(?)", poi_id, function (err, result, fields) {
 			    	if (err) throw err;
 
 			    	result = result[0];
@@ -1147,8 +1209,21 @@ app.get('/place', function(req,res){
 			    		reviews.push(review);
 			    	}
 
-					res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, no_plans: no_plans, rating: rating, accessibility: accessibility, security: security, price: price, duration: duration, reviews: reviews, fromPlan: true, inPlan: false, days: days, openslots: openslots});
+			    	con.query("call getPOIPhotos(?)", poi_id, function (err, result, fields) {
+			    		if (err) throw err;
 
+			    		result = result[0];
+
+			    		var photos = [];
+
+			    		for(var i=0 ; i < result.length; i++){
+			    			photo = result[i].photo_url.replace(/\\/g,"/");
+			    			photos.push(photo);
+			    		}
+
+						res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, no_plans: no_plans, rating: rating, accessibility: accessibility, security: security, price: price, duration: duration, reviews: reviews, fromPlan: true, inPlan: false, days: days, openslots: openslots, photos: photos});
+
+					});
 				});
 
 			});
@@ -4082,6 +4157,164 @@ app.post('/edit-profile-picture', upload.single('photo'), function (req, res, ne
 });
 
 
+app.get('/request-poi', function(req, res){
+
+	con.query("call getCities();", function (err, result, fields) {
+    	if (err) throw err;
+
+    	result = result[0];
+
+    	cities = [];
+
+    	for(var i=0; i < result.length; i++){
+    		cities.push(result[i].name);
+    	}
+
+
+    	res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: cities, wasSubmitedWithSuccess: -1});
+
+    });
+
+});
+
+app.post('/request-poi', upload_poi.single('photo'), function(req, res){
+
+	var user_id = req.cookies['user'];
+
+	var poi_id;
+
+	// verificar se o utilizador pode submeter
+
+	var poi_name = req.body.title;
+	var poi_description = req.body.description;
+	var poi_latitude = req.body.latitude;
+	var poi_longitude = req.body.longitude;
+	var poi_address = req.body.address;
+	var poi_type = req.body.poi_type;
+	var poi_website = req.body.website;
+	var poi_phone_number = req.body.phone_number;
+	var poi_photo = req.file.path;
+	var poi_city = req.body.city;
+
+	if(poi_description == "")
+		poi_description = null;
+
+	if(poi_website == "")
+		poi_website = null;
+
+	if(poi_phone_number == "")
+		poi_phone_number = null;
+
+
+
+	var sql = "call submitPOI(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+	var values = [poi_name, poi_description, poi_latitude, poi_longitude, poi_address, poi_type, poi_website, poi_phone_number, poi_city, user_id];
+
+	con.query(sql, values, function (err, result, fields) {
+		if (err){
+			throw err;
+			res.send(JSON.stringify('error'));
+		}
+
+		else{
+			poi_id = result[0][0].poiID;
+
+			var newPath = path.join(__dirname, 'dist/img/poi/' + poi_id + "/" + Date.now() + Math.random().toString(36).substring(2) + path.extname(poi_photo));
+			var newPath_rel = newPath.split('dist')[1];
+
+			mkdirp(path.join(__dirname, 'dist/img/poi/' + poi_id), function(err) {
+				if (err) throw err;
+
+			});
+
+			fs.rename(poi_photo, newPath, function (err) {
+			  if (err) throw err;
+			});
+
+
+			sql = "call uploadPOIPhoto(?, ?, ?);";
+			values = [poi_id, user_id, newPath_rel];
+
+			con.query(sql, values, function (err, result, fields) {
+		    	if (err) throw err;
+
+		    	res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: 1});
+
+		    });
+		}
+	});
+
+});
+
+
+app.get('/review-poi', function(req, res){
+
+	var user_id = req.cookies['user'];
+	var poi_id = req.query['id'];
+
+	if(poi_id == undefined){
+		con.query("call getSubmittedPOIs(?);", user_id, function (err, result, fields) {
+	    	if (err) throw err;
+
+	    	result = result[0];
+
+	    	poi_list = [];
+
+	    	for(var i=0; i < result.length; i++){
+	    		poi = new Object();
+	    		poi["id"] = result[i].id;
+	    		poi["name"] = result[i].name;
+	    		poi["photo"] = result[i].photo_url.replace(/\\/g,"/");
+	    		poi["city"] = result[i].city;
+	    		poi_list.push(poi);
+	    	}
+
+
+	    	res.render(path.join(__dirname+'/templates/review-poi-list.html'), {poi_list: poi_list});
+
+	    });
+	}
+
+	else{
+
+		con.query("call getSubmittedPOIByID(?, ?);", [user_id, poi_id], function (err, result, fields) {
+	    	if (err) throw err;
+
+	    	result = result[0];
+
+	    	if(result.length > 0){
+	    		var id = result[0].id;
+	    		var name = result[0].name;
+	    		var photo = result[0].photo_url.replace(/\\/g,"/");
+	    		var city = result[0].city;
+	    		var latitude = result[0].latitude;
+	    		var longitude = result[0].longitude;
+	    		var address = result[0].address;
+	    		var poi_type = result[0].poi_type;
+	    		var description = result[0].description;
+	    		var website = result[0].website;
+	    		var phone_number = result[0].phone_number;
+
+	    		if(description == null)
+	    			description = "No description provided";
+	    		if(website == null)
+	    			website = "No website provided";
+	    		if(phone_number == null)
+    				phone_number = "No phone number provided"; 
+
+	    		res.render(path.join(__dirname+'/templates/review-poi.html'), {id: id, name: name, photo: photo, city: city, latitude: latitude, longitude: longitude, address: address, poi_type: poi_type, description: description, website: website, phone_number: phone_number});
+
+	    	}
+
+	    	else{
+
+	    	}
+
+	    });
+	}
+
+});
+
 
 app.get('/recover', function(req, res){
 	res.render(path.join(__dirname+'/templates/recover-password.html'),);
@@ -4214,6 +4447,30 @@ app.post('/add-description-poi', function(req, res){
 	});
 });
 
+
+app.post('/upload-poi-photo', upload_poi.single('photo'), function(req, res){
+
+	var user_id = req.cookies['user'];
+	var poi_id = req.body['poi'];
+
+	var picture_url = req.file.path.split('dist')[1];
+
+	var sql = "call uploadPOIPhoto(?, ?, ?);";
+	var values = [poi_id, user_id, picture_url];
+
+	con.query(sql, values, function (err, result, fields) {
+    	if (err){
+    		throw err;
+    		//res.send(JSON.stringify('error'));
+    	}
+
+    	res.redirect('http://localhost:8080/place?id=' + poi_id);
+
+    	//res.send(JSON.stringify('success'));
+
+    });
+
+});
 
 
 

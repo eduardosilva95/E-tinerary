@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Nome da aplicação">
+    <meta name="author" content="Eduardo Silva">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Simple Map</title>
+
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/v4-shims.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script type="text/javascript" src="/js/login.js"></script>
+
+    
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
+    <script src="https://apis.google.com/js/platform.js"></script>
+    
+  
+  </head>
+  <body>
+   
+        <!-- header navbar -->
+        <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
+            <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ml-auto">
+                  <li class="nav-item">
+                    <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+                  </li>
+                
+                <li class="nav-item">
+                  <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
+                      <a class="dropdown-item header" href="./about-us">Aplicacao</a>
+                      <a class="dropdown-item header" href="./help">Help</a>
+                    </div>
+                </li>
+              </ul>
+              <ul class="navbar-nav ml-auto">
+                <li>
+                  <div id="login-user">
+                    <div id="login" style="display: none;">
+                      <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                    </div>
+                    <div id="profile" class="dropleft" style="display: none;">
+                      <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <img id="user-profile-pic" class="rounded-circle border border-light">
+                      </a>
+                      <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
+                        <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                        <a class="dropdown-item header" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                        <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                      </div>   
+                    </div>        
+                  </div>
+                </li>
+              </ul>
+            </div>
+        </nav>
+
+
+        <div class="container-fluid cont" style="min-height: 100%;">
+
+            <div class="card card-body bg-light">
+                <div class="text-left">
+                    <h3><b>Submit a new Point of Interest</b></h3>
+                </div>
+            </div>
+
+            <div class="cont">
+                <div class="card card-body bg-light">
+                  <% if(wasSubmitedWithSuccess == 1)  { %>
+                    <div class="alert alert-success text-center" role="alert">
+                        <i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Your submission was sent with success and will be reviewed soon.</span>
+                    </div>
+                  <% } %>
+
+                  <form name="request-poi-form" action="/request-poi" method="POST"  enctype="multipart/form-data" onsubmit="return verify();">
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <h4><b>Choose a photo<sup>*</sup></b></h4>
+                            
+                            <img id="photo-preview" style="width: 90%; height: 400px;" src="img/no-photo-found.png">
+
+                            <div class="cont" style="width: 85%;">
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <p class="file-return"></p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="input-poi-photo-container">  
+                                            <input class="input-poi-photo" id="my-file" type="file" accept="image/*" name="photo" >
+                                            <label tabindex="0" for="my-file" class="input-poi-photo-trigger"><i class="fas fa-camera"></i><span style="padding-left: 10px;">Upload photo</span></span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <br>
+
+                            <div class="cont">
+                                <h4><b>Pick location</b></h4>
+
+                                <div id="map" style="width: 650px; height: 400px;"></div>
+
+                                <br>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="col-md-6">
+                            
+                            <br>
+
+                            <div class="form-group">
+                              <label for="input-poi-title"><h4>Title<sup>*</sup></h4></label>
+                              <input type="text" class="form-control" id="input-poi-title" name="title" placeholder="Enter a title for the POI" required>
+                            </div>
+                            
+
+                            <div class="form-group">
+                              <label for="input-poi-address"><h4>Address<sup>*</sup></h4></label>
+                              <input type="text" class="form-control" id="input-poi-address" name="address" placeholder="Enter an address for the POI" required>
+                            </div>
+
+                            <div class="form-group">
+                              <label for="input-poi-type"><h4>Type<sup>*</sup></h4></label>
+                              <select class="form-control" id="input-poi-type" name="poi_type" required>
+                                <option>Select a type</option>
+                                <option>Museum</option>
+                                <option>Park</option>
+                                <option>Hotel</option>
+                                <option>Restaurant</option>
+                                <option>Tower</option>
+                                <option>Castle</option>
+                                <option>Church</option>
+                                <option>Amusement Park</option>
+                                <option>Natural Feature</option>
+                                <option>Zoo</option>
+                                <option>Sports Venue</option>
+                                <option>Aquarium</option>
+                                <option>Point of Interest</option>
+                              </select>
+                            </div>
+
+                            <div class="form-group">
+                              <label for="input-poi-city"><h4>City<sup>*</sup></h4></label>
+                              <select class="form-control" id="input-poi-city" name="city" required>
+                                  <option>Select a city</option>
+                              </select>
+                            </div>
+
+                            <br>
+
+                            <div class="form-group">
+                                <label for="input-poi-description"><h4>Description</h4></label>
+                                <textarea class="form-control" id="input-poi-description" name="description" rows="3" placeholder="Enter a description for the POI"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                              <label for="input-poi-website"><h4>Website</h4></label>
+                              <input type="url" class="form-control" id="input-poi-website" name="website" placeholder="Enter the URL for the website of the POI ">
+                            </div>
+
+                            <div class="form-group">
+                              <label for="input-poi-phone"><h4>Phone Number</h4></label>
+                              <input type="tel" class="form-control" id="input-poi-phone" name="phone_number" placeholder="Enter the phone number of the POI ">
+                            </div>
+
+                            <div class="form-group">
+                              <label><h4>Coordinates<sup>*</sup></h4></label>
+                              <div class="form-row">
+                                <div class="col">
+                                  <input type="text" class="form-control" id="input-poi-latitude" name="latitude" placeholder="Latitude" required>
+                                </div>
+                                <div class="col">
+                                  <input type="text" class="form-control" id="input-poi-longitude" name="longitude" placeholder="Longitude" required>
+                                </div>
+                              </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <div class="form-group pull-right">
+                        <button type="reset" class="btn btn-danger">Clear</button>
+                        <button type="submit" value="upload" class="btn btn-success"><i class="fas fa-check"></i><span style="padding-left: 10px;">Submit</span></button>
+                    </div>
+
+                  
+                  </form>
+
+
+                </div>
+
+            </div>
+
+
+            <br><br>
+
+
+
+
+
+        </div>
+
+
+        
+
+
+      <!-- Login Modal -->
+      <div class="modal fade" id="login-modal" role="dialog">
+          <div class="modal-dialog">
+              <div class="modal-content" style="width: 400px;">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      
+
+                    <img id="profile-img" class="profile-img-card" src="img/login.png" />
+                    <form class="form-signin">
+                      <span id="reauth-email"></span>
+                      <div class="alert alert-danger" id="login-error" role="alert" style="display: none;">
+                          <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">The email or password is incorrect</span>
+                      </div>
+                      <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                      <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                      <div class="row">
+                          <div class="col-md-6">
+                            <div class="custom-control custom-checkbox" id="remember">
+                                <input type="checkbox" class="custom-control-input" id="remember-me">
+                                <label class="custom-control-label" for="remember-me">Remember me</label>
+                            </div>
+                          </div>
+                          <div class="col-md-6 text-right">
+                              <a href="/recover" class="forgot-password">
+                                  Forgot the password?
+                              </a>
+                          </div>
+                      </div>
+                      <br>
+                      <button class="btn btn-success" type="button" onclick="login();"><i class="fas fa-sign-in-alt"></i><span style="padding-left: 10px">Sign in</span></button>
+                          <!--<button class="btn btn-primary" type="submit"><i class="fas fa-user-plus"></i><span style="padding-left: 10px">Register</span></button>-->
+                      <span>Don't have an account yet? <a href="/register" class="forgot-password">Register now</a></span>
+                  
+                    </form>
+                    
+
+                    <div class="login-or">
+                      <hr class="hr-or">
+                      <span class="span-or">or</span>
+                    </div>
+
+                    <div class="fb-login-button" data-width="366" data-size="large" data-button-type="login_with" data-auto-logout-link="false" data-use-continue-as="false"></div>
+                    <!--<button class="btn btn-primary btn-facebook" type="submit"><i class="fab fa-facebook-f fa-lg"></i><span style="padding-left: 10px">Log in using Facebook</span></button>-->
+                    <br><br>
+                                
+                    <div id="customBtn">
+                        <button class="btn btn-google" type="submit" ><img id="google-signin-icon" src="img/google-icon.png"><span style="padding-left: 10px">Log in using Google</span></button>
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                  </div>
+              </div>
+          </div>
+      </div>
+
+
+        <!-- Footer -->
+        <footer class="footer">
+          <!-- Footer Elements -->
+
+          <div id="social">
+              <a class="facebookBtn smGlobalBtn" href="#" ></a>
+              <a class="twitterBtn smGlobalBtn" href="#" ></a>
+              <a class="googleplusBtn smGlobalBtn" href="#" ></a>
+              <a class="linkedinBtn smGlobalBtn" href="#" ></a>
+              <a class="instagramBtn smGlobalBtn" href="#" ></a>
+            </div>
+            <!-- Footer Elements -->
+        
+            <!-- Copyright -->
+            <div class="footer-copyright"> 2019 Copyright:
+              <a href="">&copy; Aplicacao, todos os direitos reservados</a>
+            </div>
+
+        </footer>
+        <!-- Footer -->
+
+
+  
+    <!-- Scripts -->
+    <script>startGoogleSignIn();</script>
+    <script type="text/javascript" src="/js/request-poi.js"></script>
+    <script>
+      var cities = [];
+
+      '<% cities.forEach(function(city) { %>'
+            cities.push('<%= city %>');
+      '<% }); %>'
+
+      loadCities(cities);
+
+    </script>
+
+  </body>
+</html>

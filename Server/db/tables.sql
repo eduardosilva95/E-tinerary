@@ -86,7 +86,7 @@ CREATE TABLE Hotel (
 	PRIMARY KEY (poi_id),
     FOREIGN KEY (poi_id) REFERENCES Poi(id),
     CHECK(stars > 0 and stars < 6)
-);*/
+);
 
 CREATE TABLE User_isInterested_Plan (
 	user_id INT NOT NULL,
@@ -95,7 +95,21 @@ CREATE TABLE User_isInterested_Plan (
     PRIMARY KEY (user_id, plan_id),
     FOREIGN KEY (user_id) REFERENCES User(id),
     FOREIGN KEY (plan_id) REFERENCES Plan(id)
+);*/
+
+CREATE TABLE Photo_POI (
+	photo_id INT AUTO_INCREMENT NOT NULL, 
+    poi_id INT NOT NULL,
+    user_id INT NOT NULL,
+    photo_url VARCHAR(255) NOT NULL,
+    photo_timestamp TIMESTAMP DEFAULT current_timestamp,
+	PRIMARY KEY (photo_id),
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (poi_id) REFERENCES Poi(id)
 );
+
+
+
 
 
 

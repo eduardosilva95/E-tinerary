@@ -132,3 +132,16 @@ function autocomplete(inp, arr) {
   $(function () {
     $('[data-toggle="popover"]').popover()
   });
+
+
+  function submitDestination(){
+    if(document.getElementById('inputDestination').value != undefined && document.getElementById('inputDestination').value != ""){
+      var destination = document.getElementById('inputDestination').value;
+      var queryString = "?dest=" + destination;
+      window.location.href = "./places" + queryString;
+    }
+    else{
+      alert("Must select a valid destination !");
+    }
+  }
+  

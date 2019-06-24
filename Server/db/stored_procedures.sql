@@ -1,5 +1,6 @@
 -- PROCEDURES
 
+DROP PROCEDURE getCities;
 DROP PROCEDURE Get_Top_Cities;
 DROP PROCEDURE Get_Top_POI;
 DROP PROCEDURE Get_Random_Cities;
@@ -18,8 +19,20 @@ DROP PROCEDURE isUserInterested;
 DROP PROCEDURE makePlanFavorite;
 DROP PROCEDURE unfavoritePlan;
 DROP PROCEDURE reviewPOI;
+DROP PROCEDURE uploadPOIPhoto;
+DROP PROCEDURE getPOIPhotos;
+DROP PROCEDURE submitPOI;
+DROP PROCEDURE getSubmittedPOIs;
+DROP PROCEDURE getSubmittedPOIByID;
 
 DELIMITER //
+
+# obter o nome de todas as cidades
+CREATE PROCEDURE getCities ()
+BEGIN
+	select name from city order by name asc;
+END //
+
 # obter as N cidades com mais planos criados
 CREATE PROCEDURE Get_Top_Cities (num_results INT)
 BEGIN
@@ -32,7 +45,7 @@ END //
 CREATE PROCEDURE Get_Top_POI (num_results INT)
 BEGIN
 	select id, name, place_id, city, count(name) as plans from 
-    (select poi.id, poi.name, poi.place_id, city.name as city from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id where plan.isActive = 1) t 
+    (select poi.id, poi.name, poi.place_id, city.name as city from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id where plan.isActive = 1 and poi.isAproved = 1) t 
     group by name order by plans desc limit num_results;
 END //
 
@@ -49,10 +62,10 @@ END //
 CREATE PROCEDURE Get_POI_Of_City (destination VARCHAR(255), query_text VARCHAR(255), limit_inf INT, total_results INT) 
 BEGIN
 	IF query_text = "" THEN
-		SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.rating AS rating, poi.poi_type AS poi_type, poi.description as description FROM poi JOIN city ON poi.city = city.id WHERE city.name = destination ORDER BY poi.num_reviews DESC LIMIT limit_inf, total_results;
+		SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.rating AS rating, poi.poi_type AS poi_type, poi.description as description FROM poi JOIN city ON poi.city = city.id WHERE city.name = destination AND poi.isAproved = 1 ORDER BY poi.num_reviews DESC LIMIT limit_inf, total_results;
 	ELSE
 		SET query_text = CONCAT('%', query_text,'%');
-		SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.rating AS rating, poi.poi_type AS poi_type, poi.description as description FROM poi JOIN city ON poi.city = city.id WHERE city.name = destination AND poi.name LIKE query_text ORDER BY poi.num_reviews DESC LIMIT limit_inf, total_results;
+		SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.rating AS rating, poi.poi_type AS poi_type, poi.description as description FROM poi JOIN city ON poi.city = city.id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 ORDER BY poi.num_reviews DESC LIMIT limit_inf, total_results;
 	END IF;
 END //
 
@@ -107,7 +120,7 @@ END //
 # obter lista com IDs de POI de uma cidade 
 CREATE PROCEDURE Get_IDs_POI_Of_City (destination VARCHAR(255))
 BEGIN
-	select poi.id as poi from poi join city on poi.city = city.id where city.name = destination and poi.num_reviews > 100 and poi.poi_type != 'Hotel' and poi.poi_type != 'Restaurant';
+	select poi.id as poi from poi join city on poi.city = city.id where city.name = destination and poi.num_reviews > 100 and poi.poi_type != 'Hotel' and poi.poi_type != 'Restaurant' and poi.isAproved = 1;
 END //
 
 # adicionar visitas a um plano
@@ -234,6 +247,68 @@ BEGIN
     
 END //
 
+
+# fazer upload de uma foto de um POI
+CREATE PROCEDURE uploadPOIPhoto (poiID INT, userID INT, photoURL VARCHAR(255))
+BEGIN
+	DECLARE isPremium INT;
+    SELECT count(*) INTO isPremium FROM user WHERE id = userID AND type_use = 'Premium';
+	
+    IF isPremium = 1 THEN
+		INSERT INTO photo_poi (poi_id, user_id, photo_url) VALUES (poiID, userID, photoURL);
+	END IF;
+    
+END //
+
+# obter as fotos de um POI
+CREATE PROCEDURE getPOIPhotos (poiID INT)
+BEGIN
+	SELECT photo_url FROM photo_poi WHERE poi_id = poiID;
+END // 
+
+
+# submeter um poi para ser avaliado
+CREATE PROCEDURE submitPOI (poiName VARCHAR(255), poiDescription TEXT, poiLatitude DECIMAL(11,8), poiLongitude DECIMAL(11,8), poiAddress VARCHAR(255), poiType VARCHAR(255), poiWebsite VARCHAR(255), poiPhoneNumber VARCHAR(255), poiCity VARCHAR(255), userID INT)
+BEGIN
+	DECLARE poiID, cityID INT;
+    
+    SELECT id into cityID FROM city WHERE name like poiCity;
+    
+	INSERT INTO poi (name, latitude, longitude, address, poi_type, city, isAproved, submitionUser) values (poiName, poiLatitude, poiLongitude, poiAddress, poiType, cityID, 0, userID);
+    SET poiID = LAST_INSERT_ID();
+	
+    IF poiDescription is not null THEN
+		UPDATE poi SET description = poiDescription WHERE id = poiID;
+	END IF;
+    
+    IF poiWebsite is not null THEN
+		UPDATE poi SET website = poiWebsite WHERE id = poiID;
+	END IF;
+    
+    IF poiPhoneNumber is not null THEN
+		UPDATE poi SET phone_number = poiPhoneNumber WHERE id = poiID;
+	END IF;
+    
+    SELECT poiID;
+    
+END //
+
+
+# obter a lista de POIs para serem avaliados
+CREATE PROCEDURE getSubmittedPOIs (userID INT)
+BEGIN
+	# SELECT * FROM poi where isAproved = 0 and submitionUser != userID;
+	SELECT poi.id as id, poi.name as name, photo_url, city.name as city FROM poi join photo_poi on poi.id = photo_poi.poi_id join city on poi.city = city.id where isAproved = 0;
+    
+END //
+
+# obter um determinado POI para ser avaliado
+CREATE PROCEDURE getSubmittedPOIByID (userID INT, poiID INT)
+BEGIN
+	
+    SELECT poi.id as id, poi.name as name, photo_url, city.name as city, poi.latitude as latitude, poi.longitude as longitude, address, poi_type, poi.description as description, website, phone_number FROM poi join photo_poi on poi.id = photo_poi.poi_id join city on poi.city = city.id where isAproved = 0 and poi.id = poiID;
+    
+END //
 
 
 

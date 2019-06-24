@@ -192,7 +192,7 @@ hr {
   font-weight: bold;
 }
 
-#input-children-info:hover{
+#input-info-popover:hover{
   color: #ffc107;
 }
 
@@ -591,6 +591,29 @@ hr {
   font-size: 12px;
 }
 
+.btn-add-description-modal{
+  background: #34495E;
+  color: #ffc107;
+  border-color: #34495E;
+}
+
+.btn-add-description-modal:hover{
+  color: #34495E;
+  background: #ffc107;
+  border-color: #ffc107;
+}
+
+.btn-create-review-modal{
+  background: #34495E;
+  color: #ffc107;
+  border-color: #34495E;
+}
+
+.btn-create-review-modal:hover{
+  color: #34495E;
+  background: #ffc107;
+  border-color: #ffc107;
+}
 
 #place-description{
   height: 300px;
@@ -613,6 +636,63 @@ hr {
 .place-etinerary-div{
   padding-bottom: 1rem;
 }
+
+
+.input-poi-photo-container {
+  width: 160px;
+} 
+
+.js .input-poi-photo-trigger {
+  display: block;
+  padding: 14px 15px;
+  background: #34495E;
+  color: #ffc107;
+  font-size: 1em;
+  transition: all .4s;
+  cursor: pointer;
+  border-radius: .25rem;
+}
+.js .input-poi-photo{
+  position: absolute;
+  top: 0; left: 0;
+  width: 225px;
+  opacity: 0;
+  padding: 14px 0;
+  cursor: pointer;
+}
+
+.js .input-poi-photo:hover + .input-poi-photo-trigger,
+.js .input-poi-photo:focus + .input-poi-photo-trigger,
+.js .input-poi-photo-trigger:hover,
+.js .input-poi-photo-trigger:focus {
+  background: #ffc107;
+  color: #34495E;
+}
+
+.file-return {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+}
+.file-return:not(:empty) {
+  margin: 1em 0;
+}
+.js .file-return {
+  font-style: italic;
+  font-size: .9em;
+  font-weight: bold;
+}
+.js .file-return:not(:empty):before {
+  content: "Selected file: ";
+  font-style: normal;
+  font-weight: normal;
+}
+
+
+
+
 
 
 /* ---------------------------------- PLACE SLIDESHOW ------------------------- */
@@ -1031,8 +1111,6 @@ table tr td a{
 .empty-review p{
   color: #888888;
 }
-
-
 
 
 /* ---------------------------------- CALENDAR ------------------------- */

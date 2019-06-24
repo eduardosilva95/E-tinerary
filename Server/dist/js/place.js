@@ -1,5 +1,5 @@
-
 var open_slots = {};
+var photos_list = [];
 
 var slideIndex = 1;
 
@@ -54,6 +54,11 @@ $(window).on('load', function() {
   
 });
 
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})
+
+
 
 function createOpeningHoursTable(hours){
     var table = document.getElementById("table-opening-hours");
@@ -91,17 +96,29 @@ function getPlaceDetails(place_id){
           createOpeningHoursTable(place.opening_hours.weekday_text);
         }
 
+        else{
+          $("#no-opening-hours").css("display", "block");
+        }
+
         if(place.photos != undefined){
 
-          for(var i=0; i<place.photos.length;i++){
+          var merge_photos = place.photos.concat(photos_list);
 
-            console.log("image " + i);
+          for(var i=0; i<merge_photos.length;i++){
 
             var img_div = document.createElement("DIV");
             img_div.className = "mySlides slideshow-fade";
 
             var img = document.createElement("IMG");
-            img.src = place.photos[i].getUrl();
+
+            if(i >= place.photos.length){
+              img.src = merge_photos[i].replace(/"/g,"");
+            }
+
+            else{
+              img.src = merge_photos[i].getUrl();
+            }
+
             img.style.width = "100%";
 
             img_div.appendChild(img);
@@ -348,7 +365,7 @@ function getPlaceDetails(place_id){
   
   function loadRating(rating, review){
 
-    rating = parseInt(rating);
+    rating = parseFloat(rating).toFixed(1);
 
     if(isNaN(rating)){
       document.getElementById(review).innerHTML += "No information available";
@@ -357,8 +374,13 @@ function getPlaceDetails(place_id){
 
     var count = 0;
 
-    while(count < rating){
+    while(count < Math.floor(rating)){
       document.getElementById(review).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #ffc107;"></i>';
+      count = count + 1;
+    }
+
+    if(rating-count >= 0.5){
+      document.getElementById(review).innerHTML += '<i class="fas fa-star-half-alt" aria-hidden="true" style="color: #ffc107;"></i>';
       count = count + 1;
     }
 
@@ -483,4 +505,11 @@ function showSlides(n) {
 
   slides[slideIndex-1].style.display = "block"; 
   dots[slideIndex-1].className += " slideshow-active";
+}
+
+
+function loadPhotos(photos){
+   for(var i=0; i<photos.length;i++){
+      photos_list.push(photos[i]);
+   }
 }
