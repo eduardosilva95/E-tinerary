@@ -30,41 +30,35 @@
 
   
   </head>
-  <body onload="loadNavbar();" style="background-image: url('/img/home-image.jpg');">
+  <body onload="loadNavbar();" style="background-image: url('/img/home-image.jpg'); background-size: 100%; height: 1100px">
     <!-- header navbar -->
     <nav class="navbar sticky-top navbar-expand-lg navbar-dark navbar-transparent bg-dark justify-content-between">
-        <a class="navbar-brand" href="./"><img src="img/logo-3.png" style="height: 40px"></a>
-
+        <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link header active" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+              </li>
             
             <li class="nav-item">
-                <a class="nav-link active" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+              <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
             </li>
-            
             <li class="nav-item">
-              <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+              <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
             </li>
-
             <li class="nav-item">
-              <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+                <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
             </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
-            </li>
-
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
                 </a>
                 <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
-                  <a class="dropdown-item" href="./about-us">Aplicacao</a>
-                  <a class="dropdown-item" href="./help">Help</a>
+                  <a class="dropdown-item header" href="./about-us">Aplicacao</a>
+                  <a class="dropdown-item header" href="./help">Help</a>
                 </div>
             </li>
           </ul>
@@ -75,14 +69,16 @@
                   <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
                 </div>
                 <div id="profile" class="dropleft" style="display: none;">
-                  <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       <img id="user-profile-pic" class="rounded-circle border border-light">
                   </a>
-                  <div class="dropdown-menu" aria-labelledby="profile-btn">
-                    <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                    <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                  <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
+                    <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                    <a class="dropdown-item header" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                    <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
+                    <a class="dropdown-item header" href="./review-poi"><i class="fas fa-edit"></i><span style="padding-left: 10px;">Review POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
                     <div class="dropdown-divider"></div>
-                    <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                    <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
                   </div>   
                 </div>        
               </div>
@@ -123,7 +119,7 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <label class="mr-2" for="select-adults" style="color: #ffc107; font-weight: bold;">Adults</label>
-                                    <select class="custom-select mr-sm-2" id="select-adults" name="no-adults">
+                                    <select class="custom-select mr-sm-2" id="select-adults" name="adults">
                                     <option selected value="1">1</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
@@ -136,7 +132,7 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <label class="my-1 mr-2" for="select-children" style="color:#ffc107; font-weight: bold;">Children <sup id="input-info-popover"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Children to 12 years old"></i></sup></label>
-                                    <select class="custom-select mr-sm-2" id="select-children" name="no-children">
+                                    <select class="custom-select mr-sm-2" id="select-children" name="children">
                                     <option selected value="0">0</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -188,11 +184,11 @@
                         <div class="form-group fg">
                             <legend style="color: #ffc107; font-size: 1rem; font-weight: bold; padding-top: .375rem;">Budget: </legend>
                             <div class="custom-control custom-radio custom-control-inline my-1 mr-sm-2">
-                                <input type="radio" name="radio-budget" class="custom-control-input" id="radio-budget-no"  value="No" onclick="disableBudgetBox()" checked>
+                                <input type="radio" name="has_budget" class="custom-control-input" id="radio-budget-no"  value="No" onclick="disableBudgetBox()" checked>
                                 <label class="custom-control-label" for="radioBudgetNo" style="color: white; font-size: 1rem;">No</label>
                             </div>
                             <div class="custom-control custom-radio custom-control-inline my-1 mr-sm-2">
-                                <input type="radio" name="radio-budget" class="custom-control-input" id="radio-budget-yes" value="Yes" onclick="enableBudgetBox()">
+                                <input type="radio" name="has_budget" class="custom-control-input" id="radio-budget-yes" value="Yes" onclick="enableBudgetBox()">
                                 <label class="custom-control-label" for="radioBudgetYes" style="color: white; font-size: 1rem;">Yes</label>
                             </div>
                             <div class="custom-control custom-control-inline mr-sm-2 float-right">
@@ -206,22 +202,22 @@
                 <div class="form-group fg">
                     <legend style="color: #ffc107; font-size: 1rem; font-weight: bold;">How to move: </legend>
                     <div class="custom-control custom-checkbox custom-control-inline">
-                        <input type="checkbox" class="custom-control-input" id="check-move-car" name="move-car">
+                        <input type="checkbox" class="custom-control-input" id="check-move-car" name="move_car">
                         <label class="custom-control-label" for="check-move-car" style="color: white; font-size: 1rem;"><i class="fas fa-car"></i><span style="padding-left: 10px;">Car</span></label>
                     </div>
 
                     <div class="custom-control custom-checkbox custom-control-inline">
-                        <input type="checkbox" class="custom-control-input" id="check-move-foot" name="move-foot">
+                        <input type="checkbox" class="custom-control-input" id="check-move-foot" name="move_foot">
                         <label class="custom-control-label" for="check-move-foot" style="color: white; font-size: 1rem;"><i class="fas fa-walking"></i><span style="padding-left: 10px;">On foot</span></label>
                     </div>
 
                     <div class="custom-control custom-checkbox custom-control-inline">
-                        <input type="checkbox" class="custom-control-input" id="check-move-public" name="move-public">
+                        <input type="checkbox" class="custom-control-input" id="check-move-public" name="move_public">
                         <label class="custom-control-label" for="check-move-public" style="color: white; font-size: 1rem;"><i class="fas fa-bus"></i><span style="padding-left: 10px;">Public Transportations</span></label>
                     </div>
 
                     <div class="custom-control custom-checkbox custom-control-inline">
-                        <input type="checkbox" class="custom-control-input" id="check-move-bike" name="move-bike">
+                        <input type="checkbox" class="custom-control-input" id="check-move-bike" name="movebike">
                         <label class="custom-control-label" for="check-move-bike" style="color: white; font-size: 1rem;"><i class="fas fa-bicycle"></i><span style="padding-left: 10px;">Bicycle</span></label>
                     </div>
 

@@ -118,10 +118,11 @@ function filterPage(total_results){
 }
 
 
-function getPlaceDetails(place_id, place_name){
+function getPlaceDetails(place_id, dest){
 
     var request = { 
       placeId: place_id,
+      fields: ['photos']
     };
 
 
@@ -131,9 +132,9 @@ function getPlaceDetails(place_id, place_name){
       if (status === google.maps.places.PlacesServiceStatus.OK) {
 
         if(place.photos != undefined)
-          document.getElementById(place_name + " Image").src = place.photos[0].getUrl({'maxWidth': 200, 'maxHeight': 180});
+          document.getElementById(dest).src = place.photos[0].getUrl({'maxWidth': 200, 'maxHeight': 180});
         else
-          document.getElementById(place_name + " Image").src = "";
+          document.getElementById(dest).src = "";
 
 
         //console.log(place.opening_hours);
@@ -155,12 +156,6 @@ function getCityImage(city){
         if (status == google.maps.places.PlacesServiceStatus.OK) {
             var place = results[0];
 
-            /*if(place.photos != undefined)
-                document.getElementById("places-header").style.backgroundImage = 'url(' + place.photos[0].getUrl() + ')';
-            else
-                document.getElementById("places-header").style.backgroundImage = "";*/
-
-
             if(place.photos != undefined){
               document.body.style.backgroundImage = 'url(' + place.photos[0].getUrl() + ')';
               document.body.style.backgroundSize = "cover";
@@ -172,59 +167,66 @@ function getCityImage(city){
       });
 }
 
-function loadIcon(place, poi_type){
-  var place_icon = place + "_icon";
+function loadIcon(dest, poi_type){
+  
+  document.getElementById(dest).className = getIcon(poi_type);
+}
 
-  if(poi_type == 'Park'){
-    document.getElementById(place_icon).className = "fas fa-tree";
+
+function getIcon(type){
+
+  type = type.toLowerCase();
+
+  if(type == 'park'){
+      return "fas fa-tree";
   }
 
-  else if(poi_type == 'Castle'){
-    document.getElementById(place_icon).className = "fas fa-chess-rook";
+  else if(type == 'castle'){
+      return "fas fa-chess-rook";
   }
 
-  else if (poi_type == 'Tower' || poi_type == 'Museum'){
-    document.getElementById(place_icon).className = "fas fa-archway";
+  else if (type == 'tower' || type == 'museum'){
+      return "fas fa-archway";
   }
 
-  else if (poi_type == 'Church'){
-    document.getElementById(place_icon).className = "fas fa-church";
+  else if (type == 'church'){
+      return "fas fa-church";
   }
 
-  else if (poi_type == 'Restaurant'){
-    document.getElementById(place_icon).className = "fas fa-utensils";
+  else if (type == 'restaurant'){
+      return "fas fa-utensils";
   }
 
-  else if (poi_type == 'Hotel'){
-    document.getElementById(place_icon).className = "fas fa-bed";
+  else if (type == 'hotel'){
+      return "fas fa-bed";
   }
 
-  else if (poi_type == 'Natural Feature'){
-    document.getElementById(place_icon).className = "fas fa-umbrella-beach";
+  else if (type == 'natural feature'){
+      return "fas fa-umbrella-beach";
   }
 
-  else if (poi_type == 'Aquarium'){
-    document.getElementById(place_icon).className = "fas fa-fish";
+  else if (type == 'aquarium'){
+      return "fas fa-fish";
   }
 
-  else if (poi_type == 'Zoo'){
-    document.getElementById(place_icon).className = "fas fa-hippo";
+  else if (type == 'zoo'){
+      return "fas fa-hippo";
   }
 
-  else if (poi_type == 'Place of Worship'){
-    document.getElementById(place_icon).className = "fas fa-place-of-worship";
+  else if (type == 'place of worship'){
+      return "fas fa-place-of-worship";
   }
 
-  else if (poi_type == 'Amusement Park'){
-    document.getElementById(place_icon).className = "fas fa-child";
+  else if (type == 'amusement park'){
+      return "fas fa-child";
   }
 
-  else if (poi_type == 'Stadium'){
-    document.getElementById(place_icon).className = "fas fa-futbol";
+  else if (type == 'stadium'){
+      return "fas fa-futbol";
   }
 
-  else if (poi_type == 'Train Station'){
-    document.getElementById(place_icon).className = "fas fa-train";
+  else if (type == 'train station'){
+      return "fas fa-train";
   }
 
 }
@@ -318,22 +320,6 @@ function filterSearch(){
 }
 
 
-function classify(){
-  var value = 0;
-
-  if(document.getElementById('star5').checked)
-    value = 5;
-  else if(document.getElementById('star4').checked)
-    value = 4;
-  else if(document.getElementById('star3').checked)
-    value = 3;
-  else if(document.getElementById('star2').checked)
-    value = 2;
-  else if(document.getElementById('star1').checked)
-    value = 1;
-
-  console.log(value);
-}
 
 $(function () {
   $('.btn-add-visit-modal').on('click', function () {
@@ -447,3 +433,31 @@ $(function () {
 
   });
 });
+
+
+function loadRating(rating, review){
+
+  rating = parseFloat(rating).toFixed(1);
+
+  if(isNaN(rating)){
+    document.getElementById(review).innerHTML += "No information available";
+    return;
+  }
+
+  var count = 0;
+
+  while(count < Math.floor(rating)){
+    document.getElementById(review).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #ffc107;"></i>';
+    count = count + 1;
+  }
+
+  if(rating-count >= 0.5){
+    document.getElementById(review).innerHTML += '<i class="fas fa-star-half-alt" aria-hidden="true" style="color: #ffc107;"></i>';
+    count = count + 1;
+  }
+
+  while(count < 5){
+    document.getElementById(review).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #d0cfd1;"></i>';
+    count = count + 1;
+  }
+}

@@ -29,60 +29,61 @@
   
   </head>
   <body onload="loadNavbar();">
-      <!-- header navbar -->
-      <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
-          <a class="navbar-brand" href="./">HomePage</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-              
+        <!-- header navbar -->
+        <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
+            <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                    <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+                    </li>
+                
                 <li class="nav-item">
-                  <a class="nav-link" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+                    <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
                 </li>
-              
-              <li class="nav-item">
-                <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
-              </li>
-              <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
-                  </a>
-                  <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
-                    <a class="dropdown-item" href="./about-us">Aplicacao</a>
-                    <a class="dropdown-item" href="./help">Help</a>
-                  </div>
-              </li>
-            </ul>
-            <ul class="navbar-nav ml-auto">
-              <li>
-                <div id="login-user">
-                  <div id="login" style="display: none;">
-                    <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
-                  </div>
-                  <div id="profile" class="dropleft" style="display: none;">
-                    <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img id="user-profile-pic" class="rounded-circle border border-light">
+                <li class="nav-item">
+                    <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="profile-btn">
-                      <a class="dropdown-item" href="/profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                      <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
-                      <div class="dropdown-divider"></div>
-                      <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
-                    </div>   
-                  </div>        
-                </div>
-              </li>
-            </ul>
-          </div>
-      </nav>
+                    <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
+                        <a class="dropdown-item header" href="./about-us">Aplicacao</a>
+                        <a class="dropdown-item header" href="./help">Help</a>
+                    </div>
+                </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                <li>
+                    <div id="login-user">
+                    <div id="login" style="display: none;">
+                        <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                    </div>
+                    <div id="profile" class="dropleft" style="display: none;">
+                        <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img id="user-profile-pic" class="rounded-circle border border-light">
+                        </a>
+                        <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
+                        <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                        <a class="dropdown-item header" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                        <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
+                        <a class="dropdown-item header" href="./review-poi"><i class="fas fa-edit"></i><span style="padding-left: 10px;">Review POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                        </div>   
+                    </div>        
+                    </div>
+                </li>
+                </ul>
+            </div>
+        </nav>
 
 
         <div class="container" style="min-height: 100%">
@@ -120,7 +121,7 @@
                                         <div class="col-md-8">
                                             <div class="text-left">
                                                 <a href="/plan?id=<%= trip.id %>" class="trip-link"><span class="card-title"><b><%= trip.name %></b></span></a>
-                                                <button type="button" class="plan-table-btn-icons btn-rename-modal" data-toggle="modal" data-target="#rename-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Rename the trip" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
+                                                <button type="button" class="plan-table-btn-icons btn-rename-modal" data-toggle="modal" data-target="#rename-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Rename the trip" class="fas fa-pen fa-lg" style="padding-left: 10px;"></i></button>
                                                 <br>
                                                 <span class="text-bottom"><%= trip.start %> - <%= trip.end %></span> 
                                             </div>
@@ -177,7 +178,7 @@
                                         <div class="col-md-8">
                                             <div class="text-left">
                                                 <a href="/plan?id=<%= trip.id %>" class="trip-link"><span class="card-title"><b><%= trip.name %></b></span></a>
-                                                <button type="button" class="plan-table-btn-icons btn-rename-modal" data-toggle="modal" data-target="#rename-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Rename the trip" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
+                                                <button type="button" class="plan-table-btn-icons btn-rename-modal" data-toggle="modal" data-target="#rename-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Rename the trip" class="fas fa-pen fa-lg" style="padding-left: 10px;"></i></button>
                                                 <br>
                                                 <span class="text-bottom"><%= trip.start %> - <%= trip.end %></span> 
                                             </div>

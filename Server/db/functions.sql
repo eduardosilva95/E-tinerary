@@ -1,17 +1,17 @@
 -- FUNCTIONS
 
-DROP FUNCTION Check_If_Plan_Is_Manual;
-DROP FUNCTION Create_Plan;
-DROP FUNCTION Edit_User_Name;
-DROP FUNCTION Edit_User_Picture;
-DROP FUNCTION Edit_User_Birthday;
-DROP FUNCTION Edit_User_Country;
-DROP FUNCTION Edit_User_Address;
-DROP FUNCTION Edit_User_Phone_Number;
+DROP FUNCTION isPlanManual;
+DROP FUNCTION createPlan;
+DROP FUNCTION editUserName;
+DROP FUNCTION editUserPicture;
+DROP FUNCTION editUserBirthday;
+DROP FUNCTION editUserCountry;
+DROP FUNCTION editUserAddress;
+DROP FUNCTION editUserPhoneNumber;
 
 DELIMITER //
 # verificar se um plano é manual ou automatico
-CREATE FUNCTION Check_If_Plan_Is_Manual (planID INT) RETURNS BIT DETERMINISTIC
+CREATE FUNCTION isPlanManual (planID INT) RETURNS BIT DETERMINISTIC
 BEGIN
 	DECLARE isMan BIT;
 	SELECT isManual INTO isMan FROM plan WHERE id = planID;
@@ -20,7 +20,7 @@ END //
  
 
  # criar um plano
-CREATE FUNCTION Create_Plan (destination VARCHAR(255), arrival DATE, departure DATE, userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
+CREATE FUNCTION createPlan (destination VARCHAR(255), arrival DATE, departure DATE, userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
 BEGIN
 	declare cityID INT;
 	declare planID INT;
@@ -34,7 +34,7 @@ END //
 
 
 # editar nome do utilizador
-CREATE FUNCTION Edit_User_Name (new_value VARCHAR(255), userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
+CREATE FUNCTION editUserName (new_value VARCHAR(255), userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
 BEGIN
 	declare result INT;
     
@@ -46,7 +46,7 @@ END //
 
 
 # editar foto do utilizador
-CREATE FUNCTION Edit_User_Picture (new_value VARCHAR(255), userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
+CREATE FUNCTION editUserPicture (new_value VARCHAR(255), userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
 BEGIN
 	declare result INT;
     
@@ -59,7 +59,7 @@ END //
 
 
 # editar data de nascimento do utilizador
-CREATE FUNCTION Edit_User_Birthday (new_value DATE, userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
+CREATE FUNCTION editUserBirthday (new_value DATE, userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
 BEGIN
 	declare result INT;
     declare isGoogle INT;
@@ -78,7 +78,7 @@ END //
 
 
 # editar país do utilizador
-CREATE FUNCTION Edit_User_Country (new_value VARCHAR(255), userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
+CREATE FUNCTION editUserCountry (new_value VARCHAR(255), userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
 BEGIN
 	declare result INT;
     declare isGoogle INT;
@@ -97,7 +97,7 @@ END //
 
 
 # editar morada do utilizador
-CREATE FUNCTION Edit_User_Address (new_value VARCHAR(255), userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
+CREATE FUNCTION editUserAddress (new_value VARCHAR(255), userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
 BEGIN
 	declare result INT;
     declare isGoogle INT;
@@ -115,7 +115,7 @@ BEGIN
 END //
 
 # editar numero de telefone do utilizador
-CREATE FUNCTION Edit_User_Phone_Number (new_value INT, userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
+CREATE FUNCTION editUserPhoneNumber (new_value INT, userID INT) RETURNS INT NOT DETERMINISTIC MODIFIES SQL DATA READS SQL DATA
 BEGIN
 	declare result INT;
     declare isGoogle INT;

@@ -388,8 +388,6 @@ function getPlaceDetails(place_id){
       document.getElementById(review).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #d0cfd1;"></i>';
       count = count + 1;
     }
-
-
   }
 
 

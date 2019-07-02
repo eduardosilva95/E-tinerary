@@ -28,22 +28,22 @@
   </head>
   <body onload="loadPage();">
         <!-- header navbar -->
-        <nav class="navbar sticky-top navbar-expand-lg navbar-dark navbar-transparent bg-dark justify-content-between">
+        <nav class="navbar sticky-top navbar-expand-lg navbar-dark navbar-places bg-dark justify-content-between">
             <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-              <ul class="navbar-nav ml-auto">
-                  <li class="nav-item">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
                     <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
-                  </li>
+                </li>
                 
                 <li class="nav-item">
-                  <a class="nav-link header active" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+                <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
@@ -53,34 +53,35 @@
                         <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
                     </a>
                     <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
-                      <a class="dropdown-item" href="./about-us">Aplicacao</a>
-                      <a class="dropdown-item" href="./help">Help</a>
+                    <a class="dropdown-item header" href="./about-us">Aplicacao</a>
+                    <a class="dropdown-item header" href="./help">Help</a>
                     </div>
                 </li>
-              </ul>
-              <ul class="navbar-nav ml-auto">
+            </ul>
+            <ul class="navbar-nav ml-auto">
                 <li>
-                  <div id="login-user">
+                <div id="login-user">
                     <div id="login" style="display: none;">
-                      <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                    <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
                     </div>
                     <div id="profile" class="dropleft" style="display: none;">
-                      <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <img id="user-profile-pic" class="rounded-circle border border-light">
-                      </a>
-                      <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
-                        <a class="dropdown-item" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                        <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                    <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img id="user-profile-pic" class="rounded-circle border border-light">
+                    </a>
+                    <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
+                        <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                        <a class="dropdown-item header" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                        <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
+                        <a class="dropdown-item header" href="./review-poi"><i class="fas fa-edit"></i><span style="padding-left: 10px;">Review POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
                         <div class="dropdown-divider"></div>
-                        <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
-                      </div>   
+                        <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                    </div>   
                     </div>        
-                  </div>
+                </div>
                 </li>
-              </ul>
+            </ul>
             </div>
         </nav>
-
 
         <div class="container-fluid" id="places-header" style=" height: 300px; width: 100%;">
             
@@ -96,35 +97,42 @@
             
         </div>
 
+        <!-- SEARCH BAR -->
         <div class="container-fluid" style="background-color: #343a40; padding-top: 20px; padding-bottom: 20px;">
-            <form class="form-inline row">
-                <div class="col-md-1"></div>
-                <div class="col-md-5 cont">
-                  <div class="form-group has-search">
-                    <span class="fa fa-search form-control-feedback"></span>
-                    <input type="text" class="form-control float-left" placeholder="Search for a place in <%= city %>" id="search-place-input" name="query">
-                  </div>
-                </div>
-                <div class="col-md-1 cont">
-                  <div class="form-group float-right">
-                    <button type="button" onclick="queryPlace()" class="btn btn-outline-warning" id="btn-search-place" >Search</button>
-                  </div>
-                </div>
-                <div class="col-md-1 cont">
-                    <div class="dropdown row float-right">
-                        <button class="btn btn-outline-warning dropdown-toggle" type="button" id="sortDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Sort
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="sortDropdownMenu">
-                            <a class="dropdown-item" href="#"><i class="fas fa-sort-alpha-down"></i><span style="padding-left: 10px;">Alphabetically (A-Z)</span></a>
-                            <a class="dropdown-item" href="#"><i class="fas fa-eye"></i><span style="padding-left: 10px;">Number of reviews</span></a>
-                            <a class="dropdown-item" href="#"><i class="fas fa-star"></i><span style="padding-left: 10px;">Rating</span></a>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-9 cont">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="form-group has-search">
+                                    <span class="fa fa-search form-control-feedback"></span>
+                                    <input type="text" class="form-control float-left" placeholder="Search for a place in <%= city %>" id="search-place-input" name="query">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group float-right">
+                                    <button type="button" onclick="queryPlace()" class="btn btn-outline-warning" id="btn-search-place" ><i class="fas fa-search"></i><span style="padding-left: 10px; ">Search</span></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 cont">
+                        <div class="text-right">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-warning dropdown-toggle" type="button" id="sortDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Sort
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="sortDropdownMenu">
+                                    <a class="dropdown-item dropdown-sort-places" href="#"><i class="fas fa-sort-alpha-down"></i><span style="padding-left: 10px;">Alphabetically (A-Z)</span></a>
+                                    <a class="dropdown-item dropdown-sort-places active" href="#"><i class="fas fa-eye"></i><span style="padding-left: 10px;">Number of reviews</span></a>
+                                    <a class="dropdown-item dropdown-sort-places" href="#"><i class="fas fa-star"></i><span style="padding-left: 10px;">Rating</span></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4"></div>
-            </form>
-                    
+            </div>
         </div>
 
 
@@ -138,19 +146,20 @@
 
             <div class="row cont">
                 <div class="col-md-9">
+                    <% count = 0 %>
                     <% places.forEach(function(place) { %>
                     
-                    <div class="card" id="<%= place.name %>">
+                    <div class="card" id="places-poi-<%= count %>">
                         <div class="card-header">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <h6 class="panel-title"><%= place.name %></h6>  
+                                    <h6 class="panel-title"><b><%= place.name %></b></h6>  
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="text-right"><i id="<%= place.name %>_icon" class="fas fa-monument" style="padding-right: 10px;"></i><h8 class="panel-title"><%= place.type %></h8></div>
+                                    <div class="text-right"><i id="places-poi-<%= count %>-icon" class="fas fa-monument" style="padding-right: 10px;"></i><h8 class="panel-title"><%= place.type %></h8></div>
                                 </div>
                                 <script>
-                                    loadIcon('<%= place.name %>', '<%= place.type %>');
+                                    loadIcon('places-poi-<%= count %>-icon', '<%= place.type %>');
                                 </script>
                             </div>                           
                         </div>
@@ -159,51 +168,66 @@
                         <div class="card-body">
                             <div class="row no-gutters">
                                 <div class="col-md-4">
-                                    <img class="list-places-img" id="<%= place.id %> Image">
+                                    <div class="card-body">
+                                        <img class="list-places-img" id="places-poi-<%= count %>-img">
+                                    </div>
                                 </div>
                                 <div class="col-md-8">
                                     <div class="card-body">
-                                        <p><i class="fas fa-map-marker-alt"></i><span style="font-weight: bold; padding-left: 10px;">Address: </span><%= place.address %><span id="poi-address"></span></p>
-                                        <!--<p><i class="fas fa-clock"></i><span style="font-weight: bold; padding-left: 10px;">Opening hours: </span><span id="poi-address"></span></p>
-                                        -->
-                                        <div class="row" style="padding-top: 20px;">
-                                            <div class="col-md-8">
-                                                <p><i class="fas fa-star"></i><span style="font-weight: bold; padding-left: 10px;">Rating: </span><span id="rating"> <%= place.rating %> / 5.0</span></p>                  
-                                            </div>   
-                                        </div>        
+                                        <div class="row">
+                                            <div class="col-md">
+                                                <div id="places-poi-<%= count %>-rating">
+                                                    <span style="padding-right: 5px; color: #ffc107; font-weight: bold;"><%= place.rating %></span>
+                                                </div>
+                                                <script>
+                                                    loadRating("<%= place.rating %>", "places-poi-<%= count %>-rating");
+                                                </script>
+                                            </div>
+                                            <div class="col-md text-right">
+                                                preço
+                                            </div>
+                                        </div>
+
+                                        <br>
+
+                                        
+                                        <div class="places-poi-description">
+                                            <span><%= place.description %></span>
+                                        </div>
+
+                                        <div class="row cont">
+                                            <div class="col-md">
+                                                <% if(fromPlan == true) { %>
+                                                    <% if(visits.includes(place.id)){ %>
+                                                        <span class="places-poi-in-plan-info"><i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Scheduled for <%= place.schedule %> </span></span>
+                                                    <% } else{ %>
+                                                        <a class="btn-add-visit-modal" data-toggle="modal" data-target="#add-visit-modal" data-title="<%= place.name %>" data-poi="<%= place.id %>"><i class="far fa-calendar-alt"></i><span style="padding-left: 10px;">Add to your trip</span></a>
+                                                    <% } %>
+                                                <% } %>
+                                            </div>
+                                            <div class="col-md">
+                                                <div class="text-right">
+                                                    <a class="places-poi-find-more" href="/place?id=<%= place.id %>">Find out more</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="row">
-                                <div class="col-md-6"></div>
-                                <div class="col-md-6">
-                                    <!-- botão para adicionar ao plano -->
-                                    <div class="form-group text-right">
-                                        <button type="button" class="btn btn-warning" onclick="loadPlace('<%= place.id %>')" style="color: white;"><i class="fas fa-search"></i><span style="padding-left: 10px;">Find out more</span></button>
-                                        <% if(fromPlan == true) { %>
-                                            <% if(visits.includes(place.id)){ %>
-                                                <button type="button" style="background-color: #dcf2e2; color: black;" class="btn btn-success" disabled><i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Already in trip</span></button>
-                                            <% } else{ %>
-                                                <button class="btn btn-success btn-add-visit-modal" data-toggle="modal" data-target="#add-visit-modal" data-title="<%= place.name %>" data-poi="<%= place.id %>"><i class="far fa-calendar-alt"></i><span style="padding-left: 10px;">Add to your trip</span></button>
-                                            <% } %>
-                                        <% } %>
-                                    </div>
-                                </div> 
-                            </div>
-
                             
                         </div>
                         <script>
-                            var place_place_id = "<%= place.place_id %>";
-                            var place_id = "<%= place.id %>";
-                            getPlaceDetails(place_place_id, place_id);
+                            getPlaceDetails("<%= place.place_id %>", "places-poi-<%= count %>-img");
                         </script>
 
                     </div>
 
                     <br>
 
+                    <% count = count + 1 %>
                     <% }); %>
 
 
@@ -223,20 +247,27 @@
                         <div class="card-body">
                             <h5 class="card-title"><b>Filter</b></h5>
                             <p><b>Type of place</b></p>
-                            <div class="form-group">
-                                <input type="checkbox" name="hotels-filter" value="Hotels" id="hotels-filter" checked><i style="padding-left: 10px;" class="fas fa-bed"></i> Hotels
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" name="hotels-filter" value="Hotels" class="custom-control-input" id="hotels-filter" checked>
+                                <label class="custom-control-label" for="hotels-filter"><i style="padding-left: 10px;" class="fas fa-bed"></i> Hotels</label>
                                 <br>
-                                <input type="checkbox" name="restaurants-filter" value="Restaurants" id="restaurants-filter" checked><i style="padding-left: 10px;" class="fas fa-utensils"></i> Restaurants
+                                <input type="checkbox" name="restaurants-filter" value="Restaurants" class="custom-control-input" id="restaurants-filter" checked>
+                                <label class="custom-control-label" for="restaurants-filter"><i style="padding-left: 10px;" class="fas fa-utensils"></i> Restaurants</label>
                                 <br>
-                                <input type="checkbox" name="museums-filter" value="Museums" id="museums-filter" checked><i style="padding-left: 10px;" class="fas fa-archway"></i> Museums
+                                <input type="checkbox" name="museums-filter" value="Museums" class="custom-control-input" id="museums-filter" checked>
+                                <label class="custom-control-label" for="museums-filter"><i style="padding-left: 10px;" class="fas fa-archway"></i> Museums</label>
                                 <br>
-                                <input type="checkbox" name="churchs-filter" value="Museums" id="churchs-filter" checked><i style="padding-left: 10px;" class="fas fa-church"></i> Churchs
+                                <input type="checkbox" name="churchs-filter" value="Churchs" class="custom-control-input" id="churchs-filter" checked>
+                                <label class="custom-control-label" for="churchs-filter"><i style="padding-left: 10px;" class="fas fa-church"></i> Churchs</label>
                                 <br>
-                                <input type="checkbox" name="pois-filter" value="Museums" id="pois-filter" checked><i style="padding-left: 10px;" class="fas fa-monument"></i> Points of Interest
+                                <input type="checkbox" name="pois-filter" value="Points of Interest" class="custom-control-input" id="pois-filter" checked>
+                                <label class="custom-control-label" for="pois-filter"><i style="padding-left: 10px;" class="fas fa-monument"></i> Points of Interest</label>
                                 <br>
-                                <input type="checkbox" name="parks-filter" value="Museums" id="parks-filter" checked><i style="padding-left: 10px;" class="fas fa-tree"></i> Parks
+                                <input type="checkbox" name="parks-filter" value="Parks" class="custom-control-input" id="parks-filter" checked>
+                                <label class="custom-control-label" for="parks-filter"><i style="padding-left: 10px;" class="fas fa-tree"></i> Parks</label>
                             </div>
 
+                            <br>
 
                             <div id="rating-filter">
                                 <p><b>Rating</b></p>
@@ -254,35 +285,6 @@
                     
                     <br>
 
-                    <div class="card" id="review-div">
-                        <div class="card-body">
-                            <h5 class="card-title"><b>User Reviews</b></h5>
-
-                            <!--
-                            <div class="card" style="height: 150px;">
-                                <div class="row">
-                                    <div class="col-md-4 text-center" style="margin: auto;">
-                                        <img src="/img/perfil.jpg" class="img-fluid review-img">
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body">
-                                            <div class="text-right">
-                                                <small>1 hour ago</small>
-                                            </div>
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <h6 class="mb-1">Eduardo Silva</h6>
-                                            </div>
-                                            <p class="mb-1">skdjgdkfjgdgfd</p>                                                                        
-                                            
-                                            <div class="text-right">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>-->
-                                    
-                        </div>
-                    </div>
 
 
 

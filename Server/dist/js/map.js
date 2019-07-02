@@ -2,106 +2,94 @@ var map;
 var service;
 var infowindow;
 
-var plan;
+/* variables to draw the itinerary */
+var directionsService;
+var directionsDisplay;
+
 var weekdays = [];
 var plan_days = [];
 var day;
 var place_info = [];
-var visits;
 
-var places = {};
-var suggested_places = {};
-var hotels = {};
+var places = {}; // dictionary with all visits
+var suggested_places = {}; // dictionary with all suggested places
+var hotels = {}; // dictionary with all suggested hotels
 
+/* variables to store map markers and markers cluster */
 var markers = [];
-var marker_list = [];
+var markerList = [];
+var markerCluster;
+var carMarkerAnimation = [];
 
+/* colors for differentes types of visits */
 var visits_color = '#74bb82';
 var suggested_visits_color = '#ac48db';
 var hotels_color = '#2079d8';
 
-var directionsService;
-var directionsDisplay;
 
 /* load map */
-function initMap(city) {
-    var coordinates;
+function initMap(latitude, longitude) {
 
-    if(city == "Barcelona")
-        city = "Barcelona, Spain";
+    var position = {lat: parseFloat(latitude), lng: parseFloat(longitude)};
 
-    // show map in the city specified 
-    var geocoder = new google.maps.Geocoder();
-    geocoder.geocode({
-        'address': city
-    }, function(results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-            var Lat = results[0].geometry.location.lat();
-            var Lng = results[0].geometry.location.lng();
-            var coordinatesFromAddress = {
-                zoom: 12,
-                center: new google.maps.LatLng(Lat, Lng)
-            };
-            directionsService = new google.maps.DirectionsService();
-            directionsDisplay = new google.maps.DirectionsRenderer();
+    map = new google.maps.Map(document.getElementById('full-map'), {
+        center: position,
+        zoom: 12,
+    });
 
-            map = new google.maps.Map(document.getElementById('full-map'), coordinatesFromAddress);
+    directionsService = new google.maps.DirectionsService();
+    directionsDisplay = new google.maps.DirectionsRenderer();
+    directionsDisplay.setMap(map);
 
-            directionsDisplay.setMap(map);
-
-            // Apply new JSON when the user chooses to hide/show features.
-            var styles = {
-                default: null,
-                hide: [
-                    {
-                        featureType: 'poi',
-                        stylers: [{visibility: 'off'}]
-                    },
-                ]
-            };
-            map.setOptions({styles: styles['hide']});
-
-            google.maps.event.addListenerOnce(map, 'idle', function () {
-                for(var key in places){
-                    data = {color: visits_color, icon: getIcon(places[key]["poi_type"])};
-                    createMarker(places[key]['coordinates'], places[key]['name'], data, "visits");
-                }
-
-                for(var key in suggested_places){
-                    data = {color: suggested_visits_color, icon: getIcon(suggested_places[key]["poi_type"])};
-                    createMarker(suggested_places[key]['coordinates'], suggested_places[key]['name'], data, "suggestions");
-                }
-
-                for(var key in hotels){
-                    data = {color: hotels_color, icon: getIcon(hotels[key]["poi_type"])};
-                    createMarker(hotels[key]['coordinates'], hotels[key]['name'], data, "hotels");
-                }
-
-            /* Markers clustering */
-            var markerCluster = new MarkerClusterer(map, markers,
-            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
-
-            });
+    // Style map
+    var styles = {
+        default: null,
+        hide: [
+            {
+                featureType: 'poi',
+                stylers: [{visibility: 'off'}]
+            },
+        ]
+    };
+    map.setOptions({styles: styles['hide']});
 
 
-            loadItinerary(visits, weekdays[day], plan_days[day]);
+    google.maps.event.addListenerOnce(map, 'idle', function () {
 
-        } 
-
-        else {
-            alert("Something got wrong " + status);
+        for(var key in places){
+            if(places[key].day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
+                data = {color: visits_color, icon: getIcon(places[key]["poi_type"])};
+                createMarker(places[key]['coordinates'], places[key]['name'], data, "visits");
+            }
         }
+
+        /*for(var key in suggested_places){
+            data = {color: suggested_visits_color, icon: getIcon(suggested_places[key]["poi_type"])};
+            createMarker(suggested_places[key]['coordinates'], suggested_places[key]['name'], data, "suggestions");
+        }
+
+        for(var key in hotels){
+            data = {color: hotels_color, icon: getIcon(hotels[key]["poi_type"])};
+            createMarker(hotels[key]['coordinates'], hotels[key]['name'], data, "hotels");
+        }*/
+
+        /* Markers clustering */
+        markerCluster = new MarkerClusterer(map, markers,
+        {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+
+        loadItinerary();    
+
     });
 
     infoWindow = new google.maps.InfoWindow;
-
     loadNavbar();
 
 }
 
 
+
 function createMarker(local, name, data, type){
-    if(marker_list.includes(name))
+    if(markerList.includes(name))
       return;
     
     var coordinates = new google.maps.LatLng({lat: parseFloat(local.split(', ')[0]), lng: parseFloat(local.split(', ')[1])}); 
@@ -144,11 +132,44 @@ function createMarker(local, name, data, type){
         });
 
     }
-
     
     markers.push(marker);
-    marker_list.push(marker.title);
+    markerList.push(marker.title);
   }
+
+
+// Deletes all markers in the map
+function clearMarkers() {
+    markerCluster.clearMarkers();
+
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+    }
+
+    markers = [];
+    markerList = [];
+}
+
+
+// update markers in the map in function of the visit day displayed
+function updateMarkers(){
+    clearMarkers();
+
+    for(var key in places){
+        if(places[key].day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
+            data = {color: visits_color, icon: getIcon(places[key]["poi_type"])};
+            createMarker(places[key]['coordinates'], places[key]['name'], data, "visits");
+        }
+    }
+
+    /* Markers clustering */
+    markerCluster = new MarkerClusterer(map, markers,
+    {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+    
+    /* update itinerary */
+    loadItinerary();
+}
+
 
 function renderDirections(result) { 
     var directionsRenderer = new google.maps.DirectionsRenderer(); 
@@ -171,25 +192,53 @@ function calcRoute(start, end, waypts) {
         optimizeWaypoints: true,  
         travelMode: 'DRIVING'
     };
-
-    console.log(request);
     
     directionsService.route(request, function(result, status) {
       if (status == 'OK') {
-        console.log(result);
         directionsDisplay.setDirections(result);
+        animateItinerary(result);
       }
     });
   }
 
 
+  /* function to show the itinerary being traversed */
+  function animateItinerary (response){
+    var path = response.routes[0].overview_path;
+    var maxIter=path.length;
 
+    /* if exists car markers in the map, remove them */
+    for (var i = 0; i < carMarkerAnimation.length; i++) {
+        carMarkerAnimation[i].setMap(null);
+    }
+    carMarkerAnimation = [];
 
+    /* create car marker */
+    carMarker=new google.maps.Marker({
+       position: path[0],
+       map: map, 
+       icon: "img/car.png"
+    });
+
+    carMarkerAnimation.push(carMarker); 
+
+    var delay = 20, count = 0;
+    function delayed () {
+      count += 1;
+      carMarker.setPosition({lat:path[count].lat(),lng:path[count].lng()});
+      if (count < maxIter-1) {
+        setTimeout(delayed, delay);
+      }
+    }
+    delayed();
+}  
 
 function loadPlan(plan_array, days){
     plan = plan_array;
     day = 0;
     days = days.split(',');
+
+    dif_days = days.length / 2 - 1;
 
     for(var i=1; i < days.length ; i+=2){
         plan_days.push(days[i]);
@@ -199,41 +248,35 @@ function loadPlan(plan_array, days){
         weekdays.push(days[i] + days[i+1]);
     }
 
-    visits = [];
     for(var j=0 ; j < plan.length ; j++){
         p = JSON.parse(plan[j]);
-
-        places[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number, 'poi_type': p.poi_type};
-
-        if(p.day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
-            visits.push(p);
-        }
+        places[p.name] = p;
     }
 
+    document.getElementById('previous-day-btn').disabled = true;
+
+    if(day + 1 >= weekdays.length){
+        document.getElementById('next-day-btn').disabled = true;
+    }
 }
 
 
-function loadItinerary(visits, day, checkDay){
+
+function loadItinerary(){
     var visits_tmp = [];
-    for(var i=0 ; i < visits.length; i++){
-        if(visits[i].day.replace(/\s/g, '') == checkDay.replace(/\s/g, '')){
-            
-            visits_tmp.push(visits[i]);
 
+    for(var key in places){
+        if(places[key].day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
+            visits_tmp.push(places[key]);
         }
-
     }
 
     var waypoints = [];
     for(var i=1; i < visits_tmp.length - 1; i++){
-        waypoints.push({ stopover: true, location: { placeId: visits[i].place_id } });
+        waypoints.push({ stopover: true, location: { placeId: visits_tmp[i].place_id } });
     }
 
     calcRoute(visits_tmp[0].place_id, visits_tmp[visits_tmp.length-1].place_id, waypoints);
-
-
-
-
 }
 
 
@@ -257,6 +300,42 @@ function loadHotels(suggested_hotels){
     }
 }
 
+
+function nextDay(){
+    if(day == plan_days.length){
+        return;
+    }
+    day = day + 1;
+
+    document.getElementById('visit-day').innerText = weekdays[day];
+
+    document.getElementById('previous-day-btn').disabled = false;
+
+    if(day + 1 >= weekdays.length){
+        document.getElementById('next-day-btn').disabled = true;
+    }
+
+    updateMarkers();
+
+}
+
+function previousDay(){
+    if(day == 0){
+        return;
+    }
+    day = day - 1;
+
+    document.getElementById('visit-day').innerText = weekdays[day];
+
+    document.getElementById('next-day-btn').disabled = false;
+
+    if(day - 1 < 0){
+        document.getElementById('previous-day-btn').disabled = true;
+    }
+
+    updateMarkers();
+
+}
 
 
 

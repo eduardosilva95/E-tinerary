@@ -128,6 +128,11 @@ hr {
 }
 
 
+.navbar-places {
+  background-color:  rgba(0,0,0,0.5) !important;
+}
+
+
 .navbar.scrolled {
   background-color: #263238 !important;
   transition: background-color 200ms linear;
@@ -530,17 +535,54 @@ hr {
   height: 100%;
 }
 
-.card-body .row {
-  height: 100%;
+.dropdown-sort-places.active{
+  background-color: #ffc107;
 }
 
 .list-places-img {
-  height: 100%;
-  width: 100%;
   max-width: 250px;
   max-height: 180px;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px; 
 }
 
+.places-poi-description {
+  width: 100%;
+  color: #80868b;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: justify;
+  text-justify: newspaper;
+  line-height: 1.5em;
+  max-height: 6.2em;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+.places-poi-find-more {
+  font-style: italic;
+  color: #f4a029;
+}
+
+.places-poi-find-more:hover {
+  color: #ffc107;
+  text-decoration: none;
+}
+
+.places-poi-in-plan-info {
+  font-style: italic;
+  color: green;
+
+}
+
+.btn-add-visit-modal {
+  font-style: italic;
+  color: green !important;
+  cursor: pointer;
+}
 
 .has-search .form-control {
   padding-left: 2.375rem;
@@ -614,6 +656,12 @@ hr {
   background: #ffc107;
   border-color: #ffc107;
 }
+
+.place-info{
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px
+}
+
 
 #place-description{
   height: 300px;

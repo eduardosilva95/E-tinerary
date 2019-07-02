@@ -1,11 +1,8 @@
-//Set up some of our variables.
-var map; //Will contain map object.
+var map; 
 
-/* load map */
+/* load map with a marker in the coordinates submitted */
 function initMap(latitude, longitude) {
     var position = {lat: parseFloat(latitude), lng: parseFloat(longitude)};
-
-    console.log(position);
 
     map = new google.maps.Map(document.getElementById('map'), {
         center: position,
@@ -17,4 +14,25 @@ function initMap(latitude, longitude) {
     var marker = new google.maps.Marker({position: position, map: map});
 
     loadNavbar();
+}
+
+
+$(function () {
+    $('#btn-reject-modal').on('click', function () {
+        $('#modal-reject-trip-title').text($(this).data('title'));
+    });
+
+    $('#btn-accept-modal').on('click', function () {
+        $('#modal-accept-trip-title').text($(this).data('title'));
+    });
+});
+
+
+function acceptPOI(){
+
+}
+
+
+function rejectPOI(){
+
 }

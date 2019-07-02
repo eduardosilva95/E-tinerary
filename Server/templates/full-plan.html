@@ -21,68 +21,69 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
     
-    <script type="text/javascript" src="js/plan-2.js"></script>
+    <script type="text/javascript" src="js/plan.js"></script>
     <script type="text/javascript" src="js/login.js"></script>
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
     <script type="text/javascript" src="js/map-font-icons.js"></script>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://apis.google.com/js/platform.js"></script>
 
     
   </head>
   <body onload="loadNavbar();">
         <!-- header navbar -->
         <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
-            <a class="navbar-brand" href="./">HomePage</a>
+            <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-              <ul class="navbar-nav ml-auto">
-                
-                  <li class="nav-item">
-                    <a class="nav-link" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
-                  </li>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                    <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+                    </li>
                 
                 <li class="nav-item">
-                  <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                    <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+                    <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+                    <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
                     </a>
                     <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
-                      <a class="dropdown-item" href="./about-us">Aplicacao</a>
-                      <a class="dropdown-item" href="./help">Help</a>
+                        <a class="dropdown-item header" href="./about-us">Aplicacao</a>
+                        <a class="dropdown-item header" href="./help">Help</a>
                     </div>
                 </li>
-              </ul>
-              <ul class="navbar-nav ml-auto">
+                </ul>
+                <ul class="navbar-nav ml-auto">
                 <li>
-                  <div id="login-user">
+                    <div id="login-user">
                     <div id="login" style="display: none;">
-                      <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                        <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
                     </div>
                     <div id="profile" class="dropleft" style="display: none;">
                         <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <img id="user-profile-pic" class="rounded-circle border border-light">
                         </a>
-                      <div class="dropdown-menu" aria-labelledby="profile-btn">
-                        <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                        <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                        <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
+                        <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                        <a class="dropdown-item header" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                        <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
+                        <a class="dropdown-item header" href="./review-poi"><i class="fas fa-edit"></i><span style="padding-left: 10px;">Review POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
                         <div class="dropdown-divider"></div>
-                        <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
-                      </div>   
+                        <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                        </div>   
                     </div>        
-                  </div>
+                    </div>
                 </li>
-              </ul>
+                </ul>
             </div>
         </nav>
 
@@ -117,19 +118,6 @@
             </div>
             
             
-            <div class="cont row">
-                <div class="col-md-2">
-                </div>
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-body text-center">
-                        <h6 style="font-weight: normal;">Choose your destination <span class="fas fa-chevron-right" aria-hidden="true"></span> Pick your dates <span class="fas fa-chevron-right" aria-hidden="true"></span> <b>Personalize your plan</b> <span class="fas fa-chevron-right" aria-hidden="true"></span> Save your plan </h6>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                </div>
-            </div>
             
 
             <div class="cont">
@@ -213,8 +201,9 @@
                         <hr>
                     </div>
                     
+                    
+                    <!-- Sugestions div -->
                     <div class="col-md-4" style="padding-top: 40px;">
-                        <!-- Sugestions div -->
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title text-center"><b>Visit also in <%= city %></b></h5>
@@ -385,18 +374,55 @@
                             <img id="info-modal-img" height="200px;">
                         </div>
                         <br><br>
-                        <div id="place-info"> 
-                            <ul>
-                                <li><strong>City: </strong><p id="modal-info-city"></p></li>
-                                <li><strong>Address: </strong><p id="modal-info-addr"></p></li>
-                                <li><strong>Coordinates: </strong><p id="modal-info-coord"></p></li>
-                                <li><strong>Phone number: </strong><p id="modal-info-phone"></p></li>
-                                <li><strong>Website: </strong><br><a id="modal-info-website" target="_blank"></a></li>
-                            </ul>
+
+                        <nav class="nav nav-pills flex-column flex-sm-row">
+                            <a class="flex-sm-fill text-sm-center nav-link tab active" id="pills-general-info-tab" data-toggle="pill" href="#place-info" role="tab" aria-controls="place-info" aria-selected="true">General Information</a>
+                            <a class="flex-sm-fill text-sm-center nav-link tab" id="pills-more-info-tab" data-toggle="pill" href="#place-more-info" role="tab" aria-controls="place-more-info" aria-selected="false">More info</a>
+                        </nav>
+
+                        <br>
+
+                        <div class="tab-content" id="pills-tabContent">
+                            <div class="tab-pane fade show active" id="place-info" role="tabpanel" aria-labelledby="pills-general-info-tab">
+                                <ul>
+                                    <li><strong><i class="fas fa-city"></i> City: </strong><p id="modal-info-city"></p></li>
+                                    <li><strong><i class="fas fa-map-marker-alt"></i> Address: </strong><p id="modal-info-addr"></p></li>
+                                    <li><strong><i class="fas fa-map-pin"></i> Coordinates: </strong><p id="modal-info-coord"></p></li>
+                                    <li><strong><i class="fas fa-phone"></i> Phone number: </strong><p id="modal-info-phone"></p></li>
+                                    <li><strong><i class="fas fa-globe-europe"></i> Website: </strong><br><a id="modal-info-website" target="_blank"></a></li>
+                                </ul>
+                            </div>
+
+                            <div class="tab-pane fade" id="place-more-info" role="tabpanel" aria-labelledby="pills-more-info-tab">
+                                <ul>
+                                    <li><strong><i class="fas fa-map-marked-alt"></i> Plans: </strong><p id="modal-info-number-plans"></p></li>
+                                    <li><strong>
+                                        <i class="fas fa-star"></i> Rating: </strong>
+                                        <div class="place-etinerary-div" id="place-rating">
+                                            
+                                        </div>
+                                    </li>
+                                    <li><strong>
+                                        <i class="fab fa-accessible-icon"></i> Accessibility: </strong>
+                                        <div class="place-etinerary-div" id="place-accessibility">
+                                        </div>
+                                    </li>
+                                    <li><strong>
+                                        <i class="fas fa-lock"></i> Security: </strong>
+                                        <div class="place-etinerary-div" id="place-security">
+                                        </div>
+                                    </li>
+                                    <li><strong><i class="far fa-clock"></i> Duration: </strong><p id="modal-info-duration"></p></li>
+                                    <li><strong><i class="fas fa-euro-sign"></i> Price: </strong><p id="modal-info-price"></p></li>                                   
+                                </ul>
+                            </div>
                         </div>
+
+
                     </div>
                     <div class="modal-footer">
-                        <button id="modal-find-more-btn" type="submit" class="btn btn-warning" style="color: white;" data-dismiss="modal"><i class="fas fa-search"></i><span style="padding-left: 10px;">Find out more</span></button>
+                        <button id="modal-find-more-btn" type="button" class="btn btn-warning" style="color: white;" data-dismiss="modal"><i class="fas fa-search"></i><span style="padding-left: 10px;">Find out more</span></button>
+                        <button id="add-visit-btn" type="button" class="btn btn-success" style="color: white; display: none;" data-dismiss="modal"><i class="fas fa-calendar-alt"></i><span style="padding-left: 10px;">Add to the trip</span></button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Close</span></button>
                     </div>
                 </div>

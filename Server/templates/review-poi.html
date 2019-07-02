@@ -91,74 +91,95 @@
 
         <div class="container-fluid cont" style="min-height: 100%;">
             <div class="card card-body bg-light">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h4><b>POI Photo</b></h4>
-                        
-                        <img id="photo-preview" style="width: 90%; height: 400px;" src="<%= photo %>">                   
+              <div class="text-left">
+                <h3><b>Review Point of Interest</b></h3>
+              </div>
+            </div>
 
-                        <br>
+            <div class="cont">
+              <div class="card card-body bg-light">
+                  <div class="row">
+                      <div class="col-md-6">
+                          <h4><b>POI Photo</b></h4>
+                          
+                          <img id="photo-preview" style="width: 90%; height: 400px;" src="<%= photo %>">                   
 
-                        <div class="cont">
-                            <h4><b>POI Location</b></h4>
+                          <br>
 
-                            <div id="map" style="width: 650px; height: 400px;"></div>
+                          <div class="cont">
+                              <h4><b>POI Location</b></h4>
 
-                            <br>
+                              <div id="map" style="width: 650px; height: 400px;"></div>
 
-                        </div>
-                    </div>
-    
-                    <div class="col-md-6">
-                                
-                        <br>
+                              <br>
 
-                        <div class="form-group">
-                            <label for="poi-title"><h4>POI Title</h4></label>
-                            <p><span class="profile-text" id="poi-title"><%= name %></span></p>
-                        </div>
-                        
+                          </div>
+                      </div>
+      
+                      <div class="col-md-6">
+                                  
+                          <br>
 
-                        <div class="form-group">
-                            <label for="poi-address"><h4>POI Address</h4></label>
-                            <p><span class="profile-text" id="poi-address"><%= address %></span></p>
-                        </div>
+                          <div class="form-group">
+                              <label for="poi-title"><h4>POI Title</h4></label>
+                              <p><span class="profile-text" id="poi-title"><%= name %></span></p>
+                          </div>
 
-                        <div class="form-group">
-                            <label for="poi-type"><h4>POI Type</h4></label>
-                            <p><span class="profile-text" id="poi-type"><%= poi_type %></span></p>
-                        </div>
+                          <br>
+                          
 
-                        <div class="form-group">
-                            <label for="poi-city"><h4>POI City</h4></label>
-                            <p><span class="profile-text" id="poi-city"><%= city %></span></p>
-                        </div>
+                          <div class="form-group">
+                              <label for="poi-address"><h4>POI Address</h4></label>
+                              <p><span class="profile-text" id="poi-address"><%= address %></span></p>
+                          </div>
 
-                        <br>
+                          <br>
 
-                        <div class="form-group">
-                            <label for="poi-description"><h4>POI Description</h4></label>
-                            <p><span class="profile-text" id="poi-description"><%= description %></span></p>
-                        </div>
+                          <div class="form-group">
+                              <label for="poi-type"><h4>POI Type</h4></label>
+                              <p><span class="profile-text" id="poi-type"><%= poi_type %></span></p>
+                          </div>
 
-                        <div class="form-group">
-                            <label for="poi-website"><h4>POI Website</h4></label>
-                            <p><span class="profile-text" id="poi-website"><%= website %></span></p>
-                        </div>
+                          <br>
 
-                        <div class="form-group">
-                            <label for="poi-phone-number"><h4>POI Phone Number</h4></label>
-                            <p><span class="profile-text" id="poi-phone-number"><%= phone_number %></span></p>
-                        </div>
+                          <div class="form-group">
+                              <label for="poi-city"><h4>POI City</h4></label>
+                              <p><span class="profile-text" id="poi-city"><%= city %></span></p>
+                          </div>
 
-                    </div>
-                </div>
-    
-                <div class="form-group text-right">
-                    <button type="button" class="btn btn-danger"><i class="fas fa-times"></i><span style="padding-left: 10px;">Reject</span></button>
-                    <button type="button" class="btn btn-success"><i class="fas fa-check"></i><span style="padding-left: 10px;">Accept</span></button>
-                </div>
-    
+                          <br>
+
+                          <div class="form-group">
+                              <label for="poi-description"><h4>POI Description</h4></label>
+                              <p><span class="profile-text" id="poi-description"><%= description %></span></p>
+                          </div>
+
+                          <br>
+
+                          <div class="form-group">
+                              <label for="poi-website"><h4>POI Website</h4></label>
+                              <p><span class="profile-text" id="poi-website"><%= website %></span></p>
+                          </div>
+
+                          <br>
+
+                          <div class="form-group">
+                              <label for="poi-phone-number"><h4>POI Phone Number</h4></label>
+                              <p><span class="profile-text" id="poi-phone-number"><%= phone_number %></span></p>
+                          </div>
+
+                      </div>
+                  </div>
+      
+                  <div class="form-group text-right">
+                      <button type="button" class="btn btn-danger" id="btn-reject-modal" data-toggle="modal" data-target="#reject-modal" data-title="<%= name %>"><i class="fas fa-times"></i><span style="padding-left: 10px;">Reject</span></button>
+                      <button type="button" class="btn btn-success" id="btn-accept-modal" data-toggle="modal" data-target="#accept-modal" data-title="<%= name %>"><i class="fas fa-check"></i><span style="padding-left: 10px;">Accept</span></button>
+                  </div>
+      
+              </div>
+
+              <br><br>
+              
             </div>
         </div>
 
@@ -228,26 +249,105 @@
       </div>
 
 
-        <!-- Footer -->
-        <footer class="footer">
+      <!-- Accept Modal -->
+      <div class="modal fade" id="accept-modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Accept POI: <span id="modal-accept-trip-title"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                  <div class="form-group">
+                      <label for="input-google-place-id">Google Place ID <sup aria-describedby="mandatoryHelp">*</sup></label>
+                      <input type="text" class="form-control" id="input-google-place-id" placeholder="Google Place ID" required>
+                  </div>
+
+                  <div class="form-group">
+                      <label for="input-google-rating">Google Rating <sup aria-describedby="mandatoryHelp">*</sup></label>
+                      <input type="text" class="form-control" id="input-google-rating" placeholder="Google Rating" required>
+                  </div>
+
+                  <div class="form-group">
+                      <label for="input-google-reviews">Google Number of Reviews <sup aria-describedby="mandatoryHelp">*</sup></label>
+                      <input type="text" class="form-control" id="input-google-reviews" placeholder="Google Number of Reviews" required>
+                  </div>
+
+                  <div class="form-group">
+                      <label for="input-description">Description</label>
+                      <textarea class="form-control" id="input-description" rows="3" placeholder="Enter a description for the POI"></textarea>
+                  </div>
+
+                  <div class="form-group">
+                      <label for="input-website">Website</label>
+                      <input type="text" class="form-control" id="input-website" placeholder="Enter the URL for the website of the POI">
+                  </div>
+
+                  <div class="form-group">
+                      <label for="input-phone-number">Phone Number</label>
+                      <input type="tel" class="form-control" id="input-phone-number" placeholder="Enter the phone number of the POI ">
+                  </div>
+
+                  <div class="text-right">
+                    <small id="mandatoryHelp" class="form-text text-muted"><sup>*</sup> Mandatory fields</small>
+                  </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="confirm-accept-btn" onclick="acceptPOI();"><i class="fas fa-check"></i><span style="padding-left: 10px;">Confirm</span></button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
+                </div>
+            </div>
+        </div>
+      </div>
+
+
+      <!-- Reject Modal -->
+      <div class="modal fade" id="reject-modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Reject POI: <span id="modal-reject-trip-title"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure that you want to reject this Point of Interest ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="confirm-reject-btn" onclick="rejectPOI();"><i class="fas fa-check"></i><span style="padding-left: 10px;">Yes</span></button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">No</span></button>
+                </div>
+            </div>
+        </div>
+      </div>
+
+
+
+
+      <!-- Footer -->
+      <footer class="footer">
+        <!-- Footer Elements -->
+
+        <div id="social">
+            <a class="facebookBtn smGlobalBtn" href="#" ></a>
+            <a class="twitterBtn smGlobalBtn" href="#" ></a>
+            <a class="googleplusBtn smGlobalBtn" href="#" ></a>
+            <a class="linkedinBtn smGlobalBtn" href="#" ></a>
+            <a class="instagramBtn smGlobalBtn" href="#" ></a>
+          </div>
           <!-- Footer Elements -->
+      
+          <!-- Copyright -->
+          <div class="footer-copyright"> 2019 Copyright:
+            <a href="">&copy; Aplicacao, todos os direitos reservados</a>
+          </div>
 
-          <div id="social">
-              <a class="facebookBtn smGlobalBtn" href="#" ></a>
-              <a class="twitterBtn smGlobalBtn" href="#" ></a>
-              <a class="googleplusBtn smGlobalBtn" href="#" ></a>
-              <a class="linkedinBtn smGlobalBtn" href="#" ></a>
-              <a class="instagramBtn smGlobalBtn" href="#" ></a>
-            </div>
-            <!-- Footer Elements -->
-        
-            <!-- Copyright -->
-            <div class="footer-copyright"> 2019 Copyright:
-              <a href="">&copy; Aplicacao, todos os direitos reservados</a>
-            </div>
-
-        </footer>
-        <!-- Footer -->
+      </footer>
+      <!-- Footer -->
 
 
   

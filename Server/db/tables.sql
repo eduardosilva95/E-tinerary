@@ -6,7 +6,7 @@ CREATE TABLE User (
 	picture BLOB,
     type_use VARCHAR(255) DEFAULT 'Free' NOT NULL,
     PRIMARY KEY(id),
-    CHECK(type_use = 'Free' or type_use = 'Premium'),
+    CHECK(type_use = 'Free' or type_use = 'Premium' or type_use = 'Ultra Premium'),
     UNIQUE(username)
 );
 

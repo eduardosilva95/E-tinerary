@@ -89,8 +89,6 @@
                     <div class="card card-body bg-light">
                         <div class="text-left">
                             <h3><b>Review Points of Interest</b></h3>
-                            
-    
                         </div>
                     </div>
                 </div>
@@ -100,8 +98,19 @@
                         <div>
 
                             <br>
+
+                            <% if(poi_list.lenght == 0) { %>
+                              <div class="card" >
+                                <br>
+                                <div class="text-center" style="margin: auto;">
+                                    <i class="fas fa-comment-slash fa-3x" style="color: #dddddd;"></i>
+                                </div>
+                                <div class="card-body text-center empty-review">
+                                    <p class="mb-1">No submitions available to be reviewed </p>   
+                                </div>
+                              </div>
+                            <% } %>
     
-                            <% count = 0 %>
                             <% poi_list.forEach(function(poi) { %>
                             <div class="card" style="height: 150px;">
                                 <div class="row">
@@ -109,26 +118,21 @@
                                         <img class="img-fluid card-img" src="<%= poi.photo %>" alt="" style="height: 148px; width: 100%;">
                                     </div>
                                     <div class="col-md-9">
-                                        <div class="card-body row">
-                                            <div class="col-md-8">
-                                                <div class="text-left">
-                                                    <a href="" class="trip-link"><span class="card-title"><b><%= poi.name %></b></span></a>
-                                                    <br>
-                                                    <span style="color: #767676;"><%= poi.city %></span>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                
-                                            </div>
+                                        <div class="card-body">
+                                          <div class="text-left">
+                                              <a href="/review-poi?id=<%= poi.id %>" class="trip-link"><span class="card-title"><b><%= poi.name %></b></span></a>
+                                              <br>
+                                              <span style="color: #767676;"><%= poi.city %></span>
+                                              <br><br>
+                                          </div>
+                                          <div class="text-right">
+                                              <a class="btn btn-warning" href="/review-poi?id=<%= poi.id %>" style="color: white;"><i class="fas fa-search"></i><span style="padding-left: 10px;">Review this POI</span></a>
+                                          </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-    
                             <br>
-    
-                            <% count = count + 1 %>
-                            
                             <% }); %> 
                         </div>
                             

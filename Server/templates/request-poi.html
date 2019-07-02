@@ -106,7 +106,7 @@
                     <div class="row">
                         <div class="col-md-6">
 
-                            <h4><b>Choose a photo<sup>*</sup></b></h4>
+                            <h4><b>Choose a photo <sup aria-describedby="mandatoryHelp">*</sup></b></h4>
                             
                             <img id="photo-preview" style="width: 90%; height: 400px;" src="img/no-photo-found.png">
 
@@ -128,7 +128,7 @@
                             <br>
 
                             <div class="cont">
-                                <h4><b>Pick location</b></h4>
+                                <h4><b>Pick location <sup aria-describedby="mandatoryHelp">*</sup></b></h4>
 
                                 <div id="map" style="width: 650px; height: 400px;"></div>
 
@@ -145,18 +145,18 @@
                             <br>
 
                             <div class="form-group">
-                              <label for="input-poi-title"><h4>Title<sup>*</sup></h4></label>
+                              <label for="input-poi-title"><h4>Title <sup aria-describedby="mandatoryHelp">*</sup></h4></label>
                               <input type="text" class="form-control" id="input-poi-title" name="title" placeholder="Enter a title for the POI" required>
                             </div>
                             
 
                             <div class="form-group">
-                              <label for="input-poi-address"><h4>Address<sup>*</sup></h4></label>
+                              <label for="input-poi-address"><h4>Address <sup aria-describedby="mandatoryHelp">*</sup></h4></label>
                               <input type="text" class="form-control" id="input-poi-address" name="address" placeholder="Enter an address for the POI" required>
                             </div>
 
                             <div class="form-group">
-                              <label for="input-poi-type"><h4>Type<sup>*</sup></h4></label>
+                              <label for="input-poi-type"><h4>Type <sup aria-describedby="mandatoryHelp">*</sup></h4></label>
                               <select class="form-control" id="input-poi-type" name="poi_type" required>
                                 <option>Select a type</option>
                                 <option>Museum</option>
@@ -176,7 +176,7 @@
                             </div>
 
                             <div class="form-group">
-                              <label for="input-poi-city"><h4>City<sup>*</sup></h4></label>
+                              <label for="input-poi-city"><h4>City <sup aria-describedby="mandatoryHelp">*</sup></h4></label>
                               <select class="form-control" id="input-poi-city" name="city" required>
                                   <option>Select a city</option>
                               </select>
@@ -200,7 +200,7 @@
                             </div>
 
                             <div class="form-group">
-                              <label><h4>Coordinates<sup>*</sup></h4></label>
+                              <label><h4>Coordinates <sup aria-describedby="mandatoryHelp">*</sup></h4></label>
                               <div class="form-row">
                                 <div class="col">
                                   <input type="text" class="form-control" id="input-poi-latitude" name="latitude" placeholder="Latitude" required>
@@ -209,6 +209,12 @@
                                   <input type="text" class="form-control" id="input-poi-longitude" name="longitude" placeholder="Longitude" required>
                                 </div>
                               </div>
+                            </div>
+
+                            <br><br>
+
+                            <div class="text-right">
+                              <span id="mandatoryHelp" class="form-text text-muted"><sup>*</sup> Mandatory fields</span>
                             </div>
 
 
