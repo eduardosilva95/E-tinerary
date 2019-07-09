@@ -84,6 +84,7 @@ function getPlaceDetails(place_id){
 
     var request = {
       placeId: place_id,
+      fields: ["photos", "opening_hours", "review", "name"]
     };
 
 
@@ -91,7 +92,6 @@ function getPlaceDetails(place_id){
 
     service.getDetails(request, function(place, status) {
       if (status === google.maps.places.PlacesServiceStatus.OK) {
-
         if(place.opening_hours != null){
           createOpeningHoursTable(place.opening_hours.weekday_text);
         }
@@ -133,6 +133,31 @@ function getPlaceDetails(place_id){
 
           }
           showSlides(slideIndex);
+        }
+
+        if(place.reviews != undefined){
+          for(var i=0; i < place.reviews.length; i++){
+            var html = '<div class="card">';
+            html += '<div class="row">';
+            html += '<div class="col-md-3 text-center" style="margin: auto;"> <img src="' + place.reviews[i].profile_photo_url  +'" class="img-fluid review-img" > </div>'
+            html += '<div class="col-md-9"><div class="card-body">';
+            html += '<div class="text-right"><small>' + place.reviews[i].relative_time_description + '</small></div>';
+            html += '<div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><b>' + place.reviews[i].author_name +'</b></h5></div>';
+            html += '<p class="mb-1 place-reviews-text">' + place.reviews[i].text +'</p>';
+            html += '<div class="text-right" id="google-review-' + i +'-rating"></div>';
+            html += '</div></div></div></div><br>';
+
+            document.getElementById("google-reviews").innerHTML += html;
+            loadRating(place.reviews[i].rating, "google-review-" + i +"-rating");
+
+          }
+        }
+
+        else {
+          var html = '<div class="text-center" style="margin: auto;"><i class="fas fa-comment-slash fa-3x" style="color: #dddddd;"></i></html>';
+          html += '<div class="card-body text-center empty-review"><p class="mb-1">No reviews available for ' + place.name +'</p></div>';
+
+          document.getElementById("google-reviews").innerHTML += html;
         }
 
       }

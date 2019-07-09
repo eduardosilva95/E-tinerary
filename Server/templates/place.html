@@ -24,7 +24,7 @@
     <script type="text/javascript" src="js/login.js"></script>
 
     <script src='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places" async defer></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 
     
@@ -106,7 +106,7 @@
 
             <div class="row cont">
                 <div class="col-md-3">
-                    <p><i class="fab fa-google"></i><span style="font-weight: bold; padding-left: 10px;">Rating: </span><span id="place-google-rating"></span></p>                  
+                    <p><i class="fab fa-google"></i><span style="font-weight: bold; padding-left: 10px;">Rating: </span><span style="color: #ffc107; font-weight: bold; padding-right: 5px;"><%= google_rating %></span><span id="place-google-rating"></span></p>                  
                 </div> 
                 <script>
                     loadRating("<%= google_rating %>", "place-google-rating");
@@ -140,42 +140,45 @@
 
                     <br>
 
-                    <form action="/upload-poi-photo" method="POST" enctype="multipart/form-data">
-                        
-                        <input type="text" name="poi" value="<%= id %>" style="display: none">
+                    <% if(isUserRegistered == true) { %>
+                        <form action="/upload-poi-photo" method="POST" enctype="multipart/form-data">
+                            
+                            <input type="text" name="poi" value="<%= id %>" style="display: none">
 
-                        <div class="input-poi-photo-container">  
-                            <input class="input-poi-photo" id="my-file" type="file" accept="image/*" name="photo" >
-                            <label tabindex="0" for="my-file" class="input-poi-photo-trigger"><i class="fas fa-camera"></i><span style="padding-left: 10px;">Upload photo</span></span></label>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-9">
-                                <p class="file-return"></p>
+                            <div class="input-poi-photo-container">  
+                                <input class="input-poi-photo" id="my-file" type="file" accept="image/*" name="photo" >
+                                <label tabindex="0" for="my-file" class="input-poi-photo-trigger"><i class="fas fa-camera"></i><span style="padding-left: 10px;">Upload photo</span></span></label>
                             </div>
-                            <div class="col-md-3">
-                                <div class="text-right" id="update-picture-confirm-btn" style="display: none;">
-                                    <button type="submit" value="upload" class="btn btn-success"><i class="fas fa-check"></i><span style="padding-left: 10px;">Upload</span></button>
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <p class="file-return"></p>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-right" id="update-picture-confirm-btn" style="display: none;">
+                                        <button type="submit" value="upload" class="btn btn-success"><i class="fas fa-check"></i><span style="padding-left: 10px;">Upload</span></button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    <% } %>
                     
                     <br>
 
 
                     <div class="card" >
                         <div class="card-body" id="place-description">
-                            <% if(description == "" || description == place) { %>
-                                <div class="text-right">
-                                    <button class="btn btn-add-description-modal" data-toggle="modal" data-target="#add-description-modal" data-title="<%= place %>"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Add description</span></button>
-                                </div>
-                            <% } else { %>
-                                <div class="text-right">
-                                    <button class="btn btn-add-description-modal" data-toggle="modal" data-target="#add-description-modal" data-title="<%= place %>" data-description="<%= description %>"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Update description</span></button>
-                                </div>
+                            <% if(isUserPremium == true) { %>
+                                <% if(description == "" || description == place) { %>
+                                    <div class="text-right">
+                                        <button class="btn btn-add-description-modal" data-toggle="modal" data-target="#add-description-modal" data-title="<%= place %>"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Add description</span></button>
+                                    </div>
+                                <% } else { %>
+                                    <div class="text-right">
+                                        <button class="btn btn-add-description-modal" data-toggle="modal" data-target="#add-description-modal" data-title="<%= place %>" data-description="<%= description %>"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Update description</span></button>
+                                    </div>
+                                <% } %>
+                                <br>
                             <% } %>
-
-                            <br>
 
                             <p class="card-text"><%= description %></p>
 
@@ -193,11 +196,13 @@
                                 <div class="col-md-6">
                                     <h5 class="card-title"><b>User Reviews</b></h5>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="text-right">
-                                        <button class="btn btn-create-review-modal" data-toggle="modal" data-target="#review-modal" data-title="<%= place %>"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Make Review</span></button>
+                                <% if(isUserRegistered == true) { %>
+                                    <div class="col-md-6">
+                                        <div class="text-right">
+                                            <button class="btn btn-create-review-modal" data-toggle="modal" data-target="#review-modal" data-title="<%= place %>"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Make Review</span></button>
+                                        </div>
                                     </div>
-                                </div>
+                                <% } %>
                             </div>
                             <br>
 
@@ -215,7 +220,7 @@
                                 <% count = 0 %>
                                 <% reviews.forEach(function(review) { %>
 
-                                    <div class="card" style="height: 150px;">
+                                    <div class="card">
                                         <div class="row">
                                             <div class="col-md-3 text-center" style="margin: auto;">
                                                 <img src="<%= review.user_pic %>" class="img-fluid review-img" >
@@ -250,28 +255,45 @@
                         </div>
                     </div>
 
+                    <br>
+
+                    <div class="card" id="google-review-div">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5 class="card-title"><img src="/img/google-icon.png" height="50px;"><b>Google Reviews</b></h5>
+                                </div>
+                            </div>
+
+                            <div id="google-reviews">
+                            </div>
+
+                        </div>
+                    </div>
 
                 </div>
                 <div class="col-md-4">
-                    <% if(fromPlan == true) { %>
+
+                    
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="text-left">
-                                <button class="btn btn-primary" onclick="window.history.back();"><i class="fas fa-undo"></i><span style="padding-left: 10px;">Back to plan</span></button>
+                                <a class="back-btn" href="javascript:history.back()"><i class="fas fa-undo"></i><span style="padding-left: 10px;">Back</span></a>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="text-right">
-                                <% if(inPlan == false) { %>
-                                    <button class="btn btn-success btn-add-visit-modal" data-toggle="modal" data-target="#add-visit-modal" data-title="<%= place %>" data-poi="<%= id %>"><i class="far fa-calendar-alt"></i><span style="padding-left: 10px;">Add to your trip</span></button>
-                                <% } else { %>
-                                    <button type="button" style="background-color: #dcf2e2; color: black;" class="btn btn-success" disabled><i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Already in trip</span></button>
-                                <% } %>                    
+                        <% if(fromPlan == true) { %>
+                            <div class="col-md-9">
+                                <div class="text-right">
+                                    <% if(inPlan == false) { %>
+                                        <a class="btn-add-visit-modal" data-toggle="modal" data-target="#add-visit-modal" data-title="<%= place %>" data-poi="<%= id %>"><i class="far fa-calendar-alt"></i><span style="padding-left: 10px;">Add to your trip</span></a>
+                                    <% } else { %>
+                                        <span class="places-poi-in-plan-info"><i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Scheduled for <%= schedule %></span></span>
+                                    <% } %>                    
+                                </div>
                             </div>
-                        </div>
+                        <% } %>
                     </div>
                     <br>
-                    <% } %>
 
                     <div class="card">
                         <div class="card-body">
@@ -287,7 +309,13 @@
                     <div class="card">
                         <div class="card-body place-info">
                             <p class="card-text"><i class="fas fa-phone" style="color: #1a73e8"></i><span id="place-phone-number" style="padding-left: 20px;"><%= phone_number %></span></p>
-                            <p class="card-text"><i class="fas fa-globe-europe" style="color: #1a73e8"></i><a id="place-website" style="padding-left: 20px; text-decoration: none; color: black" href="<%= website %>" target="_blank"><%= website.split('www.').slice(1) %></a></p>
+                            
+                            <% if(website == "No information available") { %>
+                                <span>No information available</span>
+                            <% } else { %>
+                                <p class="card-text"><i class="fas fa-globe-europe" style="color: #1a73e8"></i><a id="place-website" style="padding-left: 20px; color: black" href="<%= website %>" target="_blank"><%= website %></a></p>
+                            <% } %>
+
                             <p class="card-text"><i class="fas fa-map-pin" style="color: #1a73e8"></i><span id="place-coordinates" style="padding-left: 20px;"><%= lat %>, <%= lon %></span></p>
                         </div>
                     </div>
@@ -303,7 +331,7 @@
 
                     <div class="card">
                         <div class="card-body">
-                            <h6 class="card-title"><b><%= place %></b> in <span class="logo-letters">e &bull; t</span><span class="logo-letters-2">inerary </span><sup id="input-info-popover"><i class="fas fa-info-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Data provided by our users"></i></sup></h6>
+                            <h6 class="card-title"><b><%= place %></b> in <span class="logo-letters">e &bull; t</span><span class="logo-letters-2">inerary </span><sup id="input-info-popover"><i class="fas fa-info-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Information provided by our users"></i></sup></h6>
                             <br>
                             
                             <p class="card-text"><i class="fas fa-map-marked-alt"></i><strong style="padding-left: 10px;">Plans: </strong><span id="" style="padding-left: 10px;"><%= no_plans %></span></p>
@@ -516,6 +544,17 @@
                                     <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 star">2</label>
                                     <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">1</label>
                                 </div>
+
+                                <br>
+
+                                <input type="text" name="poi" value="<%= id %>" style="display: none">
+
+                                <div class="input-poi-photo-container">  
+                                    <input class="input-poi-photo" id="review-photo-name" type="file" accept="image/*" name="review-photo" >
+                                    <label tabindex="0" for="review-photo-name" class="input-poi-photo-trigger"><i class="fas fa-camera"></i><span style="padding-left: 10px;">Upload photo</span></span></label>
+                                </div>
+                                        
+                                <p class="review-photo-filename"></p>
 
                             </div>
 

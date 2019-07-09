@@ -189,7 +189,6 @@ function renderDirections(result) {
 
 
 function calcRoute(start, end, waypts) {
-    console.log("calcRoute " + start + end);
 
     var request = {
         origin: {
@@ -199,12 +198,12 @@ function calcRoute(start, end, waypts) {
             placeId: end
         },     
         waypoints: waypts, 
-        optimizeWaypoints: true,  
         travelMode: 'DRIVING'
     };
     
     directionsService.route(request, function(result, status) {
       if (status == 'OK') {
+        loadTravelTimesAndDistances(result, start);
         directionsDisplay.setDirections(result);
         animateItinerary(result);
       }
@@ -233,7 +232,6 @@ function calcRoute(start, end, waypts) {
     }
     delayed();
 }  
-
 
 
 function loadPlan(plan_array, days){
@@ -283,6 +281,27 @@ function loadItinerary(){
     }
 
     calcRoute(visits_tmp[0].place_id, visits_tmp[visits_tmp.length-1].place_id, waypoints);
+}
+
+function loadTravelTimesAndDistances(result, start){
+    result = result.routes[0].legs;
+    
+    var start_index = 0;
+
+    for(var key in places){
+        if(places[key].place_id == start){
+            break;
+        }
+        start_index++;
+    }
+
+    for(var i=0; i < result.length; i++){
+        var txt = result[i].duration.text + " (" + result[i].distance.text + ")";
+        $("#desloc-" + (start_index + i)).css("display", "block");
+        $("#desloc-" + (start_index + i) + "-text").text(txt);
+    }
+
+    
 }
 
 
@@ -403,7 +422,11 @@ function loadVisits(){
             place_info[count] = places[key];
 
             document.getElementById('place-' + count).style.display = 'block';
-            loadImage(places[key].place_id, 'place-' + count + '-img');    
+            
+            if(places[key].photo == null)
+                loadImage(places[key].place_id, 'place-' + count + '-img');    
+            else
+                document.getElementById('place-' + count + '-img').src = places[key].photo;
 
         }
 
@@ -443,7 +466,11 @@ function loadImage(place_id, dest){
 function loadModalInMap(place_dict){
     $('.modal-title').text(place_dict['name']);
 
-    loadImage(place_dict['place_id'], "info-modal-img");
+    if(place_dict['photo'] == null)
+        loadImage(place_dict['place_id'], "info-modal-img");    
+    else
+        document.getElementById("info-modal-img").src = place_dict['photo'];
+
 
     
     $('#modal-info-city').text(place_dict['city']);
@@ -472,21 +499,11 @@ $(function () {
 
         $('.modal-title').text(place_info[id]['name']);
 
-        var request = { 
-            placeId: place_info[id]['place_id'],
-        };
-      
-        var service = new google.maps.places.PlacesService(document.createElement('places-map'));
-    
-        service.getDetails(request, function(place, status) {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-    
-            if(place.photos != undefined)
-            document.getElementById("info-modal-img").src = place.photos[0].getUrl();
-            else
-            document.getElementById("info-modal-img").src = "";
-        }
-        });
+        if(place_info[id]['photo'] == null)
+            loadImage(place_info[id]['place_id'], "info-modal-img");    
+        else
+            document.getElementById("info-modal-img").src = place_info[id]['photo'];
+
         
         $('#modal-info-city').text(place_info[id]['city']);
         $('#modal-info-addr').text(place_info[id]['address']);

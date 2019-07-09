@@ -161,6 +161,7 @@
                                             $('#arrival-date').datepicker({
                                                 uiLibrary: 'bootstrap4',
                                                 format: 'dd/mm/yyyy',
+                                                minDate: new Date(),
                                             });
                                         </script>
                                         </div>
@@ -175,6 +176,7 @@
                                             $('#departure-date').datepicker({
                                                 uiLibrary: 'bootstrap4',
                                                 format: 'dd/mm/yyyy',
+                                                minDate: new Date(),
                                             });
                                             </script>
                                         </div>
@@ -188,26 +190,25 @@
 
                     <div class="form-group fg">
                         <legend style="color: #ffc107; font-size: 1rem; font-weight: bold;">How to move: </legend>
-                        <div class="custom-control custom-checkbox custom-control-inline">
-                            <input type="checkbox" class="custom-control-input" id="check-move-car">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="check-move-car" name="travel_mode">
                             <label class="custom-control-label" for="check-move-car" style="color: white; font-size: 1rem;"><i class="fas fa-car"></i><span style="padding-left: 10px;">Car</span></label>
                         </div>
-
-                        <div class="custom-control custom-checkbox custom-control-inline">
-                            <input type="checkbox" class="custom-control-input" id="check-move-foot">
+    
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="check-move-foot" name="travel_mode">
                             <label class="custom-control-label" for="check-move-foot" style="color: white; font-size: 1rem;"><i class="fas fa-walking"></i><span style="padding-left: 10px;">On foot</span></label>
                         </div>
-
-                        <div class="custom-control custom-checkbox custom-control-inline">
-                            <input type="checkbox" class="custom-control-input" id="check-move-public">
+    
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="check-move-public" name="travel_mode">
                             <label class="custom-control-label" for="check-move-public" style="color: white; font-size: 1rem;"><i class="fas fa-bus"></i><span style="padding-left: 10px;">Public Transportations</span></label>
                         </div>
-
-                        <div class="custom-control custom-checkbox custom-control-inline">
-                            <input type="checkbox" class="custom-control-input" id="check-move-other">
-                            <label class="custom-control-label" for="check-move-other" style="color: white; font-size: 1rem;"><i class="fas fa-bicycle"></i><span style="padding-left: 10px;">Bicycle</span></label>
+    
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="check-move-bike" name="travel_mode">
+                            <label class="custom-control-label" for="check-move-bike" style="color: white; font-size: 1rem;"><i class="fas fa-bicycle"></i><span style="padding-left: 10px;">Bicycle</span></label>
                         </div>
-
                     </div>
                   
                     

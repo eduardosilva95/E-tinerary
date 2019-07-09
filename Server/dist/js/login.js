@@ -15,7 +15,6 @@ function loadNavbar(){
 
       
     document.getElementById("user-profile-pic").src = picture;
-    document.getElementById("profile-trips").href = "/trips?id=" + user_id;
 
     document.getElementById("profile").style.display = 'block';
     document.getElementById("login").style.display = 'none';
@@ -106,7 +105,7 @@ function signOut() {
   auth2.signOut().then(function () {
     deleteUserCookie();
 
-    if(document.location.pathname == "/profile")
+    if(document.location.pathname == "/profile" || document.location.pathname == "/trips")
       window.location.href = "/";
     else
       window.location.reload();
@@ -153,7 +152,6 @@ function hasUserCookies() {
     }
     
     document.getElementById("user-profile-pic").src = picture;
-    document.getElementById("profile-trips").href = "/trips?id=" + user_id;
 
     return true;
   }

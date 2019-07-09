@@ -20,3 +20,25 @@ fileInput.addEventListener( "change", function( event ) {
     the_return.title = event.srcElement.files[0].name;
     $("#update-picture-confirm-btn").css("display", "block");
 });  
+
+
+
+var reviewPhotoInput = document.querySelector( "#review-photo-name" );  
+var reviewPhotoBtn  = document.querySelector( ".input-poi-photo-trigger");
+var reviewPhotoFilename = document.querySelector(".review-photo-filename");
+
+reviewPhotoBtn.addEventListener("keydown", function( event ) {  
+    if ( event.keyCode == 13 || event.keyCode == 32 ) {  
+        fileInput.focus();  
+    }  
+});
+
+reviewPhotoBtn.addEventListener( "click", function( event ) {
+   fileInput.focus();
+   return false;
+});  
+
+reviewPhotoInput.addEventListener( "change", function( event ) {  
+    reviewPhotoFilename.innerHTML = event.srcElement.files[0].name;  
+    reviewPhotoFilename.title = event.srcElement.files[0].name;
+});  

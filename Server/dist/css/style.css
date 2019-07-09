@@ -139,6 +139,18 @@ hr {
 }
 
 
+.back-btn {
+  font-style: italic;
+  color:  #f4a029 !important;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  color: #ffc107 !important;
+  text-decoration: none;
+}
+
+
 
 /* SCROLLBAR */
 
@@ -584,6 +596,10 @@ hr {
   cursor: pointer;
 }
 
+.btn-add-visit-modal:hover {
+  color: #00c24a !important;
+}
+
 .has-search .form-control {
   padding-left: 2.375rem;
   width: 100%;
@@ -669,6 +685,7 @@ hr {
 }
 
 #place-description p{
+  color: #80868b;
   display: -webkit-box;
   -webkit-line-clamp: 7;
   -webkit-box-orient: vertical;
@@ -1150,6 +1167,12 @@ table tr td a{
   overflow-y: scroll;
 }
 
+#google-review-div{
+  max-height: 500px;
+  overflow-y: scroll;
+}
+
+
 .review-img {
   border-radius: 50%;
   height: 120px;
@@ -1159,6 +1182,7 @@ table tr td a{
 .empty-review p{
   color: #888888;
 }
+
 
 
 /* ---------------------------------- CALENDAR ------------------------- */

@@ -9,14 +9,16 @@
     <title>Simple Map</title>
 
     <!-- Custom styles -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/v4-shims.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/v4-shims.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
 
     
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
 
     <script type="text/javascript" src="js/places.js"></script>
@@ -40,7 +42,7 @@
                 </li>
                 
                 <li class="nav-item">
-                <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                <a class="nav-link header active" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
                 </li>
                 <li class="nav-item">
                 <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
@@ -104,11 +106,19 @@
                     <div class="col-md-9 cont">
                         <div class="row">
                             <div class="col-md-10">
-                                <div class="form-group has-search">
+                                <div class="form-group autocomplete has-search">
                                     <span class="fa fa-search form-control-feedback"></span>
-                                    <input type="text" class="form-control float-left" placeholder="Search for a place in <%= city %>" id="search-place-input" name="query">
+                                    <input type="text" class="form-control float-left" placeholder="Search for a place in <%= city %>" id="search-place-input" name="query" autocomplete="off">
                                 </div>
                             </div>
+                            <script>
+                                var places = "<%= list_places_names %>";
+                                var list_places = places.split(',');
+                                autocomplete(document.getElementById("search-place-input"), list_places);
+                            </script>
+
+
+
                             <div class="col-md-2">
                                 <div class="form-group float-right">
                                     <button type="button" onclick="queryPlace()" class="btn btn-outline-warning" id="btn-search-place" ><i class="fas fa-search"></i><span style="padding-left: 10px; ">Search</span></button>
@@ -121,12 +131,13 @@
                         <div class="text-right">
                             <div class="dropdown">
                                 <button class="btn btn-outline-warning dropdown-toggle" type="button" id="sortDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Sort
+                                <i class="fas fa-sort"></i><span style="padding-left: 10px; ">Sort</span>
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="sortDropdownMenu">
-                                    <a class="dropdown-item dropdown-sort-places" href="#"><i class="fas fa-sort-alpha-down"></i><span style="padding-left: 10px;">Alphabetically (A-Z)</span></a>
-                                    <a class="dropdown-item dropdown-sort-places active" href="#"><i class="fas fa-eye"></i><span style="padding-left: 10px;">Number of reviews</span></a>
-                                    <a class="dropdown-item dropdown-sort-places" href="#"><i class="fas fa-star"></i><span style="padding-left: 10px;">Rating</span></a>
+                                    <button type="button" id="sort-alph-az-btn" class="dropdown-item dropdown-sort-places"><i class="fas fa-sort-alpha-down"></i><span style="padding-left: 10px;">Alphabetically (A-Z)</span></button>
+                                    <button type="button" id="sort-alph-za-btn" class="dropdown-item dropdown-sort-places"><i class="fas fa-sort-alpha-down-alt"></i><span style="padding-left: 10px;">Alphabetically (Z-A)</span></button>
+                                    <button type="button" id="sort-num-reviews-btn" class="dropdown-item dropdown-sort-places"><i class="fas fa-comment"></i><span style="padding-left: 10px;">Number of reviews</span></button>
+                                    <button type="button" id="sort-rating-btn" class="dropdown-item dropdown-sort-places"><i class="fas fa-star"></i><span style="padding-left: 10px;">Rating</span></button>
                                 </div>
                             </div>
                         </div>
@@ -138,14 +149,35 @@
 
 
         <div class="container" style="padding-top: 30px;">
-
-            <div class="text-center">
-                <h3><b>The top places in <span></span><%= city %></b></h3>
+            <div class="row">
+                <div class="col-md-3">
+                    <% if(fromPlan == true) { %>
+                        <a class="back-btn" href="javascript:history.back()" style="font-size: 20px;"><i class="fas fa-undo"></i><span style="padding-left: 10px;">Back</span></a>
+                    <% } %>
+                </div>
+                <div class="col-md-">
+                    <div class="text-center">
+                        <h3><b>The top places in <span></span><%= city %></b></h3>
+                    </div>
+                </div>
             </div>
+           
 
 
             <div class="row cont">
                 <div class="col-md-9">
+
+                    <% if(places.length == 0) { %>
+                        <br><br>
+                        <div class="text-center" style="margin: auto;">
+                            <i class="fas fa-ban fa-10x" style="color: #dddddd;"></i>
+                        </div>
+                        <div class="card-body text-center" style="color: #888888; font-size: 24px;">
+                            <p class="mb-1">No places found for your search</p> 
+                        </div>
+                    <% } %>
+
+
                     <% count = 0 %>
                     <% places.forEach(function(place) { %>
                     
@@ -177,11 +209,14 @@
                                         <div class="row">
                                             <div class="col-md">
                                                 <div id="places-poi-<%= count %>-rating">
-                                                    <span style="padding-right: 5px; color: #ffc107; font-weight: bold;"><%= place.rating %></span>
+                                                    <span style="padding-right: 5px; color: #ffc107; font-weight: bold;" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Google Rating"><%= place.rating %></span>
                                                 </div>
                                                 <script>
                                                     loadRating("<%= place.rating %>", "places-poi-<%= count %>-rating");
                                                 </script>
+                                            </div>
+                                            <div class="col-md text-center">
+                                                <span style="color: #ffc107; font-weight: bold;" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Number of comments on Google"><i class="fas fa-comment"></i><span style="padding-left: 5px;"><%= place.num_reviews.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %></span></span>                                               
                                             </div>
                                             <div class="col-md text-right">
                                                 preço
@@ -211,8 +246,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
-
                                     </div>
                                 </div>
                             </div>
@@ -221,6 +254,7 @@
                         </div>
                         <script>
                             getPlaceDetails("<%= place.place_id %>", "places-poi-<%= count %>-img");
+                            updatePlaceLink("places-poi-<%= count %>");
                         </script>
 
                     </div>
@@ -235,13 +269,7 @@
 
                 <!-- Filter div -->
                 <div class="col-md-3">
-
-                    <% if(fromPlan == true) { %>
-                        <div class="text-center">
-                            <button class="btn btn-primary" onclick="window.history.back();"><i class="fas fa-undo"></i><span style="padding-left: 10px;">Back to the plan</span></button>
-                        </div>
-                        <br>
-                    <% } %>
+                   
 
                     <div class="card">
                         <div class="card-body">
@@ -250,34 +278,47 @@
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" name="hotels-filter" value="Hotels" class="custom-control-input" id="hotels-filter" checked>
                                 <label class="custom-control-label" for="hotels-filter"><i style="padding-left: 10px;" class="fas fa-bed"></i> Hotels</label>
-                                <br>
-                                <input type="checkbox" name="restaurants-filter" value="Restaurants" class="custom-control-input" id="restaurants-filter" checked>
-                                <label class="custom-control-label" for="restaurants-filter"><i style="padding-left: 10px;" class="fas fa-utensils"></i> Restaurants</label>
-                                <br>
-                                <input type="checkbox" name="museums-filter" value="Museums" class="custom-control-input" id="museums-filter" checked>
-                                <label class="custom-control-label" for="museums-filter"><i style="padding-left: 10px;" class="fas fa-archway"></i> Museums</label>
-                                <br>
-                                <input type="checkbox" name="churchs-filter" value="Churchs" class="custom-control-input" id="churchs-filter" checked>
-                                <label class="custom-control-label" for="churchs-filter"><i style="padding-left: 10px;" class="fas fa-church"></i> Churchs</label>
-                                <br>
-                                <input type="checkbox" name="pois-filter" value="Points of Interest" class="custom-control-input" id="pois-filter" checked>
-                                <label class="custom-control-label" for="pois-filter"><i style="padding-left: 10px;" class="fas fa-monument"></i> Points of Interest</label>
-                                <br>
-                                <input type="checkbox" name="parks-filter" value="Parks" class="custom-control-input" id="parks-filter" checked>
-                                <label class="custom-control-label" for="parks-filter"><i style="padding-left: 10px;" class="fas fa-tree"></i> Parks</label>
+                            </div>
+
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" name="restaurants-filter" class="custom-control-input" id="restaurants-filter" checked>
+                                <label class="custom-control-label" for="restaurants-filter"><i style="padding-left: 10px; padding-right: 5px;" class="fas fa-utensils"></i> Restaurants</label>
+                            </div>    
+                            
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" name="museums-filter" class="custom-control-input" id="museums-filter" checked>
+                                <label class="custom-control-label" for="museums-filter"><i style="padding-left: 10px; padding-right: 5px;" class="fas fa-archway"></i> Museums</label>
+                            </div> 
+
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" name="churchs-filter" class="custom-control-input" id="churchs-filter" checked>
+                                <label class="custom-control-label" for="churchs-filter"><i style="padding-left: 10px; padding-right: 5px;" class="fas fa-church"></i> Churchs</label>
+                            </div>    
+
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" name="parks-filter" class="custom-control-input" id="parks-filter" checked>
+                                <label class="custom-control-label" for="parks-filter"><i style="padding-left: 10px; padding-right: 5px;" class="fas fa-tree"></i> Parks</label>
+                            </div>    
+
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" name="others-filter" class="custom-control-input" id="others-filter" checked>
+                                <label class="custom-control-label" for="others-filter"><i style="padding-left: 10px; padding-right: 5px;" class="fas fa-monument"></i>Other Places</label>
+                            </div>
+                            <br>
+                            
+
+                            <div id="rating-filter">
+                                <p>
+                                    <label for="rating-range"><b>Rating range:</b></label>
+                                    <input type="text" id="rating-range" readonly style="border:0; color:#f6931f; font-weight:bold;">
+                                </p>
+                                <div id="slider-range"></div>
                             </div>
 
                             <br>
 
-                            <div id="rating-filter">
-                                <p><b>Rating</b></p>
-                                <input type="number" name="min-rating" min="0" max="5" step="0.1" value="0"> to <input type="number" name="max-rating" min="0" max="5" step="0.1" value="5.0">
-                                <br>
-                                <br>
-                            </div>
-
                             <div class="float-right">
-                                <button type="button" class="btn btn-warning" onclick="filterSearch();" style="color: white;"><i class="fas fa-search"></i><span style="padding-left: 10px; "><b>Search</b></span></button>
+                                <button type="button" id="places-filter-btn" class="btn btn-warning" style="color: white;"><i class="fas fa-search"></i><span style="padding-left: 10px; "><b>Filter</b></span></button>
                             </div>
                         </div>
                     </div>
