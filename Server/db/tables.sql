@@ -5,6 +5,7 @@ CREATE TABLE User (
 	name VARCHAR(255) NOT NULL, 
 	picture BLOB,
     type_use VARCHAR(255) DEFAULT 'Free' NOT NULL,
+    start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(id),
     CHECK(type_use = 'Free' or type_use = 'Premium'),
     UNIQUE(username)

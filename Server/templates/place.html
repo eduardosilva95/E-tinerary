@@ -311,7 +311,7 @@
                             <p class="card-text"><i class="fas fa-phone" style="color: #1a73e8"></i><span id="place-phone-number" style="padding-left: 20px;"><%= phone_number %></span></p>
                             
                             <% if(website == "No information available") { %>
-                                <span>No information available</span>
+                                <p class="card-text"><i class="fas fa-globe-europe" style="color: #1a73e8"></i><span style="padding-left: 20px;">No information available</span></p>
                             <% } else { %>
                                 <p class="card-text"><i class="fas fa-globe-europe" style="color: #1a73e8"></i><a id="place-website" style="padding-left: 20px; color: black" href="<%= website %>" target="_blank"><%= website %></a></p>
                             <% } %>
@@ -519,8 +519,8 @@
                     
                     <div class="modal-body">
                         <nav class="nav nav-pills flex-column flex-sm-row" id="myTab" role="tablist">
-                            <a class="flex-sm-fill text-sm-center nav-link active" id="pills-review-info-tab" data-toggle="pill" href="#review-modal-general-info" role="tab" aria-controls="review-plan-general-info" aria-selected="true">Review</a>
-                            <a class="flex-sm-fill text-sm-center nav-link" id="pills-more-info-tab" data-toggle="pill" href="#review-modal-more-info" role="tab" aria-controls="review-plan-more-info" aria-selected="false">More info</a>
+                            <a class="flex-sm-fill text-sm-center nav-link tab active" id="pills-review-info-tab" data-toggle="pill" href="#review-modal-general-info" role="tab" aria-controls="review-plan-general-info" aria-selected="true">Review</a>
+                            <a class="flex-sm-fill text-sm-center nav-link tab" id="pills-more-info-tab" data-toggle="pill" href="#review-modal-more-info" role="tab" aria-controls="review-plan-more-info" aria-selected="false">More info</a>
                         </nav>
 
                         <br>
@@ -631,15 +631,20 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
+                  
                     
                     <div class="modal-body">
+                        <div class="alert alert-danger" role="alert" id="add-description-error" style="display: none;">
+                            The description can't be empty !!
+                        </div>
+
                         <label for="add-description-text">Description:</label>
                         <textarea class="form-control" rows="10" id="add-description-text"></textarea>  
 
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
-                        <button type="button" onclick="addDescription();" class="btn btn-success" data-dismiss="modal"><i class="fas fa-check"></i><span style="padding-left: 10px;">Submit</span></button>
+                        <button type="button" onclick="editDescription();" class="btn btn-success"><i class="fas fa-check"></i><span style="padding-left: 10px;">Submit</span></button>
                     </div>
                 </div>
             </div>

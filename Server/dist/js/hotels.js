@@ -9,6 +9,7 @@ var hotels = {};
 
 
 
+
 /* load map */
 function initMap(city) {
     var coordinates;
@@ -43,11 +44,13 @@ function initMap(city) {
             };
             map.setOptions({styles: styles['hide']});
 
+            
+
             google.maps.event.addListenerOnce(map, 'idle', function () {
 
                 for(var key in hotels){
                     data = {color: '#ac48db', icon: 'fas fa-bed'};
-                    createMarker(hotels[key]['coordinates'], hotels[key]['name'], data);
+                    createMarker(hotels[key]['coordinates'], hotels[key]['name'], hotels[key]["price"]);
                 }
 
             /* Markers clustering */
@@ -69,31 +72,44 @@ function initMap(city) {
 }
 
 
-function createMarker(local, name, data){
+function createMarker(local, name, price){
     if(marker_list.includes(name))
       return;
     
     var coordinates = new google.maps.LatLng({lat: parseFloat(local.split(', ')[0]), lng: parseFloat(local.split(', ')[1])}); 
     
-    marker = new Marker({
-      position: coordinates,
-      map: map,
-      title: name,
-      icon: {
-          path: MAP_PIN,
-          fillColor: data.color,
-          fillOpacity: 1,
-          strokeColor: '',
-          strokeWeight: 0
-      },
-      map_icon_label: '<i class="'+data.icon+'"></i>'
+    var image = {
+        url: '/img/map-marker-hotel.jpg',
+        // This marker is 35 pixels wide by 35 pixels high.
+        size: new google.maps.Size(67, 38),
+        // The origin for this image is (0, 0).
+        origin: new google.maps.Point(0, 0),
+        // The anchor for this image is the base of the flagpole at (0, 32).
+        anchor: new google.maps.Point(0, 35),
+      };
+
+    var marker = new google.maps.Marker({
+    position: coordinates,
+    map: map,
+    draggable: true,
+    icon: image,
+    label: {
+        text: price,
+        color: 'white',
+        fontSize: '15px',
+        fontWeight: 'bold'
+    }
     });
+
 
     marker.addListener('click', function () {
         loadModalInMap(hotels[this.title])
         $("#info-modal").modal();
       });
-      
+    
+    marker.addListener('mouseover', function () {
+
+    });
     
     markers.push(marker);
     marker_list.push(marker.title);
@@ -102,13 +118,11 @@ function createMarker(local, name, data){
 
 function loadHotels(hotels_list){
 
+    console.log(hotels_list);
+
     for(var i=0 ; i < hotels_list.length ; i++){
 
-        console.log(hotels_list[i]);
-
         hotel = JSON.parse(hotels_list[i]);
-
-        hotel["price"] = Math.floor((Math.random() * 150) + 30) + " €";
 
         hotels[hotel.name] = hotel;
 

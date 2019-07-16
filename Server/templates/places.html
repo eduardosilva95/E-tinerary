@@ -72,7 +72,7 @@
                     </a>
                     <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
                         <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                        <a class="dropdown-item header" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                        <a class="dropdown-item header" href="./trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
                         <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
                         <a class="dropdown-item header" href="./review-poi"><i class="fas fa-edit"></i><span style="padding-left: 10px;">Review POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
                         <div class="dropdown-divider"></div>
@@ -219,7 +219,12 @@
                                                 <span style="color: #ffc107; font-weight: bold;" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Number of comments on Google"><i class="fas fa-comment"></i><span style="padding-left: 5px;"><%= place.num_reviews.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %></span></span>                                               
                                             </div>
                                             <div class="col-md text-right">
-                                                preço
+                                                <div id="places-poi-<%= count %>-price">
+                                                    <span style="padding-right: 5px; color: #ffc107; font-weight: bold;" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Price Level"></span>
+                                                </div>
+                                                <script>
+                                                    loadPriceRating("<%= place.price_level %>", "places-poi-<%= count %>-price");
+                                                </script>
                                             </div>
                                         </div>
 
@@ -227,7 +232,11 @@
 
                                         
                                         <div class="places-poi-description">
-                                            <span><%= place.description %></span>
+                                            <% if(place.description != null && place.description != "") { %>
+                                                <span><%= place.description %></span>
+                                            <% } else { %>
+                                                <span>No description available</span>
+                                            <% } %> 
                                         </div>
 
                                         <div class="row cont">
@@ -253,7 +262,7 @@
                             
                         </div>
                         <script>
-                            getPlaceDetails("<%= place.place_id %>", "places-poi-<%= count %>-img");
+                            getPlaceDetails("<%= place.place_id %>", "places-poi-<%= count %>-img", "<%= place.photo %>");
                             updatePlaceLink("places-poi-<%= count %>");
                         </script>
 

@@ -223,7 +223,9 @@ function filterPage(total_results){
 }
 
 
-function getPlaceDetails(place_id, dest){
+function getPlaceDetails(place_id, dest, photo){
+  
+  if(photo == null || photo == ""){
 
     var request = { 
       placeId: place_id,
@@ -243,6 +245,16 @@ function getPlaceDetails(place_id, dest){
 
       }
     });
+
+  }
+
+  else{
+    document.getElementById(dest).src = photo;
+
+  }
+
+
+
 }
 
 
@@ -523,32 +535,56 @@ $(function () {
 });
 
 
-function loadRating(rating, review){
+function loadRating(rating, dest){
 
   rating = parseFloat(rating).toFixed(1);
 
   if(isNaN(rating)){
-    document.getElementById(review).innerHTML += "No information available";
+    document.getElementById(dest).innerHTML += "No information available";
     return;
   }
 
   var count = 0;
 
   while(count < Math.floor(rating)){
-    document.getElementById(review).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #ffc107;"></i>';
+    document.getElementById(dest).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #ffc107;"></i>';
     count = count + 1;
   }
 
   if(rating-count >= 0.5){
-    document.getElementById(review).innerHTML += '<i class="fas fa-star-half-alt" aria-hidden="true" style="color: #ffc107;"></i>';
+    document.getElementById(dest).innerHTML += '<i class="fas fa-star-half-alt" aria-hidden="true" style="color: #ffc107;"></i>';
     count = count + 1;
   }
 
   while(count < 5){
-    document.getElementById(review).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #d0cfd1;"></i>';
+    document.getElementById(dest).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #d0cfd1;"></i>';
     count = count + 1;
   }
 }
+
+function loadPriceRating(rating, dest){
+
+  rating = parseInt(rating);
+
+  if(isNaN(rating)){
+    //document.getElementById(dest).innerHTML += "No information available";
+    return;
+  }
+
+  var count = 0;
+
+  while(count < rating){
+    document.getElementById(dest).innerHTML += '<i class="fas fa-euro-sign" aria-hidden="true" style="color: #ffc107;"></i>';
+    count = count + 1;
+  }
+
+  while(count < 5){
+    document.getElementById(dest).innerHTML += '<i class="fas fa-euro-sign" aria-hidden="true" style="color: #d0cfd1;"></i>';
+    count = count + 1;
+  }
+}
+
+
 
 
 $(function () {

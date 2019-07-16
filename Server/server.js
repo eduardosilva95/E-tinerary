@@ -22,7 +22,7 @@ var OPEN_WEATHER_API_KEY = '8271fd206ceeef12df4e7bb6063241c3';
 distance.key(GOOGLE_API_KEY);
 
 
-
+/* store images of users */
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(__dirname, 'dist/img/users'))
@@ -32,6 +32,7 @@ var storage = multer.diskStorage({
   }
 });
 
+/* store images of plans */
 var storage_plan = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(__dirname, 'dist/img/plans'))
@@ -41,6 +42,7 @@ var storage_plan = multer.diskStorage({
   }
 });
 
+/* store images of points of interest */
 var storage_poi = multer.diskStorage({
   destination: function (req, file, cb) {
   	var dir;
@@ -395,6 +397,12 @@ app.get('/places', function (req, res){
 		            place["address"] = result[i].address;
 		            place["rating"] = result[i].rating;
 		            place["num_reviews"] = result[i].num_reviews;
+		            place["price_level"] = result[i].price_level;
+
+		            if(result[i].photo != null)
+		        		place["photo"] = result[i].photo.replace(/\\/g,"/");
+		        	else
+		        		place["photo"] = null;
 
 		            if(result[i].start_time != undefined && result[i].end_time != undefined){
 		            	st_date = new Date(result[i].start_time);
@@ -839,6 +847,8 @@ app.get('/place', function(req,res){
 							if(result == 1)
 								return;
 
+							result = result[0];
+
 							var start_date = "n/a";
 					        var end_date = "n/a";
 					        var date_diff = 0;
@@ -849,7 +859,7 @@ app.get('/place', function(req,res){
 					        	start_date = new Date(result[0].start_date);
 					        	end_date = new Date(result[0].end_date);
 
-					        	start_date_aux = start_date.getDate() + "-" + (start_date.getMonth()+1) + "-" + start_date.getFullYear();
+					        	start_date_aux = (start_date.getDate()<10?'0':'') + start_date.getDate() + "-" + (start_date.getMonth()+1) + "-" + start_date.getFullYear();
 
 					        	start_date = start_date.getDate() + " " + convertToTextMonth(start_date.getMonth()) + " " + start_date.getFullYear();
 					        	end_date = end_date.getDate() + " " + convertToTextMonth(end_date.getMonth()) + " " + end_date.getFullYear();
@@ -905,81 +915,25 @@ app.get('/search-hotels',function(req,res){
 });
 
 
+// hotels page
 app.get('/hotels', function(req,res){
-	var destination = req.query['dest'];
-	var query = req.query['query'];
 
-	var page = 1;
-
-	if(req.query['page'] != undefined)
-		page = req.query['page'];
-
-	var limit_inf = (page-1) * 9;
-	var total_results = 9;
-
-	if(query != undefined){
-
-		query = "%" + query + "%"
-
-		var sql = "SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description FROM poi JOIN city ON poi.city = city.id WHERE city.name = ? AND poi.poi_type = 'Hotel' AND poi.name LIKE ? ORDER BY poi.num_reviews DESC LIMIT ?, ?";
-		var parameters = [destination, query, limit_inf, total_results];
-
-		con.query(sql, parameters, function (err, result, fields) {
-	        if (err) throw err;
-	        var list_hotels = []
-
-	        var city = destination;
-	        var country = 'Portugal';
-
-	        if(result.length > 0){
-	        	city = result[0].city;
-	        	country = result[0].country;
-	        } 
+	var destination = req.query['dest']; // destination
+    var list_hotels = []
 
 
-	        for(var i =0 ; i < result.length; i++){
+	con.query("call getHotels(?)", destination, function (err, result, fields) {
+        if (err) throw err;
 
-	        	var hotel = new Object();
-	        	hotel["id"] = result[i].id;
-	        	hotel["place_id"] = result[i].place_id;
-	            hotel["name"] = result[i].place.replace(/['"]+/g, '');
-	            hotel["city"] = result[i].city;
-	            hotel["type"] = result[i].poi_type.charAt(0).toUpperCase() + result[i].poi_type.slice(1);
-	            hotel["description"] = result[i].description.replace(/['"]+/g, '').replace(/(\r\n|\n|\r)/gm, "");
-	            hotel["address"] = result[i].address.replace(/['"]+/g, '');
-	            hotel["rating"] = result[i].rating;
-	        	hotel["coordinates"] = result[i].latitude + ", " + result[i].longitude;
-	        	hotel["website"] = result[i].website;
-	        	hotel["phone_number"] = result[i].phone;
+        result = result[0];
 
-	        	list_hotels.push(hotel);
-	        }
+        if(result.length == 0){
 
-	        res.render(path.join(__dirname+'/templates/hotels.html'), {hotels: list_hotels, city: city, country: country});
+        } 
 
+        else{
 
-		});
-
-	}
-
-	else{
-
-		destination = req.query['dest'];
-
-		var sql = "SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.latitude as latitude, poi.longitude as longitude, poi.website as website, poi.phone_number as phone FROM poi JOIN city ON poi.city = city.id WHERE city.name = ? AND poi.poi_type = 'Hotel' ORDER BY poi.num_reviews DESC LIMIT ?, ?";
-		var parameters = [destination, limit_inf, total_results];
-
-		con.query(sql, parameters, function (err, result, fields) {
-	        if (err) throw err;
-	        var list_hotels = []
-
-         	var city = destination;
-	        var country = 'Portugal';
-
-	        if(result.length > 0){
-	        	city = result[0].city;
-	        	country = result[0].country;
-	        } 
+        	var city = result[0].city;
 
 	        for(var i =0 ; i < result.length; i++){
 
@@ -988,23 +942,22 @@ app.get('/hotels', function(req,res){
 	        	hotel["place_id"] = result[i].place_id;
 	            hotel["name"] = result[i].place;
 	            hotel["city"] = result[i].city;
-	            hotel["type"] = result[i].poi_type.charAt(0).toUpperCase() + result[i].poi_type.slice(1);
-	            hotel["description"] = result[i].description;
 	            hotel["address"] = result[i].address;
 	            hotel["rating"] = result[i].rating;
 	        	hotel["coordinates"] = result[i].latitude + ", " + result[i].longitude;
-	        	hotel["website"] = result[i].website;
-	        	hotel["phone_number"] = result[i].phone;
+
+	        	// generate random price / offer between 30€ and 150€
+	        	hotel["price"] = Math.floor((Math.random() * 150) + 30) + " €";
 
 	        	list_hotels.push(hotel);
 	        }
 
-	        res.render(path.join(__dirname+'/templates/hotels.html'), {hotels: list_hotels, city: city, country: country});
-	        
+	        res.render(path.join(__dirname+'/templates/hotels.html'), {hotels: list_hotels, city: city});
 
-		});
+        }
 
-	}
+	});
+
 });
 
 
@@ -1163,7 +1116,7 @@ app.post('/create-plan', function(req, res){
 	        		}
 	        	}
 
-			  	con.query("call addVisitToPlan(?, ?, ?, ?)", [plan_id, poi, start_time_list[i], end_time_list[i]], function (err, result) {
+			  	con.query("call addVisitToPlan(?, ?, ?, ?, ?)", [plan_id, poi, start_time_list[i], end_time_list[i], 0], function (err, result) {
 			    	if (err) throw err;
 
 			  	});
@@ -1174,21 +1127,48 @@ app.post('/create-plan', function(req, res){
 
 	    connection.end();
 
+
+    	console.log("PLAN CREATED: ", plan_id);
+
     	res.render(path.join(__dirname+'/templates/see-plan.html'), {plan: plan_id});
 	});
 
 });
 
+
+// create plan manual
 app.post('/create-plan-m', function(req, res){
 	var connection;
 
-	destination = req.body.destination;
+	var user_id = parseInt(req.cookies['user']);
 
-	arrival = req.body.arrival;
+	if(isNaN(user_id)){
+		// send error message
+		return;
+	}
 
-	departure = req.body.departure;
+	var destination = req.body.destination;
 
-	user_id = parseInt(req.body.user);
+	if(destination == null)
+		return; // send error message
+
+	var arrival = req.body.arrival;
+
+	if(arrival == null)
+		return; // send error message
+
+	var departure = req.body.departure;
+
+	if(departure == null)
+		return; // send error message
+
+
+	var num_adults = req.body.adults;
+	var num_children = req.body.children;
+	var hasBudgetConstraint = req.body.has_budget;
+	var budget = req.body.budget;
+	var travel_mode = req.body.travel_mode;
+
 
     promise.createConnection({
 	    host: 'localhost',
@@ -1200,41 +1180,54 @@ app.post('/create-plan-m', function(req, res){
 	}).then(function(conn){
 		connection = conn;
 
-		var sql = "select id from city where name = ?";
-		var values = [destination];
-	    var result = connection.query(sql, [values]);
-
-	    return result;
-
-	}).then(function(result){
-		var city = result[0].id;
-
-		var sql = "insert into Plan (start_date, end_date, user, isActive, city, isManual) VALUES ?";
-		var values = [
-	    	[arrival.split('/')[2] + "-" + (arrival.split('/')[1]<10?'0':'') + arrival.split('/')[1] + "-" + (arrival.split('/')[0]<10?'0':'') + arrival.split('/')[0], 
+		var values = [destination,
+	    	arrival.split('/')[2] + "-" + (arrival.split('/')[1]<10?'0':'') + arrival.split('/')[1] + "-" + (arrival.split('/')[0]<10?'0':'') + arrival.split('/')[0], 
 	    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0],
-	    	user_id, 0, city, 1], 
-	  	];
-	    var result = connection.query(sql, [values]);
-	    connection.end();
+	    	user_id];
+
+	    var result = connection.query("call createPlanManual(?, ?, ?, ?)", values);
 
 	    return result;
-	}).then(function(result){
-  		var plan_id = result.insertId;
+
+    }).then(function(result){
+    	var plan_id = parseInt(result[0][0].planID);
+
+    	console.log("MANUAL PLAN CREATED: ", plan_id);
 
     	res.redirect('http://localhost:8080/plan-m?id='+ plan_id)
+
 	});
 
 });
 
-
+// create a plan from a already created plans
 app.post('/create-child-plan', function(req, res){
 	var connection;
 
+	var user_id = parseInt(req.cookies['user']);
+
+	if(isNaN(user_id)){
+		// send error message
+		return;
+	}
+
 	var plan_id = req.body.plan;
+
+	if(isNaN(plan_id)){
+		// send error message
+		return;
+	}
+
 	var start_date = req.body.start_date;
+
+	if(start_date == null)
+		return; // send error message
+
 	var end_date = req.body.end_date;
-	var user_id = req.cookies['user'];
+
+	if(end_date == null)
+		return; // send error message
+
 
 	var start_time_list = [];
 	var end_time_list = [];
@@ -1246,17 +1239,19 @@ app.post('/create-child-plan', function(req, res){
 	    database: 'placesdb'
 
 	}).then(function(conn){
-
 		connection = conn;
 
-		var sql = "select city, poi_id, start_time, end_time from plan join visit on plan.id = visit.plan_id where plan_id = ?";
-		var values = [plan_id];
-	    var result = connection.query(sql, [values]);
+	    var result = connection.query("call getInfoPlan(?)", [plan_id]);
 
     	return result;
+
 	}).then(function(result){
 
+		result = result[0];
+
 		var visits = [];
+		var city = result[0].city;
+
 
 		for(var i=0; i<result.length; i++){
 			visits.push(result[i]);
@@ -1285,209 +1280,228 @@ app.post('/create-child-plan', function(req, res){
 
 		}
 
-		return visits
-
-	}).then(function(result){
-
-		var city = result[0].city;
-
-		var visits = result;
-
-		sql = "insert into plan (start_date, end_date, user, city, parent_plan) values (?)";
-		values = [start_date, end_date, user_id, city, plan_id];
-
-		con.query(sql, [values], function(err, result) {
+		con.query("call createChildPlan(?,?,?,?,?)", [start_date, end_date, user_id, city, plan_id], function(err, result) {
 			if (err) throw err;
 
-			var new_plan = result.insertId;
+			result = result[0];
+
+			var child_plan = result[0].planID;
 
 			var i = 0;
 
 			while(i < start_time_list.length){
-				sql= "insert into Visit (plan_id, poi_id, start_time, end_time, weather) VALUES ?";
-				values = [[new_plan, visits[i].poi_id, start_time_list[i], end_time_list[i], 'Sunny']];
 
-				con.query(sql, [values], function (err, result) {
+				con.query("call addVisitToPlan(?,?,?,?, ?);", [child_plan, visits[i].poi_id, start_time_list[i], end_time_list[i], 0], function (err, result) {
 			    	if (err) throw err;
 			  	});
 
 		  		i++;
 			}
 
-			console.log("PLAN CREATED: ", new_plan)
+			console.log("PLAN CREATED: ", child_plan)
 
 			res.contentType('json');
-			res.send({result: 'success', plan: new_plan});
+			res.send({result: 'success', plan: child_plan});
 
 		});
+	});
 });
 
 
-
-
-	});
-
-
 app.post('/delete-plan', function(req, res){
-	var plan_id = parseInt(req.body.plan);
-	var user = parseInt(req.body.user);
-	var connection;
 
-	if(plan_id != undefined && user != undefined){
+	var user_id = parseInt(req.cookies['user']);
 
-		promise.createConnection({
-	    host: 'localhost',
-	    user: 'root',
-	    password: 'password',
-	    database: 'placesdb'
-
-		}).then(function(conn){
-			connection = conn;
-
-			var sql = "select user from plan where id = ?";
-			var values = [plan_id];
-
-		    var result = conn.query(sql, [values]);
-
-		    return result;
-		}).then(function(result){
-
-			if(result[0].user == user){
-				sql = "update plan set isActive = 0 where id = ?";
-				values = [plan_id];
-
-				var result = connection.query(sql, [values]);
-		    	connection.end();
-
-
-				res.contentType('json');
-				res.send({result: 'success'});
-
-			}
-
-			else{
-				res.contentType('json');
-				res.send({result: 'error'});
-			}
-
-		});
-
-	}
-
-	else{
+	if(isNaN(user_id)){
 		res.contentType('json');
 		res.send({result: 'error'});
+		return;
 	}
+
+	var plan_id = req.body.plan;
+
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error'});
+		return;
+	}
+
+
+	con.query("call deletePlan(?,?)", [plan_id, user_id], function(err, result) {
+		if (err) throw err;
+
+		res.contentType('json');
+		res.send({result: 'success'});
+
+	});
 
 });
 
 
 app.post('/rename-plan', function(req, res){
-	var plan_id = parseInt(req.body.plan);
-	var user = parseInt(req.body.user);
-	var connection;
+	var user_id = parseInt(req.cookies['user']);
 
-	if(plan_id != undefined && user != undefined){
-
-		promise.createConnection({
-	    host: 'localhost',
-	    user: 'root',
-	    password: 'password',
-	    database: 'placesdb'
-
-		}).then(function(conn){
-			connection = conn;
-
-			var sql = "select user from plan where id = ?";
-			var values = [plan_id];
-
-		    var result = conn.query(sql, [values]);
-
-		    return result;
-		}).then(function(result){
-
-			if(result[0].user == user){
-				sql = "update plan set name = ? where id = ?";
-				values = [req.body.name, plan_id];
-
-				var result = connection.query(sql, values);
-		    	connection.end();
-
-				res.contentType('json');
-				res.send({result: 'success'});
-
-			}
-
-			else{
-				res.contentType('json');
-				res.send({result: 'error'});
-			}
-
-		});
-
-	}
-
-	else{
+	if(isNaN(user_id)){
 		res.contentType('json');
-		res.send({result: 'error'});
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		return;
 	}
+
+	var plan_id = req.body.plan;
+
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The plan is not valid."});
+		return;
+	}
+
+	var name = req.body.name;
+
+	if(name == undefined || name == null || name == ""){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The name of the trip is not valid."});
+		return;
+	}
+
+
+	con.query("call renamePlan(?,?,?)", [plan_id, user_id, name], function(err, result) {
+		if (err) throw err;
+
+		res.contentType('json');
+		res.send({result: 'success'});
+
+	});
 
 });
 
 
 
 app.post('/share-plan', upload_plan.single('picture'), function (req, res, next){
-	var user_id = req.cookies['user'];
-	var plan_id = req.cookies['plan'];
+	var user_id = parseInt(req.cookies['user']);
 
-	var connection;
+	if(isNaN(user_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		return;
+	}
 
-	var sql = "update plan set isPublic = 1, photo = ?, description = ?, category = ? where id = ? and user = ? and isActive = 1";
-	var values = [req.file.filename, req.body.description, req.body.category, plan_id, user_id];
+	var plan_id = req.body.plan;
 
-	con.query(sql, values, function (err, result, fields) {
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The plan is not valid."});
+		return;
+	}
+
+	var filename = req.file.filename;
+	var description = req.body.description;
+	var category = req.body.category;
+	var rating = req.body.rating;	
+
+
+	con.query("call sharePlan(?,?,?,?,?,?)", [plan_id, user_id, description, filename, category, rating], function (err, result, fields) {
 		if (err) throw err;
 
-		promise.createConnection({
-		host: 'localhost',
-	    user: 'root',
-	    password: 'password',
-	    database: 'placesdb'
-
-		}).then(function(conn){
-			connection = conn;
-
-			sql = "insert into review (user_id) values (?)";
-			values = [user_id];
-		    var result = connection.query(sql, [values]);
-
-	    	return result;
-		}).then(function(result){
-			var review_id = result.insertId;
-
-			sql = "insert into review_plan values (?)";
-			values = [review_id, plan_id, req.body.description, req.body.rating, convertToSQLTimestamp(Date.now())];
-	    	result = connection.query(sql, [values]);
-
-	    	res.redirect('http://localhost:8080/trips');
-
-		});
+    	res.redirect('http://localhost:8080/trips');
 
 	});
-
-	
 
 });
 
 
 
 app.post('/review-plan', function(req, res){
+
+	var user_id = parseInt(req.cookies['user']);
+
+	if(isNaN(user_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		return;
+	}
+
+	var plan_id = req.body.plan;
+
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The plan is not valid."});
+		return;
+	}
+
+	var review = null;
+
+	if(req.body.review != undefined)
+		review = req.body.review;
+
+	var rating = parseInt(req.body.rating);	
+
+	if(isNaN(rating)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The rating is not valid."});
+		return;
+	}
+
+	con.query("call reviewPlan(?,?,?,?)", [plan_id, user_id, rating, review], function (err, result, fields) {
+		if (err) throw err;
+
+		res.contentType('json');
+		res.send({result: 'success'});
+
+	});
+});
+
+
+app.post('/archive-plan', function(req, res){
+	var user_id = parseInt(req.cookies['user']);
+
+	if(isNaN(user_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		return;
+	}
+
+	var plan_id = req.body.plan;
+
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The plan is not valid."});
+		return;
+	}
+
+	con.query("call archivePlan(?,?)", [plan_id, user_id], function (err, result, fields) {
+		if (err) throw err;
+
+    	res.contentType('json');
+		res.send({result: 'success'});
+
+	});
+});
+
+
+
+
+app.post('/save-plan', function(req, res){
 	var connection;
 
-	var user_id = req.cookies['user'];
+	var user_id = parseInt(req.cookies['user']);
+
+	if(isNaN(user_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		return;
+	}
+
+	var plan_id = req.body.plan;
+
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The plan is not valid."});
+		return;
+	}
+
 
 	promise.createConnection({
-		host: 'localhost',
+	    host: 'localhost',
 	    user: 'root',
 	    password: 'password',
 	    database: 'placesdb'
@@ -1495,171 +1509,49 @@ app.post('/review-plan', function(req, res){
 	}).then(function(conn){
 		connection = conn;
 
-		var sql = "insert into review (user_id) values (?)";
-		var values = [user_id];
-	    var result = connection.query(sql, [values]);
+	    var result = connection.query("call getOwnerOfPlanManual(?)", [plan_id]);
 
-    	return result;
+	    return result;
 	}).then(function(result){
-		var review_id = result.insertId;
 
-		if(req.body.review == ""){
-			var sql = "insert into review_plan (review_id, plan_id, review_rating, review_timestamp) values (?)";
-			var values = [review_id, req.body.plan, req.body.rating, convertToSQLTimestamp(Date.now())];
-	    	var result = connection.query(sql, [values]);
+		if(result[0][0].user == user){
+			connection.query("call savePlanManual(?)", [plan_id]);
 
-	    	res.send(JSON.stringify('success'));
+			connection.end();
+
+			res.contentType('json');
+			res.send({result: 'success'});
+
 		}
 
 		else{
-			var sql = "insert into review_plan values (?)";
-			var values = [review_id, req.body.plan, req.body.review, req.body.rating, convertToSQLTimestamp(Date.now())];
-	    	var result = connection.query(sql, [values]);
-
-	    	res.send(JSON.stringify('success'));
+			res.contentType('json');
+			res.send({result: 'error'});
 		}
 
 	});
-});
-
-
-app.post('/archive-plan', function(req, res){
-	var plan_id = parseInt(req.body.plan);
-	var user = req.cookies['user'];
-
-	var connection;
-
-	if(plan_id != undefined && user != undefined){
-
-		promise.createConnection({
-	    host: 'localhost',
-	    user: 'root',
-	    password: 'password',
-	    database: 'placesdb'
-
-		}).then(function(conn){
-			connection = conn;
-
-			var sql = "select user from plan where id = ?";
-			var values = [plan_id];
-
-		    var result = conn.query(sql, [values]);
-
-		    return result;
-		}).then(function(result){
-
-			if(result[0].user == user){
-				sql = "update plan set isArchived = 1 where id = ?";
-				values = [plan_id];
-
-				var result = connection.query(sql, values);
-		    	connection.end();
-
-				res.contentType('json');
-				res.send({result: 'success'});
-
-			}
-
-			else{
-				res.contentType('json');
-				res.send({result: 'error'});
-			}
-
-		});
-
-	}
-
-	else{
-		res.contentType('json');
-		res.send({result: 'error'});
-	}
-
-
-
-});
-
-
-
-
-app.post('/save-plan', function(req, res){
-	var plan_id = parseInt(req.body.plan);
-	var user = parseInt(req.body.user);
-	var connection;
-
-
-	if(plan_id != undefined && user != undefined){
-
-		promise.createConnection({
-	    host: 'localhost',
-	    user: 'root',
-	    password: 'password',
-	    database: 'placesdb'
-
-		}).then(function(conn){
-			connection = conn;
-
-			var sql = "select user from plan where id = ? and isManual = 1";
-			var values = [plan_id];
-
-		    var result = conn.query(sql, [values]);
-
-		    return result;
-		}).then(function(result){
-
-			if(result[0].user == user){
-				sql = "update plan set isActive = 1, isManual = 0 where id = ?";
-				values = [plan_id];
-
-				var result = connection.query(sql, values);
-
-				return true;
-
-			}
-
-			else{
-				res.contentType('json');
-				res.send({result: 'error'});
-
-				return false;
-			}
-
-		}).then(function(result){
-
-			if(result){
-				sql = "update visit set isActive = 1 where plan_id = ?";
-				values = [plan_id];
-
-				connection.query(sql, values);
-
-				connection.end();
-
-				res.contentType('json');
-				res.send({result: 'success'});
-
-			}
-
-		});
-
-	}
-
-	else{
-		res.contentType('json');
-		res.send({result: 'error'});
-	}
-
 
 });
 
 
 app.post('/favorite-plan', function(req, res){
+	var user_id = parseInt(req.cookies['user']);
 
-	var user_id = req.cookies['user'];
-	var plan_id = req.body['plan'];
+	if(isNaN(user_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		return;
+	}
 
-	var sql = "call setFavoritePlan(?,?)";
-	var values = [user_id, plan_id];
+	var plan_id = req.body.plan;
 
-	con.query(sql, values, function (err, result, fields) {
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The plan is not valid."});
+		return;
+	}
+
+	con.query("call setFavoritePlan(?,?)", [user_id, plan_id], function (err, result, fields) {
     	if (err){
     		throw err;
     		res.send(JSON.stringify('error'));
@@ -1674,14 +1566,23 @@ app.post('/favorite-plan', function(req, res){
 
 
 app.post('/unfavorite-plan', function(req, res){
+	var user_id = parseInt(req.cookies['user']);
 
-	var user_id = req.cookies['user'];
-	var plan_id = req.body['plan'];
+	if(isNaN(user_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		return;
+	}
 
-	var sql = "call unfavoritePlan(?,?)";
-	var values = [user_id, plan_id];
+	var plan_id = req.body.plan;
 
-	con.query(sql, values, function (err, result, fields) {
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The plan is not valid."});
+		return;
+	}
+
+	con.query("call unfavoritePlan(?,?)", [user_id, plan_id], function (err, result, fields) {
     	if (err){
     		throw err;
     		res.send(JSON.stringify('error'));
@@ -1691,26 +1592,36 @@ app.post('/unfavorite-plan', function(req, res){
 
     });
 
+
 });
 
 
 
 app.post('/user-interested', function(req, res){
 
-	var user_id = req.cookies['user'];
-	var plan_id = req.body['plan'];
+	var user_id = parseInt(req.cookies['user']);
 
-	var sql = "call setUserInterested(?,?)";
-	var values = [user_id, plan_id];
+	if(isNaN(user_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		return;
+	}
 
-	con.query(sql, values, function (err, result, fields) {
+	var plan_id = req.body.plan;
+
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The plan is not valid."});
+		return;
+	}
+
+	con.query("call setUserInterested(?,?)", [user_id, plan_id], function (err, result, fields) {
     	if (err){
     		throw err;
     		res.send(JSON.stringify('error'));
     	}
 
     	res.send(JSON.stringify('success'));
-
     });
 
 });
@@ -1720,13 +1631,23 @@ app.post('/user-interested', function(req, res){
 
 app.post('/user-not-interested', function(req, res){
 
-	var user_id = req.cookies['user'];
-	var plan_id = req.body['plan'];
+	var user_id = parseInt(req.cookies['user']);
 
-	var sql = "call unsetUserInterested(?,?)";
-	var values = [user_id, plan_id];
+	if(isNaN(user_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		return;
+	}
 
-	con.query(sql, values, function (err, result, fields) {
+	var plan_id = req.body.plan;
+
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The plan is not valid."});
+		return;
+	}
+
+	con.query("call unsetUserInterested(?,?)", [user_id, plan_id], function (err, result, fields) {
     	if (err){
     		throw err;
     		res.send(JSON.stringify('error'));
@@ -1735,21 +1656,39 @@ app.post('/user-not-interested', function(req, res){
     	res.send(JSON.stringify('success'));
 
     });
-
 });
 
 
 
 app.post('/add-visit', function(req, res){
-	
-	console.log("ADD VISIT " + req.body.poi + " TO THE PLAN " + req.body.plan);
-
 	var connection;
 
-	var plan_id = parseInt(req.body.plan);
-	var poi_id = parseInt(req.body.poi);
+	var user_id = parseInt(req.cookies['user']);
 
-	var sql, parameters;
+	if(isNaN(user_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		return;
+	}
+
+	var plan_id = req.body.plan;
+
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The plan is not valid."});
+		return;
+	}
+
+	var poi_id = req.body.poi;
+
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The place is not valid."});
+		return;
+	}
+
+	var schedule = req.body.schedule;
+
 	var isManual;
 
 	promise.createConnection({
@@ -1759,39 +1698,26 @@ app.post('/add-visit', function(req, res){
 	    database: 'placesdb'
 
     }).then(function(conn){
+    	connection = conn;
 
-		connection = conn;
+		return connection.query("call isPlanManual(?)", [plan_id]);
 
-		sql = "select isManual from plan where id = ?";
-		parameters = [plan_id];
-
-		return connection.query(sql, [parameters]);
-						
 	}).then(function(result){
 
-		isManual = parseInt(result[0].isManual[0]);
+		isManual = parseInt(result[0][0].isManual[0]);
 
-		if(isManual == 0){
-			sql = "select plan.start_date as start_date, plan.end_date as end_date, datediff(plan.end_date, plan.start_date) as date_diff, visit.start_time as start_time, visit.end_time as end_time from plan join visit on plan.id = visit.plan_id where plan.id = ? and visit.isActive = 1";
-		}
+		return connection.query("call getVisitTimes(?,?)", [plan_id, isManual]);
 
-		else{
-			sql = "select plan.start_date as start_date, plan.end_date as end_date, datediff(plan.end_date, plan.start_date) as date_diff, visit.start_time as start_time, visit.end_time as end_time from plan join visit on plan.id = visit.plan_id where plan.id = ? and plan.isManual = 1";
-		}
+	}).then(function(result){
 
-		parameters = [plan_id]
+		result = result[0];
 
-		var result = connection.query(sql, [parameters]);
+		var plan = {};
 
-		return result;
+        // if plan has visits 
+        if(result.length > 0){
 
-    }).then(function(result){
-
-    	var plan = {};
-
-    	if(result.length > 0){
-
-		 	for(var i=0; i < result.length; i++){
+        	for(var i=0; i < result.length; i++){
 	        	var visit = new Object();
 
 	        	var start_time = new Date(result[i].start_time);
@@ -1812,109 +1738,80 @@ app.post('/add-visit', function(req, res){
 	        	}
 	        }
 
-	        var schedule;
 
-	        if(req.body.schedule != undefined){
-	        	schedule = getFinalSchedule(req.body.schedule.split(" ")[0], req.body.schedule.split(" ")[1]);
+	        var chosen_schedule;
+
+	        if(schedule != undefined){
+	        	chosen_schedule = getFinalSchedule(schedule.split(" ")[0], schedule.split(" ")[1]);
 	        }
 	        else
-	    		schedule = getPlanOpenSlot(plan);
+	    		chosen_schedule = getPlanOpenSlot(plan);
 
 
-	    	if(schedule != false){
-	        	var values;
+	    	if(chosen_schedule != false){
 
-	        	if(isManual == 0){
-	        		sql = "insert into Visit(plan_id, poi_id, start_time, end_time) VALUES ?";
-					values = [[plan_id, poi_id, schedule[0], schedule[1]]];
-				}
-
-				else{
-	        		sql = "insert into Visit(plan_id, poi_id, start_time, end_time, isActive) VALUES ?";
-					values = [[plan_id, poi_id, schedule[0], schedule[1], 0]];
-
-				}
-
-				connection.query(sql, [values], function (err, result) {
+				connection.query("call addVisitToPlan(?,?,?,?,?)", [plan_id, poi_id, chosen_schedule[0], chosen_schedule[1], isManual], function (err, result) {
 		    		if (err) throw err;
 				  	
 		    		res.contentType('json');
+
 		    		if(isManual == 1)
 						res.send({result: 'success', isManual: true});
 					else
 						res.send({result: 'success', isManual: false});
-
-
 				});
 
 	        }
 
 	        else{
-
 				res.contentType('json');
 				res.send({result: 'error', msg: 'schedule error'});
-
 	        }
 
-	    	return 1;
+	        return 1;
 
-	    }
+        }
 
-	    else{
+        else{
+        	return connection.query("call getPlanDates(?)", [plan_id]);
 
-	    	sql = "select plan.start_date as start_date, plan.end_date as end_date, datediff(plan.end_date, plan.start_date) as date_diff from plan where id = ?";
-			parameters = [plan_id];
-
-			return connection.query(sql, [parameters]);
-
-	    }
-
+        }
 
 	}).then(function(result){
 
 		if(result == 1)
 			return;
 
-		var schedule;
+		result = result[0];
 
-		var schedule;
+		var chosen_schedule;
 
-        if(req.body.schedule != undefined)
-        	schedule = req.body.schedule;
+        if(schedule != undefined){
+    		chosen_schedule = getFinalSchedule(schedule.split(" ")[0], schedule.split(" ")[1]);
+        }
+
         else{
         	day = new Date(result[0].start_date);
 			day = day.getFullYear() + "-" + (day.getMonth()<10?'0':'') + (day.getMonth() + 1)  + "-" + (day.getDate()<10?'0':'') + day.getDate();
 
 			var schedules = getSchedules();
-
-			schedule = getFinalSchedule(day, schedules[0]);
+			chosen_schedule = getFinalSchedule(day, schedules[0]);
 
         }
 
-		if(schedule != false){
-        	var values;
-
-        	if(isManual == 0){
-        		sql = "insert into Visit(plan_id, poi_id, start_time, end_time, weather) VALUES ?";
-				values = [[plan_id, poi_id, schedule[0], schedule[1], 'Sunny']];
-			}
-
-			else{
-        		sql = "insert into Visit(plan_id, poi_id, start_time, end_time, weather, isActive) VALUES ?";
-				values = [[plan_id, poi_id, schedule[0], schedule[1], 'Sunny', 0]];
-
-			}
-
-			connection.query(sql, [values], function (err, result) {
+		if(chosen_schedule != false){
+        	
+        	connection.query("call addVisitToPlan(?,?,?,?,?)", [plan_id, poi_id, chosen_schedule[0], chosen_schedule[1], isManual], function (err, result) {
 	    		if (err) throw err;
 			  	
 	    		res.contentType('json');
+
+				console.log("ADDED VISIT " + req.body.poi + " TO THE PLAN " + req.body.plan);
 
 	    		if(isManual == 1)
 					res.send({result: 'success', isManual: true});
 				else
 					res.send({result: 'success', isManual: false});
-
 			});
 
         }
@@ -1934,74 +1831,71 @@ app.post('/add-visit', function(req, res){
 
 
 app.post('/delete-visit', function(req, res){
-	var plan_id = parseInt(req.body.plan);
-	var poi_id = parseInt(req.body.poi);
-	var user = parseInt(req.body.user);
 	var connection;
+
+	var user_id = parseInt(req.cookies['user']);
+
+	if(isNaN(user_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		return;
+	}
+
+	var plan_id = req.body.plan;
+
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The plan is not valid."});
+		return;
+	}
+
+	var poi_id = req.body.poi;
+
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The place is not valid."});
+		return;
+	}
 
 	var isManual;
 
-	if(plan_id != undefined && user != undefined){
-
-		promise.createConnection({
+	promise.createConnection({
 	    host: 'localhost',
 	    user: 'root',
 	    password: 'password',
 	    database: 'placesdb'
 
-		}).then(function(conn){
+	}).then(function(conn){
+    	connection = conn;
 
-			connection = conn;
+		return connection.query("call isPlanManual(?)", [planId]);
 
-			var sql = "select isManual from plan where id = ?";
-			var values = [plan_id];
+	}).then(function(result){
 
-			return connection.query(sql, [values]);
-							
-		}).then(function(result){
+		isManual = parseInt(result[0][0].isManual[0]);
 
-			isManual = parseInt(result[0].isManual[0]);
+	    var result = connection.query("call getOwnerOfPlan;", [plan_id]);
 
-			sql = "select user from plan where id = ?";
-			values = [plan_id];
+	    return result;
 
-		    var result = connection.query(sql, [values]);
+	}).then(function(result){
 
-		    return result;
+		if(result[0][0].user == user){
 
-		}).then(function(result){
-			if(result[0].user == user){
+			result = connection.query("call deleteVisit(?,?,?)", [plan_id, poi_id, isManual]);
+	    	connection.end();
 
-				if(isManual == 0)
-					sql = "update visit set isActive = 0 where plan_id = ? and poi_id = ?";
+			res.contentType('json');
+			res.send({result: 'success'});
 
-				else
-					sql = "delete from visit where plan_id = ? and poi_id = ?";
+		}
 
-				values = [plan_id, poi_id];
+		else{
+			res.contentType('json');
+			res.send({result: 'error'});
+		}
 
-				result = connection.query(sql, values);
-		    	connection.end();
-
-				res.contentType('json');
-				res.send({result: 'success'});
-
-			}
-
-			else{
-				res.contentType('json');
-				res.send({result: 'error'});
-			}
-
-		});
-
-	}
-
-	else{
-		res.contentType('json');
-		res.send({result: 'error'});
-	}
-
+	});
 });
 
 
@@ -2384,207 +2278,265 @@ app.get('/plan', function(req, res){
 
 
 app.get('/plan-m', function(req,res){
-	if(req.query['id'] != undefined){
+	var connection;
 
-		var plan_id = req.query['id'];
+	var user_id = req.cookies['user'];
+	var plan_id = parseInt(req.query['id']);
 
-		var sql = "select plan.name as plan_name, plan.start_date as start_date, plan.end_date as end_date, datediff(plan.end_date, plan.start_date) as date_diff, visit.start_time as start_time, visit.end_time as end_time, weather, poi.name as name, poi.id as id, city.name as city, place_id, website, phone_number, address, poi_type, poi.latitude as latitude, poi.longitude as longitude from plan join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on plan.id = visit.plan_id where plan.id = ? and plan.isManual = 1 order by start_time";
-		var parameters = [plan_id];
-
-		con.query(sql, parameters, function (err, result, fields) {
-	        if (err) throw err;
-
-	        var start_date = "n/a";
-	        var end_date = "n/a";
-	        var city = "";
-	        var name;
-	        var date_diff = 0;
-
-	        var dates = [];
-	        if(result.length > 0){
-	        	var month = new Array();
-				month[0] = "January";
-				month[1] = "February";
-				month[2] = "March";
-				month[3] = "April";
-				month[4] = "May";
-				month[5] = "June";
-				month[6] = "July";
-				month[7] = "August";
-				month[8] = "September";
-				month[9] = "October";
-				month[10] = "November";
-				month[11] = "December";
-
-
-	        	start_date = new Date(result[0].start_date);
-	        	end_date = new Date(result[0].end_date);
-
-	        	start_date_aux = start_date.getDate() + "-" + (start_date.getMonth()+1) + "-" + start_date.getFullYear();
-
-	        	start_date = start_date.getDate() + " " + month[start_date.getMonth()] + " " + start_date.getFullYear();
-	        	end_date = end_date.getDate() + " " + month[end_date.getMonth()] + " " + end_date.getFullYear();
-
-	        	date_diff = result[0].date_diff;
-
-	        	city = result[0].city;
-
-	        	days = getPlanDays(start_date_aux, parseInt(date_diff));
-
-	        	if(result[0].plan_name != null && result[0].plan_name.length > 0)
-	        		name = result[0].plan_name;
-	        	else
-	        		name = 'Your visit to ' + city;
-
-
-	        }
-
-
-	        else{
-
-	        	sql = "select plan.name as plan_name, plan.start_date as start_date, plan.end_date as end_date, datediff(plan.end_date, plan.start_date) as date_diff, city.name as city from plan join city on plan.city = city.id where plan.id = ?";
-	        	parameters = [plan_id];
-
-	        	con.query(sql, parameters, function (err, result, fields) {
-			        if (err) throw err;
-
-			        if(result.length > 0){
-			        	var month = new Array();
-						month[0] = "January";
-						month[1] = "February";
-						month[2] = "March";
-						month[3] = "April";
-						month[4] = "May";
-						month[5] = "June";
-						month[6] = "July";
-						month[7] = "August";
-						month[8] = "September";
-						month[9] = "October";
-						month[10] = "November";
-						month[11] = "December";
-
-
-			        	start_date = new Date(result[0].start_date);
-			        	end_date = new Date(result[0].end_date);
-
-			        	start_date_aux = start_date.getDate() + "-" + (start_date.getMonth()+1) + "-" + start_date.getFullYear();
-
-			        	start_date = start_date.getDate() + " " + month[start_date.getMonth()] + " " + start_date.getFullYear();
-			        	end_date = end_date.getDate() + " " + month[end_date.getMonth()] + " " + end_date.getFullYear();
-
-			        	date_diff = result[0].date_diff;
-
-			        	city = result[0].city;
-
-			        	days = getPlanDays(start_date_aux, parseInt(date_diff));
-
-			        	if(result[0].plan_name != null && result[0].plan_name.length > 0)
-			        		name = result[0].plan_name;
-			        	else
-			        		name = 'Your visit to ' + city;
-
-
-			        }
-
-			    });
-
-	        }
-
-
-
-	        var plan = []
-	        for(var i=0; i < result.length; i++){
-	        	var visit = new Object();
-	        	visit["id"] = result[i].id;
-	        	visit["name"] = result[i].name;
-	        	visit["place_id"] = result[i].place_id;
-
-	        	var start_time = new Date(result[i].start_time);
-	        	var end_time = new Date(result[i].end_time);
-
-	        	visit["day"] = (start_time.getDate()<10?'0':'') + start_time.getDate() + " " + month[start_time.getMonth()] + " " + start_time.getFullYear();
-
-	        	visit["start_time"] = start_time.getHours() + ":" + (start_time.getMinutes()<10?'0':'') + start_time.getMinutes();
-	        	visit["end_time"] = end_time.getHours() + ":" + (end_time.getMinutes()<10?'0':'') + end_time.getMinutes();
-	        	visit["weather"] = result[i].weather;
-	        	visit["address"] = result[i].address;
-	        	visit["coordinates"] = result[i].latitude + ", " + result[i].longitude;
-	        	visit["website"] = result[i].website;
-	        	visit["phone_number"] = result[i].phone_number;
-	        	visit["poi_type"] = result[i].poi_type;
-	        	visit["city"] = result[i].city; 
-
-	        	plan.push(visit);
-	        }
-
-
-    	 	promise.createConnection({
-    			host: 'localhost',
-			    user: 'root',
-			    password: 'password',
-			    database: 'placesdb'
-
-			}).then(function(conn){
-				var sql = "select distinct city from plan where id = ?";
-				var values = [plan_id];
-			    var result = conn.query(sql, [values]);
-			    conn.end();
-
-		    	return result;
-			}).then(function(result){
-				var city_id = result[0].city;
-
-				var sql2 = "select id, place_id, name from poi where city = ? and id not in (select poi_id from visit where plan_id = ?) order by num_reviews desc";
-	        	var parameters2 = [city_id, plan_id];
-
-		        con.query(sql2, parameters2, function (err, result, fields) {
-		        	if (err) throw err;
-
-		        	var suggested_visits = [];
-
-		        	var length = 3;
-		        	if(result.length < length)
-		        		length = result.length;
-
-		        	for(var i=0; i < length; i++){
-			        	var visit = new Object();
-			        	visit["id"] = result[i].id;
-			        	visit["name"] = result[i].name;
-			        	visit["place_id"] = result[i].place_id;
-			        	suggested_visits.push(visit);
-			        }
-
-			        var sql3 = "select id, place_id, name from poi where city = ? and poi_type = 'Hotel' and id not in (select poi_id from visit where plan_id = ?)  order by num_reviews desc";
-			        var parameters3 = [city_id, plan_id];
-
-			        con.query(sql3, parameters3, function (err, result, fields) {
-			        	if (err) throw err;
-
-			        	var suggested_hotels = [];
-
-			        	var length = 3;
-			        	if(result.length < length)
-			        		length = result.length;
-
-			        	for(var i=0; i < length; i++){
-				        	var visit = new Object();
-			        		visit["id"] = result[i].id;
-				        	visit["name"] = result[i].name;
-				        	visit["place_id"] = result[i].place_id;
-				        	suggested_hotels.push(visit);
-				        }
-
-				        res.render(path.join(__dirname+'/templates/full-plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: "author", isPublic: 0, isManual: 1, reviews: [], num_viewers: 0, rating: 0, num_reviews: 0, num_plans: 0});
-
-			        });
-
-        		});
-			});
-    	});
-		
+	if(isNaN(plan_id)){
+		res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
+		return;
 	}
-	
+
+	if(isNaN(user_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		return;
+	}
+
+	var start_date = "n/a";
+    var end_date = "n/a";
+    var city = "";
+    var name;
+    var date_diff = 0;
+    var isPublic = 0;
+    var source;
+    var num_viewers = 0;
+
+
+	con.query("call getVisitsFromPlan(?, ?)", [user_id, plan_id], function (err, result, fields) {
+		if (err) throw err;
+
+		result = result[0];
+
+		/* atributos do plano */
+		if(result.length > 0){
+
+			start_date = new Date(result[0].start_date);
+        	end_date = new Date(result[0].end_date);
+
+        	start_date_aux = start_date.getDate() + "-" + (start_date.getMonth()+1) + "-" + start_date.getFullYear();
+
+        	start_date = start_date.getDate() + " " + convertToTextMonth(start_date.getMonth()) + " " + start_date.getFullYear();
+        	end_date = end_date.getDate() + " " + convertToTextMonth(end_date.getMonth()) + " " + end_date.getFullYear();
+
+        	date_diff = result[0].date_diff;
+
+        	city = result[0].city;
+
+        	city_latitude = result[0].city_latitude;
+        	city_longitude = result[0].city_longitude;
+
+        	days = getPlanDays(start_date_aux, parseInt(date_diff));
+
+        	if(result[0].plan_name != null && result[0].plan_name.length > 0)
+        		name = result[0].plan_name;
+        	else
+        		name = 'Your visit to ' + city;
+
+        	isPublic = result[0].isPublic[0];
+
+        	if(parseInt(result[0].user) == parseInt(user_id))
+        		source = "author";
+        	else
+        		source = "viewer";
+
+        	num_viewers = result[0].num_viewers;
+
+		}
+
+		else{
+
+			con.query("call getPlanDates(?)", [plan_id], function (err, result, fields) {
+		        if (err) throw err;
+
+		        result = result[0];
+
+		        if(result.length > 0){
+		        	start_date = new Date(result[0].start_date);
+		        	end_date = new Date(result[0].end_date);
+
+		        	start_date_aux = start_date.getDate() + "-" + (start_date.getMonth()+1) + "-" + start_date.getFullYear();
+
+		        	start_date = start_date.getDate() + " " + convertToTextMonth(start_date.getMonth()) + " " + start_date.getFullYear();
+		        	end_date = end_date.getDate() + " " + convertToTextMonth(end_date.getMonth()) + " " + end_date.getFullYear();
+
+		        	date_diff = result[0].date_diff;
+
+		        	city = result[0].city;
+
+		        	days = getPlanDays(start_date_aux, parseInt(date_diff));
+
+		        	if(result[0].plan_name != null && result[0].plan_name.length > 0)
+		        		name = result[0].plan_name;
+		        	else
+		        		name = 'Your visit to ' + city;
+	        	}
+
+
+	        	else{
+					res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
+					return;
+	        	}
+	        });
+
+		}
+
+		var plan = [];
+
+        for(var i=0; i < result.length; i++){
+        	var visit = new Object();
+
+        	/* atributos da visita */
+        	var start_time = new Date(result[i].start_time);
+        	var end_time = new Date(result[i].end_time);
+
+        	visit["day"] = (start_time.getDate()<10?'0':'') + start_time.getDate() + " " + convertToTextMonth(start_time.getMonth()) + " " + start_time.getFullYear();
+        	visit["start_time"] = start_time.getHours() + ":" + (start_time.getMinutes()<10?'0':'') + start_time.getMinutes();
+        	visit["end_time"] = end_time.getHours() + ":" + (end_time.getMinutes()<10?'0':'') + end_time.getMinutes();
+        	
+        	/* atributos do POI */
+
+        	visit["id"] = result[i].id;
+        	visit["name"] = result[i].name;
+        	visit["place_id"] = result[i].place_id;
+        	visit["address"] = result[i].address;
+        	visit["coordinates"] = result[i].latitude + ", " + result[i].longitude;
+        	visit["poi_type"] = result[i].poi_type;
+        	visit["city"] = result[i].city; 
+
+        	if(result[i].photo != null)
+        		visit["photo"] = result[i].photo.replace(/\\/g,"/");
+        	else
+        		visit["photo"] = null;
+
+        	var website = result[i].website;
+			if(website == null)
+				website = "No information available";
+
+        	visit["website"] = website;
+
+        	var phone_number = result[i].phone_number;
+			if(phone_number == null)
+				phone_number = "No information available";
+
+        	visit["phone_number"] = phone_number;
+
+
+        	var no_plans = result[i].no_plans;
+			if(no_plans == null)
+				no_plans = 0;
+
+			visit["no_plans"] = no_plans;
+
+			var rating = result[i].rating;
+			if(rating == null)
+				rating = "No information available";
+			else
+				rating = parseFloat(rating).toFixed(1) + " / 5.0";
+
+			visit["rating"] = rating;
+
+			var accessibility = result[i].accessibility;
+			if(accessibility == null)
+				accessibility = "No information available";
+			else
+				accessibility = parseFloat(accessibility).toFixed(1) + " / 5.0";
+
+			visit["accessibility"] = accessibility;
+
+			var security = result[i].security;	
+			if(security == null)
+				security = "No information available";
+			else
+				security = parseFloat(security).toFixed(1) + " / 5.0";
+
+			visit["security"] = security;
+
+			var price = result[i].price;
+			if(price == null)
+				price = "No information available";
+			else
+				price = parseFloat(price).toFixed(2);
+
+			visit["price"] = price;
+
+			var duration = result[i].duration;
+			if(duration == null)
+				duration = "No information available";
+			else
+				duration = ((parseInt(duration) / 60)<10?'0':'') + (parseInt(duration) / 60)  + ":" + ((parseInt(duration) % 60)<10?'0':'') + (parseInt(duration) % 60);
+
+			visit["duration"] = duration;
+
+			visit["distance_km"] = null;
+			visit["deslocation_duration"] = null;
+
+        	plan.push(visit);
+        }
+
+        promise.createConnection({
+			host: 'localhost',
+		    user: 'root',
+		    password: 'password',
+		    database: 'placesdb'
+
+		}).then(function(conn){
+			connection = conn;
+
+			var result = connection.query("call getCityIDFromPlan(?)", [plan_id]);
+
+			return result;
+
+		}).then(function(result){
+			var city_id = result[0][0].city;
+
+			/* obter sugestões */
+
+	        con.query("call getOtherSuggestionsFromPlan(?, ?)", [plan_id, city_id], function (err, result, fields) {
+	        	if (err) throw err;
+
+	        	result = result[0];
+
+	        	var suggested_visits = []; // lista com POIs sugeridos
+	        	var suggested_hotels = []; // lista com Hoteis sugeridos
+	        	var size = 6; // numero de sugestões
+	        	var total_hotels = 0;
+
+	        	if(result.length < size)
+	        		size = result.length;
+
+	        	for(var i=0; i < result.length; i++){
+	        		if(result[i].poi_type == 'Hotel')
+		        		total_hotels++;
+		        }
+
+		        var i = 0;
+
+	        	while(suggested_hotels.length + suggested_visits.length < size){
+		        	var visit = new Object();
+		        	visit["id"] = result[i].id;
+		        	visit["name"] = result[i].name;
+		        	visit["place_id"] = result[i].place_id;
+
+		        	if(result[i].poi_type == 'Hotel' && suggested_hotels.length < Math.floor(size / 2))
+		        		suggested_hotels.push(visit);
+		        	else if (suggested_visits.length < Math.ceil(size / 2) || suggested_hotels.length == total_hotels)
+		        		suggested_visits.push(visit);
+
+		        	i = (i + 1) % result.length;
+		        }
+
+		        res.render(path.join(__dirname+'/templates/full-plan.html'), {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: "author", isPublic: 0, isManual: 1, reviews: [], num_viewers: 0, rating: 0, num_reviews: 0, num_plans: 0});
+
+		    });
+
+	    });
+
+    });
+
 });
+
 
 
 
@@ -2631,26 +2583,12 @@ app.get('/trips', function(req, res){
 
 	        	plan["photo"] = result[i].photo;
 
-	        	var month = new Array();
-				month[0] = "January";
- 				month[1] = "February";
-				month[2] = "March";
-				month[3] = "April";
-				month[4] = "May";
-				month[5] = "June";
-				month[6] = "July";
-				month[7] = "August";
-				month[8] = "September";
-				month[9] = "October";
-				month[10] = "November";
-				month[11] = "December";
-
 	        	start_date = new Date(result[i].start);
 	        	end_date = new Date(result[i].end);
 	        	now = new Date();
 
-	        	plan["start"] = start_date.getDate() + " " + month[start_date.getMonth()] + " " + start_date.getFullYear();
-	        	plan["end"] = end_date.getDate() + " " + month[end_date.getMonth()] + " " + end_date.getFullYear();
+	        	plan["start"] = start_date.getDate() + " " + convertToTextMonth(start_date.getMonth()) + " " + start_date.getFullYear();
+	        	plan["end"] = end_date.getDate() + " " + convertToTextMonth(end_date.getMonth()) + " " + end_date.getFullYear();
 
 	        	if(start_date < now){
 	        		past_trips.push(plan);
@@ -2679,110 +2617,49 @@ app.get('/trips', function(req, res){
 });
 
 
-
+// login usando o GOOGLE
 app.post('/login-g', function(req, res){
 
-	var connection;
+	var googleID = req.body.google_id;
+	var username = req.body.username;
+	var name = req.body.name;
+	var picture = req.body.picture;
 
-	promise.createConnection({
-		host: 'localhost',
-	    user: 'root',
-	    password: 'password',
-	    database: 'placesdb'
+	con.query("call loginWithGoogle(?,?,?,?)", [googleID, username, name, picture], function (err, result, fields) {
+    	if (err) throw err;
 
-	}).then(function(conn){
-		connection = conn;
+    	result = result[0];
 
-		var sql = "select count(*) as count from user_g where google_id = ?";
-		var values = [req.body.google_id];
-	    var result = connection.query(sql, [values]);
+    	if(result[0].error != undefined){
+    		console.log("ERROR " + result[0].error);
+    		return;
+    	}
 
-    	return result;
-	}).then(function(result){
+	 	var user_id = result[0].id;
+       	var picture = result[0].picture;
 
-		if(parseInt(result[0].count) == 0){
-			var sql = "insert into user (username, name, picture) values (?)";
-			var values = [req.body.username, req.body.name, req.body.picture];
-			var result = connection.query(sql, [values]);	
-
-			return result;
-		}
-
-		else{
-
-			var sql = "select id, picture from user join user_g on user.id = user_g.user_id where google_id = ?";
-			var values = [req.body.google_id];
-
-			con.query(sql, values, function (err, result, fields) {
-	        	if (err) throw err;
-
-	    	 	var user_id = result[0].id;
-		       	var picture = result[0].picture;
-
-      			res.contentType('json');
-				res.send({user_id: user_id, picture: picture});
-
-			});
-
-
-	        return -1;
-		}
-
-	}).then(function(result){
-
-		if(result == -1){
-			return;
-		}
-
-		var user_id = result.insertId;
-
-		var sql = "insert into user_g values (?) ";
-		var values = [user_id, req.body.google_id];
-		var result = connection.query(sql, [values]);	
-
-        var sql2 = "select id, picture from user where id = ?";
-		var values2 = [user_id];
-
-		con.query(sql2, values2, function (err, result, fields) {
-        	if (err) throw err;
-
-    	 	var user_id = result[0].id;
-	        var picture = result[0].picture;
-
-
-      		res.contentType('json');
-			res.send({user_id: user_id, picture: picture});
-
-		});
+		res.contentType('json');
+		res.send({user_id: user_id, picture: picture});
 
 	});
 
 });
 
 
+
+
 app.post('/login-e', function(req, res){
+	var username = req.body.email;
+	var password = md5(req.body.password);
 
-	var connection;
+	con.query("call login(?)", [username], function (err, result, fields) {
+    	if (err) throw err;
 
-	promise.createConnection({
-		host: 'localhost',
-	    user: 'root',
-	    password: 'password',
-	    database: 'placesdb'
+    	result = result[0];
 
-	}).then(function(conn){
-		connection = conn;
+    	if(parseInt(result.length) == 1){
 
-		var sql = "select id, picture, CAST(password AS CHAR(32) CHARACTER SET utf8) as password from user_e join user on user_e.user_id = user.id where username = ?";
-		var values = [req.body.email];
-	    var result = connection.query(sql, [values]);
-
-    	return result;
-	}).then(function(result){
-
-		if(parseInt(result.length) == 1){
-
-			if(result[0].password == md5(req.body.password)){
+			if(result[0].password == password){
 
 	    	 	var user_id = result[0].id;
 		       	var picture = result[0].picture;
@@ -2805,9 +2682,7 @@ app.post('/login-e', function(req, res){
 			res.send({user_id: 'error', picture: 'email not found'});
 
 		}
-
 	});
-
 });
 
 
@@ -2817,228 +2692,60 @@ app.get('/register', function(req, res){
 });
 
 
+
 app.post('/register', upload.single('photo'), function (req, res, next){
 
-	var connection;
+	var username = req.body.email;
+	var name = req.body.fname + " " + req.body.lname;
+	var country = req.body.country;
+	var phone_number = req.body.phone;
 
-	if(req.file) {
+	if(phone_number == '')
+		phone_number = null;
+	
+	var picture = null;
 
-		var password = md5(req.body.password);
+	if(req.file)
+		picture = req.file.path.split('dist')[1];
 
-		promise.createConnection({
-			host: 'localhost',
-		    user: 'root',
-		    password: 'password',
-		    database: 'placesdb'
+	var birthday = req.body.birthday;
 
-		}).then(function(conn){
+	if(birthday != null)
+		birthday = birthday.split('/')[2] + "-" + birthday.split('/')[1] + "-" + birthday.split('/')[0];
 
-			connection = conn;
+	var gender = req.body.gender;
 
-			var sql = "select count(*) as count from user where username = ?";
-			var values = [req.body.email];
-		    var result = connection.query(sql, [values]);
-
-	    	return result;
-		}).then(function(result){
-
-			if(parseInt(result[0].count) == 0){
-
-				/* Begin transaction */
-				con.beginTransaction(function(err) {
-  					if (err) { throw err; }
-
-					var sql = "insert into user (username, name, picture, type_use) values (?)";
-					var values = [req.body.email, req.body.fname + " " + req.body.lname, req.file.filename, req.body.type_use];
-
-					con.query(sql, [values], function(err, result) {
-    					if (err) { 
-      						con.rollback(function() {
-        						throw err;
-      						});
-      					}
-
-	      				var user_id = result.insertId;
-
-	      				//var picture_fn = req.file.path.split('.')[0] + "_" + user_id + "." + req.file.path.split('.')[1];
-
-		    			var birthday = req.body.birthday.split('/')[2] + "-" + req.body.birthday.split('/')[1] + "-" + req.body.birthday.split('/')[0];
-
-						if(req.body.phone != undefined){
-							sql = "insert into user_e (user_id, birthday, gender, country, phone_number, password) values (?) ";
-							values = [user_id, birthday, req.body.gender, req.body.country, req.body.phone, password];
-						}
-
-						else{
-							sql = "insert into user_e (user_id, birthday, gender, country, password) values (?) ";
-							values = [user_id, birthday, req.body.gender, req.body.country, password];
-
-						}
-
-						con.query(sql, [values],  function(err, result) {
-							if (err) { 
-    							con.rollback(function() {
-					          		throw err;
-					        	});
-				     		}
-
-							var sql2 = "update user set picture = (?) where id = (?)";
-							var values2 = [req.file.path.split('dist')[1], user_id];
-
-							con.query(sql2, values2,  function(err, result) {
-								if (err) { 
-	    							con.rollback(function() {
-						       	   		throw err;
-						        	});
-					     		}
-
-	        					var sql3 = "select id, picture from user where id = ?";
-								var values3 = [user_id];
-
-								con.query(sql3, values3, function (err, result, fields) {
-		        					if (err) { 
-	    								con.rollback(function() {
-						       	   			throw err;
-					        			});
-					     			}
-
-					     			con.commit(function(err) {
-							        	if (err) { 
-							          		con.rollback(function() {
-							            		throw err;
-							          		});
-							        	}
-							       	 	console.log('Transaction Complete.');
-							        	con.end();
-							      	});	
-
-	    	 						var user_id = result[0].id;
-			        				var picture = result[0].picture;
+	if(gender != 'M' || gender != 'F')
+		gender = null;
 
 
-									res.render(path.join(__dirname+'/templates/register.html'), {isRegistered: true, alreadyExists: false});
+	var password = md5(req.body.password);
 
-								});
-							});
-						});
-					});
-				});
-			}
+	con.query("call register(?,?,?,?,?,?,?,?)", [username, name, picture, birthday, gender, country, phone_number, password], function (err, result, fields) {
+    	if (err) throw err;
 
-			else{
+    	result = result[0];
 
-				res.render(path.join(__dirname+'/templates/register.html'), {isRegistered: false, alreadyExists: true});
-			}
+    	if(result[0].error != undefined){
+    		console.log("ERROR " + result[0].error);
 
-		});
-			
-	}
+    		res.render(path.join(__dirname+'/templates/register.html'), {isRegistered: false, alreadyExists: true});
 
+    	}
 
-	else{
+    	else{
 
-		var password = md5(req.body.password);
+		 	var user_id = result[0].id;
+	       	var picture = result[0].picture;
 
-		promise.createConnection({
-			host: 'localhost',
-		    user: 'root',
-		    password: 'password',
-		    database: 'placesdb'
+	       	res.render(path.join(__dirname+'/templates/register.html'), {isRegistered: true, alreadyExists: false});
 
-		}).then(function(conn){
+		}
 
-			connection = conn;
-
-			var sql = "select count(*) as count from user where username = ?";
-			var values = [req.body.email];
-		    var result = connection.query(sql, [values]);
-
-	    	return result;
-		}).then(function(result){
-
-			if(parseInt(result[0].count) == 0){
-
-				/* Begin transaction */
-				con.beginTransaction(function(err) {
-  					if (err) { throw err; }
-
-					var sql = "insert into user (username, name) values (?)";
-					var values = [req.body.email, req.body.fname + " " + req.body.lname];
-
-					con.query(sql, [values], function(err, result) {
-    					if (err) { 
-      						con.rollback(function() {
-        						throw err;
-      						});
-      					}
-
-	      				var user_id = result.insertId;
-
-      					console.log('User ' + user_id + ' added');
-
-			    		var birthday = req.body.birthday.split('/')[2] + "-" + req.body.birthday.split('/')[1] + "-" + req.body.birthday.split('/')[0];
-
-						if(req.body.phone != undefined){
-							sql = "insert into user_e values (?) ";
-							values = [user_id, birthday, req.body.gender, req.body.country, req.body.phone, password];
-						}
-
-						else{
-							sql = "insert into user_e (birthday, gender, country, password) values (?) ";
-							values = [user_id, birthday, req.body.gender, req.body.country, password];
-
-						}
-
-						con.query(sql, [values],  function(err, result) {
-							if (err) { 
-    							con.rollback(function() {
-					          		throw err;
-					        	});
-				     		}
-
-      						console.log('Register completed');
-
-        					var sql2 = "select id, picture from user where id = ?";
-							var values2 = [user_id];
-
-							con.query(sql2, values2, function (err, result, fields) {
-	        					if (err) { 
-    								con.rollback(function() {
-					       	   			throw err;
-				        			});
-				     			}
-
-				     			con.commit(function(err) {
-						        	if (err) { 
-						          		con.rollback(function() {
-						            		throw err;
-						          		});
-						        	}
-						       	 	console.log('Transaction Complete.');
-						        	con.end();
-						      	});	
-
-    	 						var user_id = result[0].id;
-		        				var picture = result[0].picture;
-
-
-								res.render(path.join(__dirname+'/templates/register.html'), {isRegistered: true, alreadyExists: false});
-							});
-						});
-					});
-				});
-			}
-
-			else{
-
-				res.render(path.join(__dirname+'/templates/register.html'), {isRegistered: false, alreadyExists: true});
-			}
-
-		});
-
-	}
-
+	});
 });
+
+
 
 
 app.get('/profile', function(req, res){
@@ -3570,13 +3277,33 @@ app.post('/review-poi', function(req, res){
 });
 
 
+/* edit the description of a POI */
 
-app.post('/add-description-poi', function(req, res){
+app.post('/edit-description-poi', function(req, res){
 	
-	var sql = "update poi set description = ? where id = ?";
-	var values = [req.body.description, req.body.poi];
+	var user_id = req.cookies['user'];
+	var plan_id = parseInt(req.body.poi);
+	var description = req.body.description;
 
-	con.query(sql, values, function (err, result, fields) {
+	if(isNaN(plan_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The POI does not exist."});
+		return;
+	}
+
+	if(isNaN(user_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		return;
+	}
+
+	if(description == "" || description == null){
+		res.contentType('json');
+		res.send({result: 'error', msg: "Please provide a valid description."});
+		return;
+	}
+
+	con.query("call editPOIDescription(?,?,?)", [user_id, plan_id, description], function (err, result, fields) {
 		if (err){
 			throw err;
 			res.send(JSON.stringify('error'));
@@ -3614,6 +3341,7 @@ app.post('/upload-poi-photo', upload_poi.single('photo'), function(req, res){
 });
 
 
+// update POI DB from data collected from Google
 app.post('/update-info-poi-automatically', function(req, res){
 
 	var poi_id = parseInt(req.body['poi']);
@@ -3624,8 +3352,36 @@ app.post('/update-info-poi-automatically', function(req, res){
 	var poi_field_name = req.body['field'];
 	var poi_field_value = req.body['value'];
 
+	// update price level 
+	if(poi_field_name == "price_level"){
+		price_level = parseInt(poi_field_value);
+
+		if(isNaN(price_level))
+			return;
+
+		con.query("call updatePOIPriceLevel(?,?)", [poi_id, price_level], function (err, result, fields) {
+    		if (err) throw err;
+
+		});
+	}
 
 
+	// update address 
+	else if(poi_field_name == "address"){
+		address = poi_field_value;
+
+		if(address == "" || address == null)
+			return;
+
+		con.query("call updatePOIAddress(?,?)", [poi_id, address], function (err, result, fields) {
+    		if (err) throw err;
+
+			res.contentType('json');
+			res.send({result: result[0][0].result});
+
+
+		});
+	}
 
 });
 
@@ -4175,8 +3931,6 @@ function getWeather(plan){
 	    for(var i=0; i < weather.length; i++){
 	    	plan[i]["weather"] = weather[i];
 	    }
-
-	    console.log(plan);
 
 	    return plan;
 	});

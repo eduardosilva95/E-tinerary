@@ -82,9 +82,11 @@ function createOpeningHoursTable(hours){
 
 function getPlaceDetails(place_id){
 
+    var poi_id = /id=([^&]+)/.exec(location.search)[1];
+
     var request = {
       placeId: place_id,
-      fields: ["photos", "opening_hours", "review", "name"]
+      fields: ["photos", "opening_hours", "review", "name", "price_level", "formatted_address"]
     };
 
 
@@ -100,40 +102,58 @@ function getPlaceDetails(place_id){
           $("#no-opening-hours").css("display", "block");
         }
 
-        if(place.photos != undefined){
+        var merge_photos = [];
 
-          var merge_photos = place.photos.concat(photos_list);
+        
+        if(place.photos != undefined && photos_list.length < 10){
 
-          for(var i=0; i<merge_photos.length;i++){
+          var num_photos_from_google_required = 10-photos_list.length;
 
-            var img_div = document.createElement("DIV");
-            img_div.className = "mySlides slideshow-fade";
+          var google_photos = place.photos.slice(0,num_photos_from_google_required);
+          
+          merge_photos = photos_list.concat(google_photos);
 
-            var img = document.createElement("IMG");
-
-            if(i >= place.photos.length){
-              img.src = merge_photos[i].replace(/"/g,"");
-            }
-
-            else{
-              img.src = merge_photos[i].getUrl();
-            }
-
-            img.style.width = "100%";
-
-            img_div.appendChild(img);
-
-            document.getElementById("slideshow-div").appendChild(img_div);
-
-            var dot = document.createElement("SPAN");
-            dot.className = "dot";
-            dot.setAttribute( "onClick", "javascript: currentSlide(" + (i+1) + ");" );
-
-            document.getElementById("dots-div").appendChild(dot);
-
-          }
-          showSlides(slideIndex);
         }
+
+        else {
+
+          merge_photos = photos_list;
+
+        }
+
+
+        for(var i=0; i<merge_photos.length;i++){
+
+          var img_div = document.createElement("DIV");
+          img_div.className = "mySlides slideshow-fade";
+
+          var img = document.createElement("IMG");
+
+          if(i >= photos_list.length){
+            img.src = merge_photos[i].getUrl();
+          }
+
+          else{
+            img.src = merge_photos[i].replace(/"/g,"");
+          }
+
+          img.style.width = "100%";
+
+          img_div.appendChild(img);
+
+          document.getElementById("slideshow-div").appendChild(img_div);
+
+          var dot = document.createElement("SPAN");
+          dot.className = "dot";
+          dot.setAttribute( "onClick", "javascript: currentSlide(" + (i+1) + ");" );
+
+          document.getElementById("dots-div").appendChild(dot);
+
+        }
+
+        showSlides(slideIndex);
+
+
 
         if(place.reviews != undefined){
           for(var i=0; i < place.reviews.length; i++){
@@ -158,6 +178,25 @@ function getPlaceDetails(place_id){
           html += '<div class="card-body text-center empty-review"><p class="mb-1">No reviews available for ' + place.name +'</p></div>';
 
           document.getElementById("google-reviews").innerHTML += html;
+        }
+
+
+        if(place.price_level != undefined){
+
+          $.post("/update-info-poi-automatically", {poi: poi_id, field: "price_level", value: place.price_level}, function(result){
+          });
+        }
+
+        if(place.formatted_address != undefined){
+
+          $.post("/update-info-poi-automatically", {poi: poi_id, field: "address", value: place.formatted_address}, function(result){
+            
+            // if there are changes, refresh the page
+            if(result.result == 1){
+              window.location.reload();
+            }
+
+          });
         }
 
       }
@@ -371,17 +410,17 @@ function getPlaceDetails(place_id){
     }
   }
 
-  function addDescription(){
+  function editDescription(){
     var poi_id = /id=([^&]+)/.exec(location.search)[1];
 
     if(document.getElementById("add-description-text").value == ''){
-      alert("The review can't be empty");
+      $("#add-description-error").css("display", "block");
       return;
     }
 
     var description = document.getElementById("add-description-text").value;
 
-    $.post("/add-description-poi", {poi: poi_id, description: description}, function(result){
+    $.post("/edit-description-poi", {poi: poi_id, description: description}, function(result){
         window.location.reload();
     });
 

@@ -21,14 +21,14 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
     
+
     <script type="text/javascript" src="js/hotels.js"></script>
     <script type="text/javascript" src="js/login.js"></script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
-    <script type="text/javascript" src="js/map-font-icons.js"></script>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
     
+
+        
   </head>
   <body onload="initMap('<%= city %>')">
         <!-- header navbar -->
@@ -295,13 +295,17 @@
 
   
     <!-- Scripts -->
+    <script src="https://apis.google.com/js/platform.js"></script>
+    
+
     <script>startGoogleSignIn();</script>
     <script>
         var hotels_list = [];
         
         '<% hotels.forEach(function(hotel) { %>'
-            hotels_list.push("<%- JSON.stringify(hotel) %>");
+            hotels_list.push('<%- JSON.stringify(hotel) %>');
         '<% }); %>'
+
 
             
 

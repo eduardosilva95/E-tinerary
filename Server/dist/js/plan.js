@@ -205,7 +205,7 @@ function calcRoute(start, end, waypts) {
       if (status == 'OK') {
         loadTravelTimesAndDistances(result, start);
         directionsDisplay.setDirections(result);
-        animateItinerary(result);
+        //animateItinerary(result);
       }
     });
   }

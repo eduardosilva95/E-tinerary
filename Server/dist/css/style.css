@@ -569,6 +569,7 @@ hr {
   text-justify: newspaper;
   line-height: 1.5em;
   max-height: 6.2em;
+  height: 6.2em;
   display: -webkit-box;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;

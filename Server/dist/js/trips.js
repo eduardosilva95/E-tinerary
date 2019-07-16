@@ -80,45 +80,31 @@ $(function () {
 
 
 function deleteTrip(trip_id){
-    var user = getUserCookie();
-
-    if(user != null){
-        $.post("/delete-plan", {plan: trip_id, user: user}, function(result){
+    $.post("/delete-plan", {plan: trip_id}, function(result){
     
-      
-            if(result.result == 'error'){
-            }
-            
-            else{
-              window.location.reload();
-            }
-      
-        });
-      
-    }
-
+        if(result.result == 'error'){
+        }
+        
+        else{
+            window.location.reload();
+        }
+    
+    });
 }
 
 function renameTrip(trip_id){
-    var user = getUserCookie();
-
     var name = document.getElementById("inputName").value;
 
-    if(user != null){
-        $.post("/rename-plan", {plan: trip_id, user: user, name: name}, function(result){
-
-            console.log(result);
-    
-      
-            if(result.result == 'error'){
-            }
-            
-            else{
-              window.location.reload();
-            }
-        })    
-    }
-
+    $.post("/rename-plan", {plan: trip_id, name: name}, function(result){
+        if(result.result == 'error'){
+            $("#rename-error").css("display", "block");
+            $("#rename-error").text(result.msg);
+        }
+        
+        else{
+            window.location.reload();
+        }
+    })    
 }
 
 function archiveTrip(trip_id){
