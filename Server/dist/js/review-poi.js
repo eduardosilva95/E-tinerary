@@ -29,7 +29,15 @@ $(function () {
 
 
 function acceptPOI(){
+    var poi_id = /id=([^&]+)/.exec(location.search)[1];
+    var place_id = $("#input-google-place-id").val();
+    var google_rating = $("#input-google-rating").val();
+    var google_num_reviews = $("#input-google-reviews").val();
+    var description = $("#input-description").val();
+    var website = $("#input-website").val();
+    var phone_number = $("#input-phone-number").val();
 
+    $.post("/accept-poi", {poi: poi_id, google_place_id: place_id, google_rating: google_rating, google_reviews: google_num_reviews,description: description, website: website, phone_number: phone_number });
 }
 
 

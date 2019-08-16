@@ -30,7 +30,7 @@
     
   
   </head>
-  <body onload="loadNavbar();" style="background-image: url('/img/home-image.jpg');">
+  <body onload="loadNavbar();" style="background-image: url('/img/home-image.jpg'); background-size: 100%; height: 1100px">
       <!-- header navbar -->
         <nav class="navbar sticky-top navbar-expand-lg navbar-dark navbar-transparent bg-dark justify-content-between">
             <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
@@ -91,8 +91,8 @@
         <div class="container-fluid home-image" >
           <br><br>
           <div class="row">
-              <div class="col-md-1 col-sm-1"></div>
-              <div class="col-md-5 col-sm-8 home-search">
+              <div class="col-md-1 col-1"></div>
+              <div class="col-md-5 col-10 home-search">
                 <br>
                 <h3 align="center" style="color: white;"><b>Let us plan your trip</b></h3>
                 <br><br>
@@ -102,7 +102,7 @@
                     </div>
                     
                     <div class="row">
-                      <div class='col-sm-6'>
+                      <div class='col-6'>
                         <div class="input-group date">
                           <input type="text" class="form-control" placeholder="Arrival" id="arrival-date" name="arrival" required>
                           <script>
@@ -116,7 +116,7 @@
                       </div>
 
                       <br>
-                      <div class='col-sm-6' >
+                      <div class='col-6' >
                           <div class="input-group date" >
                             <input type="text" class="form-control" placeholder="Departure" id="departure-date" name="departure" required>
                             <script>
@@ -133,7 +133,7 @@
                     <br>
 
                     <div class="row">
-                      <div class="col-sm-6">
+                      <div class="col-6">
                         <label class="my-1 mr-2" for="select-adults" style="color: white; font-weight: bold;">Adults</label>
                         <select class="custom-select my-1 mr-sm-2" id="select-adults" name="adults">
                           <option selected value="1">1</option>
@@ -141,7 +141,7 @@
                           <option value="3">3</option>
                         </select>
                       </div>
-                      <div class="col-sm-6">
+                      <div class="col-6">
                         <label class="my-1 mr-2" for="select-children" style="color: white; font-weight: bold;">Children <sup id="input-info-popover"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Children to 12 years old"></i></sup></label>
                         <select class="custom-select my-1 mr-sm-2" id="select-children" name="children">
                           <option selected value="0">0</optsion>
@@ -160,16 +160,24 @@
                     
 
                     <br><br>
-
                     
-                    <div class="float-md-right float-sm-none">
-                        <button type="submit" value="submit" class="btn btn-success"><b>Generate your plan</b></button>
-                    </div>
+                    <div class="row">
+                      
+                      <div class="col-md-6 col-12">
+                          <div class="text-md-left text-center">
+                              <a class="btn btn-warning" href="/create-plan">Create your itinerary manually</a>
+                          </div>
+                      </div>
 
-                    <div class="float-md-left float-sm-none">
-                        <a class="btn btn-warning" href="/create-plan">Create your plan manually</a>
-                    </div>
 
+                      <div class="col-md-6 col-12">
+                          <div class="text-md-right text-center">
+                              <button type="submit" value="submit" class="btn btn-success"><b>Create</b></button>
+                          </div>
+                      </div>
+
+                      
+                    </div>
                  
                   </form>
                   
@@ -180,7 +188,7 @@
                   </script>
 
               </div>
-              <div class="col-md-6 col-sm-1"></div>
+              <div class="col-md-6 col-1"></div>
           </div>
         </div>
 
@@ -192,58 +200,65 @@
               <p style="color: #fff; font-size: 23px; opacity: .7">Easy to use, get a itinerary for your travel within a few seconds</p>
           </div>
           <br>
-          <div class="cont"> 
-            <ul class="row clearfix">
-              <li class="col-md-1 col-sm-1"></li>
-              <li class="col-md-2 col-sm-2">
-                  <div class="row">
-                      <div class="col-8"><img src="/img/search-image-2.png" width="150px;" height="150px;"></div>
-                  </div>
-                  <div class="row">
-                    <div class="col-8"><h3 class="howto-label">Choose your destination</h3></div>
-                    <div class="col-4"><i class="fas fa-long-arrow-alt-right fa-3x howto-arrow"></i></div>
-                  </div>
-                  
-                  
-              </li>
-              <li class="col-md-2 col-sm-2">
-                  <div class="row">
-                      <div class="col-8"><img src="/img/calendar-image-2.png" width="150px;" height="150px;"></div>
-                  </div>
-                  <div class="row">
-                    <div class="col-8"><h3 class="howto-label">Pick your dates</h3></div>
-                    <div class="col-4"><i class="fas fa-long-arrow-alt-right fa-3x howto-arrow"></i></div>
-                  </div>
-              </li>
-              <li class="col-md-2 col-sm-2">
-                  <div class="row">
-                      <div class="col-8"><img src="/img/map-plan.png" width="150px;" height="150px;"></div>
-                  </div>
-                  <div class="row">
-                    <div class="col-8"><h3 class="howto-label">Personalize your plan</h3></div>
-                    <div class="col-4"><i class="fas fa-long-arrow-alt-right fa-3x howto-arrow"></i></div>
-                  </div>
-              </li>
-              <li class="col-md-2 col-sm-2">
-                  <div class="row">
-                      <div class="col-8"><img src="/img/travel-image.png" width="150px;" height="150px;"></div>
-                  </div>
-                  <div class="row">
-                    <div class="col-8"><h3 class="howto-label">Travel</h3></div>
-                    <div class="col-4"><i class="fas fa-long-arrow-alt-right fa-3x howto-arrow"></i></div>
-                  </div>
-              </li>
-              <li class="col-md-2 col-sm-2">
-                  <div class="row">
-                      <div class="col-8"><img src="/img/visit-image.png" width="150px;" height="150px;"></div>
-                  </div>
-                  <div class="row">
-                    <div class="col-8"><h3 class="howto-label">Enjoy</h3></div>
-                    <div class="col-4"></div>
-                  </div>
 
+          <div class="cont"> 
+            <ul class="row">
+              <li class="col-md-1 howto-space"></li>
+
+              <li class="col-md-2 col-12 text-center">
+                  <div class="row">
+                      <div class="col-md-8 col-12"><img src="/img/search-image-2.png" width="150px;" height="150px;"></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-8 col-12"><h3 class="howto-label">Choose your destination</h3></div>
+                    <div class="col-md-4 col-12"><i class="fas fa-long-arrow-alt-right fa-3x howto-arrow"></i></div>
+                    <div class="col-md-4 col-12"><i class="fas fa-long-arrow-alt-down fa-3x howto-arrow-mobile"></i></div>
+                  </div>
               </li>
-              <li class="col-md-1 col-sm-1"></li>
+
+              <li class="col-md-2 col-12 text-center">
+                  <div class="row">
+                      <div class="col-md-8 col-12"><img src="/img/calendar-image-2.png" width="150px;" height="150px;"></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-8 col-12"><h3 class="howto-label">Pick your dates</h3></div>
+                    <div class="col-md-4 col-12"><i class="fas fa-long-arrow-alt-right fa-3x howto-arrow"></i></div>
+                    <div class="col-md-4 col-12"><i class="fas fa-long-arrow-alt-down fa-3x howto-arrow-mobile"></i></div>
+                  </div>
+              </li>
+
+              <li class="col-md-2 col-12 text-center">
+                  <div class="row">
+                      <div class="col-md-8 col-12"><img src="/img/map-plan.png" width="150px;" height="150px;"></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-8 col-12"><h3 class="howto-label">Personalize your plan</h3></div>
+                    <div class="col-md-4 col-12"><i class="fas fa-long-arrow-alt-right fa-3x howto-arrow"></i></div>
+                    <div class="col-md-4 col-12"><i class="fas fa-long-arrow-alt-down fa-3x howto-arrow-mobile"></i></div>
+                  </div>
+              </li>
+
+              <li class="col-md-2 col-12 text-center">
+                  <div class="row">
+                      <div class="col-md-8 col-12"><img src="/img/travel-image.png" width="150px;" height="150px;"></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-8 col-12"><h3 class="howto-label">Travel</h3></div>
+                    <div class="col-md-4 col-12"><i class="fas fa-long-arrow-alt-right fa-3x howto-arrow"></i></div>
+                    <div class="col-md-4 col-12"><i class="fas fa-long-arrow-alt-down fa-3x howto-arrow-mobile"></i></div>
+                  </div>
+              </li>
+
+              <li class="col-md-2 col-12 text-center">
+                  <div class="row">
+                      <div class="col-md-8 col-12"><img src="/img/visit-image.png" width="150px;" height="150px;"></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-8 col-12"><h3 class="howto-label">Enjoy</h3></div>
+                  </div>
+              </li>
+
+              <li class="col-md-1 col-0"></li>
             </ul>
 
           </div>
@@ -274,13 +289,13 @@
           </div>
 
           <div class="row">
-              <div class="col-md-1 col-sm-1"></div>
-              <div class="col-md-10 col-sm-10">
+              <div class="col-md-1 col-1"></div>
+              <div class="col-md-10 col-10">
                   <br>
                   <div class="row">
                       <% recommended_dest.forEach(function(dest) { %>
-                        <a href="/places?dest=<%= dest.name %>" class="card-home-link">
-                        <div class="col-md col-sm-12 cont">
+                        <a href="/city?name=<%= dest.name %>" class="card-home-link">
+                        <div class="col-md col-12 cont">
                             <div class="card card-home" style="width: 18rem;">
                               <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
                               <div class="card-body">
@@ -297,7 +312,7 @@
                       <% }); %>
                   </div>
               </div>
-              <div class="col-md-1 col-sm-1"></div>
+              <div class="col-md-1 col-1"></div>
           </div>
 
           <br><br><br>
@@ -312,13 +327,13 @@
           </div>
 
           <div class="row">
-              <div class="col-md-1 col-sm-1"></div>
-              <div class="col-md-10 col-sm-10">
+              <div class="col-md-1 col-1"></div>
+              <div class="col-md-10 col-10">
                   <br>
                   <div class="row">
                       <% top_dest.forEach(function(dest) { %>
-                        <a href="/places?dest=<%= dest.name %>" class="card-home-link">
-                        <div class="col-md col-sm-12 cont">
+                        <a href="/city?name=<%= dest.name %>" class="card-home-link">
+                        <div class="col-md col-12 cont">
                             <div class="card card-home" style="width: 18rem;">
                               <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
                               <div class="card-body">
@@ -335,7 +350,7 @@
                       <% }); %>
                   </div>
               </div>
-              <div class="col-md-1 col-sm-1"></div>
+              <div class="col-md-1 col-1"></div>
           </div>
 
         
@@ -351,14 +366,14 @@
           </div>
 
           <div class="row">
-              <div class="col-md-1 col-sm-1"></div>
-              <div class="col-md-10 col-sm-10">
+              <div class="col-md-1 col-1"></div>
+              <div class="col-md-10 col-10">
                   <br>
                   <div class="row">
                     <% count = 0 %>
                     <% top_places.forEach(function(place) { %>
                       <a href="/place?id=<%= place.id %>" class="card-home-link">
-                      <div class="col-md col-sm-12 cont">
+                      <div class="col-md col-12 cont">
                           <div class="card card-home" style="width: 18rem; height: 360px;">
                             <img class="card-img-top cities-imgs" id="top-places-img-<%= count %>">
                             <div class="card-body">
@@ -380,7 +395,7 @@
                     <% }); %>
                   </div>
               </div>
-              <div class="col-md-1 col-sm-1"></div>
+              <div class="col-md-1 col-1"></div>
           </div>
         
         <br><br><br><br>

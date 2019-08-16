@@ -137,8 +137,8 @@ function autocomplete(inp, arr) {
   function submitDestination(){
     if(document.getElementById('inputDestination').value != undefined && document.getElementById('inputDestination').value != ""){
       var destination = document.getElementById('inputDestination').value;
-      var queryString = "?dest=" + destination;
-      window.location.href = "./places" + queryString;
+      var queryString = "?name=" + destination;
+      window.location.href = "./city" + queryString;
     }
     else{
       alert("Must select a valid destination !");

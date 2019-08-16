@@ -72,7 +72,6 @@ hr {
 }
 
 
-
 .dr {
   display: none;
 }
@@ -174,7 +173,7 @@ hr {
   background: #cccccc; 
 }
 
-/* ----------------------------------- */
+/* ------------- HOME ---------------------- */
 
 .home-image {
   background-repeat: no-repeat; 
@@ -213,6 +212,11 @@ hr {
   color: #ffc107;
 }
 
+@media (max-width: 1200px) {
+  .howto-space {
+    display: none;
+  }
+}
 
 .howto-image {
 	margin-left: auto;
@@ -232,6 +236,20 @@ hr {
   color: gold;
   padding-left: 1rem;
 }
+
+.howto-arrow-mobile {
+  color: gold;
+  padding-left: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  display: none;
+}
+
+@media (max-width: 1200px) {
+  .howto-arrow { display: none; }
+  .howto-arrow-mobile { display: block; }
+}
+
 
 #features-list{
   color: white;
@@ -680,6 +698,7 @@ hr {
 }
 
 
+
 #place-description{
   height: 300px;
   overflow-y: scroll;
@@ -693,6 +712,14 @@ hr {
   max-width: 100%;
   text-align: justify;
   text-justify: newspaper;
+}
+
+#place-website {
+  position: absolute;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 70%;
 }
 
 #place-map {
@@ -861,7 +888,7 @@ hr {
 }
 
 
-/* ------------------------------------------------------------------------ */
+/* -------------------------------- PLAN ---------------------------------------- */
 
 
 #tab-plan td {
@@ -891,10 +918,32 @@ hr {
 }
 
 
+#visit-day-mobile { display: none; }
+
+
+@media (max-width: 1200px) {
+    #visit-day-mobile { display: inline-block; }
+    #visit-day { display: none; }
+}
+
+.visit-img {
+  height: 150px; 
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .visit-img {
+    height: 150px; 
+    width: 100%;
+  }
+}
+
+
 .plan-table-icons {
   position: absolute;
   bottom: 0;
   right: 15px;
+  padding-bottom: 10px;
 }
 
 .plan-table-btn-icons{
@@ -914,6 +963,10 @@ hr {
 
 .plan-table-btn-icons:hover:enabled{
   color: #f4a029;
+}
+
+@media (max-width: 1200px) {
+  .plan-table-icons { display: none; }
 }
 
 
@@ -1415,8 +1468,22 @@ table tr td a{
 }
 
 
+@media (max-width: 1200px) {
+  #favorite-trip-div {display: none;}
+}
 
+/* ---------------------------------- CITY ------------------------------ */
 
+.city-places-link {
+ font-weight: bold; 
+ color: black;
+ text-decoration: none;
+}
+
+.city-places-link:hover {
+  color: #ffc107;
+ }
+ 
 
 
 

@@ -1,0 +1,6 @@
+D:\universidade\5º ano\Tese\aplicação\Server\algorithms\Matematica\Matematica\bin\Debug\Matematica.dll
+D:\universidade\5º ano\Tese\aplicação\Server\algorithms\Matematica\Matematica\bin\Debug\Matematica.pdb
+D:\universidade\5º ano\Tese\aplicação\Server\algorithms\Matematica\Matematica\obj\Debug\Matematica.csprojAssemblyReference.cache
+D:\universidade\5º ano\Tese\aplicação\Server\algorithms\Matematica\Matematica\obj\Debug\Matematica.csproj.CoreCompileInputs.cache
+D:\universidade\5º ano\Tese\aplicação\Server\algorithms\Matematica\Matematica\obj\Debug\Matematica.dll
+D:\universidade\5º ano\Tese\aplicação\Server\algorithms\Matematica\Matematica\obj\Debug\Matematica.pdb

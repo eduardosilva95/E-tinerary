@@ -8,6 +8,7 @@ var directionsDisplay;
 
 var plan;
 var weekdays = [];
+var shortdays = [];
 var dif_days;
 var plan_days = [];
 var day; // index of the day displayed
@@ -29,6 +30,8 @@ var hotels_color = '#2079d8';
 
 var hasMap = false;
 
+var TRAVEL_MODE;
+
 
 /* load map */
 function initMap(latitude, longitude) {
@@ -41,7 +44,7 @@ function initMap(latitude, longitude) {
     });
 
     directionsService = new google.maps.DirectionsService();
-    directionsDisplay = new google.maps.DirectionsRenderer();
+    directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
     directionsDisplay.setMap(map);
 
     // Style map
@@ -198,7 +201,7 @@ function calcRoute(start, end, waypts) {
             placeId: end
         },     
         waypoints: waypts, 
-        travelMode: 'DRIVING'
+        travelMode: TRAVEL_MODE
     };
     
     directionsService.route(request, function(result, status) {
@@ -234,10 +237,12 @@ function calcRoute(start, end, waypts) {
 }  
 
 
-function loadPlan(plan_array, days){
+function loadPlan(plan_array, days, days_shortname, travel_mode){
+    TRAVEL_MODE = travel_mode;
     plan = plan_array;
     day = 0;
     days = days.split(',');
+    days_shortname = days_shortname.split(',');
 
     dif_days = days.length / 2 - 1;
 
@@ -252,6 +257,10 @@ function loadPlan(plan_array, days){
     for(var j=0 ; j < plan.length ; j++){
         p = JSON.parse(plan[j]);
         places[p.name] = p;
+    }
+
+    for(var i=0; i < days_shortname.length ; i++){
+        shortdays.push(days_shortname[i]);
     }
 
     loadVisits();
@@ -277,7 +286,13 @@ function loadItinerary(){
 
     var waypoints = [];
     for(var i=1; i < visits_tmp.length - 1; i++){
-        waypoints.push({ stopover: true, location: { placeId: visits_tmp[i].place_id } });
+        if(visits_tmp[i].place_id != undefined)
+            waypoints.push({ stopover: true, location: { placeId: visits_tmp[i].place_id } });
+        else{
+            var lat = visits_tmp[i].coordinates.split(', ')[0];
+            var lng = visits_tmp[i].coordinates.split(', ')[1];
+            waypoints.push({ stopover: true, location: new google.maps.LatLng(lat, lng)});
+        }
     }
 
     calcRoute(visits_tmp[0].place_id, visits_tmp[visits_tmp.length-1].place_id, waypoints);
@@ -381,6 +396,7 @@ function previousDay(){
 
 function loadVisits(){
     document.getElementById('visit-day').innerText = weekdays[day];
+    document.getElementById('visit-day-mobile').innerText = shortdays[day];
 
     var count = 0;
     for(var key in places){
@@ -393,6 +409,8 @@ function loadVisits(){
         
             if(places[key].weather == null){
                 // does not have weather forecast
+                $('#place-' + count + '-weather').parent().css("display", "none");
+                $('#place-' + count + '-name').parent().attr("class", "col-md-12");
             }
 
             else{

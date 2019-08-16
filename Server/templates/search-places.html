@@ -127,7 +127,7 @@
                 <br>
                 <div class="row">
                     <% top_dest.forEach(function(dest) { %>
-                      <a href="/places?dest=<%= dest.name %>" class="card-home-link">
+                      <a href="/city?name=<%= dest.name %>" class="card-home-link">
                       <div class="col-md col-sm-12 cont">
                           <div class="card card-home" style="width: 18rem;">
                             <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">

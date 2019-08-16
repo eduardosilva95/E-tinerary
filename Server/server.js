@@ -15,11 +15,19 @@ var fs = require('fs');
 var promise = require('promise-mysql');
 const mkdirp = require('mkdirp');
 var distance = require('google-distance-matrix');
+var builder = require('xmlbuilder');
+var edge = require('edge-js');
 
 var GOOGLE_API_KEY = 'AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw';
 var OPEN_WEATHER_API_KEY = '8271fd206ceeef12df4e7bb6063241c3';
 
 distance.key(GOOGLE_API_KEY);
+
+var RELIGION_TYPES = ['CHURCH', 'PLACE OF WORSHIP'];
+var HISTORIC_TYPES = ['CHURCH', 'CASTLE', 'MUSEUM'];
+var RECREATION_TYPES = ['AMUSEUMENT PARK', 'AQUARIUM', 'ZOO'];
+var NATURE_TYPES = ['PARK', 'NATURAL FEATURE'];
+var CULTURE_TYPES = ['THEATER', 'THEATRE', 'MUSEUM'];
 
 
 /* store images of users */
@@ -246,6 +254,128 @@ app.get('/search-places',function(req,res){
 
 
 // city page
+app.get('/city', function(req, res){
+	var connection;
+
+	var city_name = req.query['name'];	
+	var user_id = 0;
+
+	if(req.cookies['user'] != undefined && !isNaN(req.cookies['user']))
+		user_id = parseInt(req.cookies['user']);
+
+
+	con.query("call getInfoCity(?)", [city_name], function (err, result, fields) {
+	    if (err) throw err;
+
+	    result = result[0];
+
+	    if(result.length == 0){
+	    	res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
+	    	return;
+	    }
+
+
+	    var city = result[0].name;
+	    var city_id = result[0].id;
+	    var place_id = result[0].place_id;
+	    var coordinates = result[0].latitude + ", " + result[0].longitude;
+	    var description = result[0].description;
+	    var address = result[0].name + ", " + result[0].country;
+
+	    con.query("call getPOIsFromCity(?,?,?,?)", [city, '', -1, 'reviews'], function(err, result, fields){
+	    	if (err) throw err;
+
+	    	result = result[0];
+
+	    	var places = [];
+
+	    	var i = 0;
+	    	while(places.length < 4){
+	    		if(result[i].poi_type.toUpperCase() != 'Hotel'.toUpperCase() && result[i].poi_type.toUpperCase() != 'Restaurant'.toUpperCase()){
+	    			var place = new Object();
+		    		place["id"] = result[i].id;
+		        	place["place_id"] = result[i].place_id;
+		            place["name"] = result[i].place;
+
+		    		if(result[i].photo != null)
+		        		place["photo"] = result[i].photo.replace(/\\/g,"/");
+		        	else
+		        		place["photo"] = null;
+
+		        	places.push(place);
+	    		}
+	    		i++;
+	    	}
+
+    	 	con.query("call getHotels(?)", [city], function(err, result, fields){
+		    	if (err) throw err;
+
+		    	result = result[0];
+
+		    	var hotels = [];
+
+		    	var i = 0;
+		    	while(hotels.length < 4 && i < result.length){
+		    		if(result[i].poi_type.toUpperCase() == 'Hotel'.toUpperCase()){
+		    			var hotel = new Object();
+			    		hotel["id"] = result[i].id;
+			        	hotel["place_id"] = result[i].place_id;
+			            hotel["name"] = result[i].place;
+
+			    		if(result[i].photo != null)
+			        		hotel["photo"] = result[i].photo.replace(/\\/g,"/");
+			        	else
+			        		hotel["photo"] = null;
+
+			        	hotels.push(hotel);
+		    		}
+
+		    		i++;
+		    	}
+
+
+		    	con.query("call getCityTrips(?)", [city_id], function(err, result, fields){
+		    		if (err) throw err;
+
+		    		result = result[0];
+
+		    		var plans = [];
+
+		    		var max_num_plans = 4;
+
+		    		if(result.length < 4)
+		    			max_num_plans = result.length;
+
+		    		for(var i=0; i < max_num_plans; i++){
+		    			var plan = new Object();
+
+		    			plan["id"] = result[i].id;
+
+		    			if(result[i].name != null && result[i].name.length > 0)
+			        		plan["name"] = result[i].name;
+			        	else
+			        		plan["name"] = 'Visit to ' + result[i].city;
+
+
+			        	plan["photo"] = result[i].photo;
+			        	plan["description"] = result[i].description;
+
+			        	plans.push(plan);
+		    		}
+
+		    		res.render(path.join(__dirname+'/templates/city.html'), {city: city, place_id: place_id, coordinates: coordinates, description: description, address: address, places: places, hotels: hotels, plans: plans});
+
+
+		    	});
+			});
+	    });
+
+	});
+
+});
+
+
+
 app.get('/places', function (req, res){
 
 	var connection;
@@ -448,7 +578,7 @@ app.get('/places', function (req, res){
 			}).then(function(conn){
 				connection = conn;
 
-				return connection.query("call isPlanManual(?)", [planId]);
+				return connection.query("call isTripManual(?)", [planId]);
 
 			}).then(function(result){
 
@@ -532,7 +662,7 @@ app.get('/places', function (req, res){
 				if(result == 1)
 					return result;
 
-				return connection.query("call getPlanDates(?)", [planId]);
+				return connection.query("call getTripDates(?)", [planId]);
 
 			}).then(function(result){
 
@@ -593,8 +723,14 @@ app.get('/places', function (req, res){
 
 app.get('/place', function(req,res){  	
 	var connection;
-	var poi_id = req.query['id'];	
 	var user_id = 0;
+
+	var poi_id = parseInt(req.query['id']);
+
+	if(isNaN(poi_id)){
+		res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
+		return;
+	}
 
 	if(req.cookies['user'] != undefined && !isNaN(req.cookies['user']))
 		user_id = parseInt(req.cookies['user']);
@@ -619,6 +755,14 @@ app.get('/place', function(req,res){
 		var lon = result[0].longitude;
 		var google_rating = result[0].google_rating;
 		var type = result[0].poi_type.charAt(0).toUpperCase() + result[0].poi_type.slice(1);
+
+		var price = result[0].price;
+		if(price != null)
+			price = price.toFixed(2) + " €";
+
+		var price_children = result[0].price_children;
+		if(price_children != null)
+			price_children = price_children.toFixed(2) + " €";
 
 		var schedule;
 
@@ -678,12 +822,12 @@ app.get('/place', function(req,res){
 		else
 			security = parseFloat(security).toFixed(1) + " / 5.0";
 
-		var price = result[0].price;
+		var rating_price = result[0].price;
 
 		if(price == null)
-			price = "No information available";
+			rating_price = "No information available";
 		else
-			price = parseFloat(price).toFixed(2);
+			rating_price = parseFloat(price).toFixed(2);
 
 		var duration = result[0].duration;
 
@@ -739,7 +883,7 @@ app.get('/place', function(req,res){
 	    				isUserRegistered = true;
 
 		    		if(planId == -1)
-						res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, no_plans: no_plans, rating: rating, accessibility: accessibility, security: security, price: price, duration: duration, reviews: reviews, fromPlan: false, schedule: null, openslots: [], photos: photos, isUserRegistered: isUserRegistered, isUserPremium: isUserPremium});
+						res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, price: price, price_children: price_children, no_plans: no_plans, rating: rating, accessibility: accessibility, security: security, rating_price: rating_price, duration: duration, reviews: reviews, fromPlan: false, schedule: null, openslots: [], photos: photos, isUserRegistered: isUserRegistered, isUserPremium: isUserPremium});
 
 					else {
 
@@ -752,7 +896,7 @@ app.get('/place', function(req,res){
 						}).then(function(conn){
 							connection = conn;
 
-							return connection.query("call isPlanManual(?)", [planId]);
+							return connection.query("call isTripManual(?)", [planId]);
 
 						}).then(function(result){
 
@@ -824,7 +968,7 @@ app.get('/place', function(req,res){
 				    			}
 
 
-					        	res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, no_plans: no_plans, rating: rating, accessibility: accessibility, security: security, price: price, duration: duration, reviews: reviews, fromPlan: true, schedule: schedule, inPlan: inPlan, days: days, openslots: openslots, photos: photos, isUserRegistered: isUserRegistered, isUserPremium: isUserPremium});
+					        	res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, price: price, price_children: price_children, no_plans: no_plans, rating: rating, accessibility: accessibility, security: security, rating_price: rating_price, duration: duration, reviews: reviews, fromPlan: true, schedule: schedule, inPlan: inPlan, days: days, openslots: openslots, photos: photos, isUserRegistered: isUserRegistered, isUserPremium: isUserPremium});
 
 					        	return 1;
 
@@ -840,7 +984,7 @@ app.get('/place', function(req,res){
 							if(result == 1)
 								return result;
 
-							return connection.query("call getPlanDates(?)", [planId]);
+							return connection.query("call getTripDates(?)", [planId]);
 
 						}).then(function(result){
 
@@ -886,7 +1030,7 @@ app.get('/place', function(req,res){
 
 						    }
 						    
-						    res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, no_plans: no_plans, rating: rating, accessibility: accessibility, security: security, price: price, duration: duration, reviews: reviews, fromPlan: true, schedule: schedule, inPlan: false, days: days, openslots: openslots, photos: photos, isUserRegistered, isUserRegistered, isUserPremium: isUserPremium});
+						    res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, price: price, price_children: price_children, no_plans: no_plans, rating: rating, accessibility: accessibility, security: security, rating_price: rating_price, duration: duration, reviews: reviews, fromPlan: true, schedule: schedule, inPlan: false, days: days, openslots: openslots, photos: photos, isUserRegistered, isUserRegistered, isUserPremium: isUserPremium});
 
 						});	        		
 		        	}
@@ -947,7 +1091,10 @@ app.get('/hotels', function(req,res){
 	        	hotel["coordinates"] = result[i].latitude + ", " + result[i].longitude;
 
 	        	// generate random price / offer between 30€ and 150€
-	        	hotel["price"] = Math.floor((Math.random() * 150) + 30) + " €";
+	        	if(result[i].price != null)
+	        		hotel["price"] = result[i].price + " €";
+        		else
+	        		hotel["price"] = Math.floor((Math.random() * 150) + 30) + " €";
 
 	        	list_hotels.push(hotel);
 	        }
@@ -981,7 +1128,7 @@ app.get('/create-plan', function(req, res){
         }
 
        
-        con.query("call GetTopCities(?)", num_results, function (err, result, fields) {
+        con.query("call getTopCities(?)", num_results, function (err, result, fields) {
         	if (err) throw err;
 
         	result = result[0];
@@ -994,7 +1141,7 @@ app.get('/create-plan', function(req, res){
         	}
 
         	
-        	con.query("call GetRandomCities(?)", num_results, function (err, result, fields) {
+        	con.query("call getRandomCities(?)", num_results, function (err, result, fields) {
 	        	if (err) throw err;
 
 	        	result = result[0];
@@ -1017,7 +1164,7 @@ app.get('/create-plan', function(req, res){
 });
 
 
-app.post('/create-plan', function(req, res){
+app.post('/create-plan-old', function(req, res){
 	var connection;
 
 	var user_id = parseInt(req.cookies['user']);
@@ -1026,7 +1173,6 @@ app.post('/create-plan', function(req, res){
 		// send error message
 		return;
 	}
-
 
 	var destination = req.body.destination;
 
@@ -1063,7 +1209,7 @@ app.post('/create-plan', function(req, res){
 	    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0],
 	    	user_id];
 
-	    var result = connection.query("call createPlan(?, ?, ?, ?)", values);
+	    var result = connection.query("call createTrip(?, ?, ?, ?)", values);
 
 	    return result;
 
@@ -1116,7 +1262,7 @@ app.post('/create-plan', function(req, res){
 	        		}
 	        	}
 
-			  	con.query("call addVisitToPlan(?, ?, ?, ?, ?)", [plan_id, poi, start_time_list[i], end_time_list[i], 0], function (err, result) {
+			  	con.query("call addVisitToTrip(?, ?, ?, ?, ?)", [plan_id, poi, start_time_list[i], end_time_list[i], 0], function (err, result) {
 			    	if (err) throw err;
 
 			  	});
@@ -1134,6 +1280,341 @@ app.post('/create-plan', function(req, res){
 	});
 
 });
+
+
+app.post('/create-plan', function(req, res){
+	var connection;
+
+	var user_id = parseInt(req.cookies['user']);
+
+	if(isNaN(user_id)){
+		// send error message
+		return;
+	}
+
+	var destination = req.body.destination;
+
+	if(destination == null)
+		return; // send error message
+
+	var arrival = req.body.arrival;
+
+	if(arrival == null)
+		return; // send error message
+
+	var departure = req.body.departure;
+
+	if(departure == null)
+		return; // send error message
+
+	var num_adults = req.body.adults;
+	var num_children = req.body.children;
+	var hasBudgetConstraint = req.body.has_budget;
+	var budget = req.body.budget;
+
+	var travel_mode = req.body.travel_mode.toUpperCase();
+
+
+	var isReligionSitesInterestChecked = false;
+	if(req.body['interests_religion'] != undefined){
+		isReligionSitesInterestChecked = true;
+	}
+
+	var isTopRatedInterestChecked = false;
+	if(req.body['interests_top_rated'] != undefined){
+		isTopRatedInterestChecked = true;
+	}
+
+	var isHistoricPlacesInterestChecked = false;
+	if(req.body['interests_history'] != undefined){
+		isHistoricPlacesInterestChecked = true;
+	}
+
+	var isRecreationInterestChecked = false;
+	if(req.body['interests_recreation'] != undefined){
+		isRecreationInterestChecked = true;
+	}
+
+	var isNaturePlacesInterestChecked = false;
+	if(req.body['interests_nature'] != undefined){
+		isNaturePlacesInterestChecked = true;
+	}
+	
+	var isCultureInterestChecked = false;	
+	if(req.body['interests_culture'] != undefined){
+		isCultureInterestChecked = true;
+	}
+
+
+	// by default, the itinerary category is overall
+	var category = "OVERALL";
+
+	if(isNaturePlacesInterestChecked && !isReligionSitesInterestChecked && !isHistoricPlacesInterestChecked && !isRecreationInterestChecked && !isCultureInterestChecked)
+		category = "NATURE";
+	else if(isHistoricPlacesInterestChecked && !isNaturePlacesInterestChecked && !isRecreationInterestChecked && !isCultureInterestChecked)
+		category = "HISTORY";
+	else if(isCultureInterestChecked && !isReligionSitesInterestChecked && !isHistoricPlacesInterestChecked && !isRecreationInterestChecked && !isNaturePlacesInterestChecked)
+		category = "CULTURE";
+	else if(isRecreationInterestChecked && !isReligionSitesInterestChecked && !isHistoricPlacesInterestChecked && !isCultureInterestChecked && !isNaturePlacesInterestChecked)
+		category = "RECREATION";
+
+
+
+
+	var xml;
+
+	var num_max_pois = 7;
+	var num_max_hotels = 3;
+
+	con.query("call getPOIsInfoFromCity(?)", [destination], function (err, result, fields) {
+        if (err) throw err;
+
+        result = result[0];
+
+        var places_score = {};
+
+        for(var i=0; i < result.length; i++){
+        	result[i].score = result[i].num_reviews / 100 + result[i].google_rating * 10;
+        	if(isReligionSitesInterestChecked && RELIGION_TYPES.includes(result[i].poi_type.toUpperCase()))
+        		result[i].score += 50;
+
+        	if(isHistoricPlacesInterestChecked && HISTORIC_TYPES.includes(result[i].poi_type.toUpperCase()))
+        		result[i].score += 50;
+
+        	if(isRecreationInterestChecked && RECREATION_TYPES.includes(result[i].poi_type.toUpperCase()))
+        		result[i].score += 50;
+
+        	if(isNaturePlacesInterestChecked && NATURE_TYPES.includes(result[i].poi_type.toUpperCase()))
+        		result[i].score += 50;
+
+        	if(isCultureInterestChecked && CULTURE_TYPES.includes(result[i].poi_type.toUpperCase()))
+        		result[i].score += 50;
+
+        	if(isTopRatedInterestChecked)
+        		result[i].score += result[i].num_reviews * 2 / 100 + result[i].google_rating * 10;
+        }
+
+        pois = sortPOIs(result, 'score');
+
+        var poi_root = builder.create('POIs');
+        var hotels_root = builder.create('Hotels');
+        var graphs_root = builder.create('Graphs');
+
+        var num_pois = 0;
+        var num_hotels = 0;
+
+        var places = [];
+        var coordinates = [];
+
+        for(var i=0; i < pois.length; i++){
+
+        	if(pois[i].poi_type.toUpperCase() == "HOTEL" && num_hotels < num_max_hotels){
+        		var item = hotels_root.ele('Hotel');
+	        	item.ele('Number', pois[i].id);
+	        	item.ele('Name', pois[i].name);
+	        	item.ele('Latitude', pois[i].latitude);
+	        	item.ele('Longitude', pois[i].longitude);
+	        	item.ele('FixedCost', pois[i].price);
+
+	        	var place = new Object();
+	        	place["id"] = pois[i].id;
+	        	place["name"] = pois[i].name;
+	        	place["coordinates"] = pois[i].latitude + ", " + pois[i].longitude;
+	        	place["type"] = pois[i].poi_type;
+
+	        	places.push(place);
+	        	coordinates.push(pois[i].latitude + ", " + pois[i].longitude);
+
+
+	        	num_hotels++;
+        	}
+
+        	else if(pois[i].poi_type.toUpperCase() != "HOTEL" && pois[i].poi_type.toUpperCase() != "RESTAURANT" && num_pois < num_max_pois){
+        		var item = poi_root.ele('POI');
+	        	item.ele('Number', pois[i].id);
+	        	item.ele('Name', pois[i].name);
+	        	item.ele('Latitude', pois[i].latitude);
+	        	item.ele('Longitude', pois[i].longitude);
+	        	item.ele('Longitude', pois[i].longitude);
+
+	        	var place = new Object();
+	        	place["id"] = pois[i].id;
+	        	place["name"] = pois[i].name;
+	        	place["coordinates"] = pois[i].latitude + ", " + pois[i].longitude;
+	        	place["type"] = pois[i].poi_type;
+
+	        	places.push(place);
+	        	coordinates.push(pois[i].latitude + ", " + pois[i].longitude);
+
+
+	        	num_pois++;
+        	}
+
+        	if(num_hotels == num_max_hotels && num_pois == num_max_pois)
+        		break;
+        	
+        }
+
+        /* Generate XML and write to a file */
+        xml = poi_root.end({ pretty: true});
+		fs.writeFile('xml/pois.xml', xml, function(err, data) {
+	   		if (err) console.log(err);
+
+     	 	console.log('XML for POIs Generated');
+	  	});
+
+
+		/* Generate XML and write to a file */
+		xml = hotels_root.end({ pretty: true});
+		fs.writeFile('xml/hotels.xml', xml, function(err, data) {
+	   		if (err) console.log(err);
+
+     	 	console.log('XML for Hotels Generated');
+	  	});
+
+
+		var item = graphs_root.ele('Graph');
+		item.ele('Number', 1);
+		item.ele('Name', 'Distance Matrix');
+		item.ele('Complete', 'True');
+		item.ele('Directed', 'True');
+
+		distance.mode(travel_mode.toLowerCase());
+
+		distance.matrix(coordinates, coordinates, function (err, distances) {
+		    if (err) {
+		        return console.log(err);
+		    }
+
+		    if (distances.status == 'OK') {
+		    	for (var i=0; i < coordinates.length; i++) {
+		    		var arc = item.ele('Arcs');
+
+		    		if(places[i].type == 'Hotel')
+		    			arc.ele("SrcObject", "H");
+		    		else
+		    			arc.ele("SrcObject", "P");
+
+		    		arc.ele("SrcNumber", places[i].id);
+
+
+		    		for (var j=0; j < coordinates.length; j++) {
+
+		    			// only add if there is a distance between the two places and if it's not the same place
+		    			if(j != i && distances.rows[0].elements[j].status == 'OK'){
+			    			var des = arc.ele('Des');
+
+			    			if(places[j].type == 'Hotel')
+				    			des.ele("Obj", "H");
+				    		else
+				    			des.ele("Obj", "P");
+
+			    			des.ele('Num', places[j].id);
+			    			des.ele('Len', {'units': 'meters'}, distances.rows[i].elements[j].distance.value);
+			    			des.ele('Time', {'units': 'seconds'}, distances.rows[i].elements[j].duration.value);
+			    		}
+		    		}
+		    	}
+	    	}
+
+	    	xml = graphs_root.end({ pretty: true});
+
+
+	    	/* Generate XML and write to a file */
+			fs.writeFile('xml/graphs.xml', xml, function(err, data) {
+		   		if (err) console.log(err);
+
+     	 		console.log('XML for Distances Generated');
+		  	});
+
+
+			/* REPLACE WITH THE RESULTS FROM THE ALGORITHMS */
+			
+			promise.createConnection({
+			    host: 'localhost',
+			    user: 'root',
+			    password: 'password',
+			    database: 'placesdb'
+
+			}).then(function(conn){
+				connection = conn;
+
+				var values = [destination,
+			    	arrival.split('/')[2] + "-" + (arrival.split('/')[1]<10?'0':'') + arrival.split('/')[1] + "-" + (arrival.split('/')[0]<10?'0':'') + arrival.split('/')[0], 
+			    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0],
+			    	user_id, num_adults, num_children, category, travel_mode];
+
+			    var result = connection.query("call createTrip(?, ?, ?, ?, ?, ?, ?, ?)", values);
+
+			    return result;
+
+			}).then(function(result){
+				plan_id = parseInt(result[0][0].planID);
+
+				var num_days = diffBetweenDays(arrival, departure);
+
+				arrival = arrival.split('/')[0] + "-" + arrival.split('/')[1] + "-" + arrival.split('/')[2];
+
+		  		var days = getPlanDays(arrival, parseInt(num_days), false);
+
+		  		var start_hours = ["10:00", "13:00", "15:00", "16:15", "18:00"];
+		  		var end_hours = ["12:00", "14:30", "16:00", "18:00", "20:00"];
+
+		  		var start_time_list = [];
+		  		var end_time_list = [];
+
+		  		for(var i=0 ; i < days.length ; i++){
+		  			day = days[i].split('-')[2] + "-" + (days[i].split('-')[1]<10?'0':'') + days[i].split('-')[1] + "-" + (days[i].split('-')[0]<10?'0':'') + days[i].split('-')[0]
+		  			for(var j=0 ; j < start_hours.length; j++){
+		  				start_time_list.push(day + " " + start_hours[j]);
+		  				end_time_list.push(day + " " + end_hours[j]);
+		  			}
+		  		}
+
+		  		var i=0;
+
+		        var list_pois_in_plan = [];
+
+		        while(i < start_time_list.length){
+
+		        	if(pois.length == list_pois_in_plan.length){
+	        			break;
+	        		}
+		        	
+		        	var poiIsValid = false;
+
+		        	while(!poiIsValid){
+		        		var poi = pois[i].id;
+
+		        		if(!list_pois_in_plan.includes(poi)){
+		        			list_pois_in_plan.push(poi);
+		        			poiIsValid = true;
+		        		}
+		        	}
+
+				  	con.query("call addVisitToTrip(?, ?, ?, ?, ?)", [plan_id, poi, start_time_list[i], end_time_list[i], 0], function (err, result) {
+				    	if (err) throw err;
+
+				  	});
+
+				  	i++;	
+		  		}
+
+
+			    connection.end();
+
+
+		    	console.log("TRIP CREATED: ", plan_id);
+
+		    	res.render(path.join(__dirname+'/templates/see-plan.html'), {plan: plan_id});
+
+	    	});
+	    });
+   	});
+
+});
+
+
 
 
 // create plan manual
@@ -1185,14 +1666,14 @@ app.post('/create-plan-m', function(req, res){
 	    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0],
 	    	user_id];
 
-	    var result = connection.query("call createPlanManual(?, ?, ?, ?)", values);
+	    var result = connection.query("call createManualTrip(?, ?, ?, ?)", values);
 
 	    return result;
 
     }).then(function(result){
     	var plan_id = parseInt(result[0][0].planID);
 
-    	console.log("MANUAL PLAN CREATED: ", plan_id);
+    	console.log("MANUAL TRIP CREATED: ", plan_id);
 
     	res.redirect('http://localhost:8080/plan-m?id='+ plan_id)
 
@@ -1280,7 +1761,7 @@ app.post('/create-child-plan', function(req, res){
 
 		}
 
-		con.query("call createChildPlan(?,?,?,?,?)", [start_date, end_date, user_id, city, plan_id], function(err, result) {
+		con.query("call createChildTrip(?,?,?,?,?)", [start_date, end_date, user_id, city, plan_id], function(err, result) {
 			if (err) throw err;
 
 			result = result[0];
@@ -1291,14 +1772,14 @@ app.post('/create-child-plan', function(req, res){
 
 			while(i < start_time_list.length){
 
-				con.query("call addVisitToPlan(?,?,?,?, ?);", [child_plan, visits[i].poi_id, start_time_list[i], end_time_list[i], 0], function (err, result) {
+				con.query("call addVisitToTrip(?,?,?,?, ?);", [child_plan, visits[i].poi_id, start_time_list[i], end_time_list[i], 0], function (err, result) {
 			    	if (err) throw err;
 			  	});
 
 		  		i++;
 			}
 
-			console.log("PLAN CREATED: ", child_plan)
+			console.log("TRIP CREATED: ", child_plan)
 
 			res.contentType('json');
 			res.send({result: 'success', plan: child_plan});
@@ -1327,7 +1808,7 @@ app.post('/delete-plan', function(req, res){
 	}
 
 
-	con.query("call deletePlan(?,?)", [plan_id, user_id], function(err, result) {
+	con.query("call deleteTrip(?,?)", [plan_id, user_id], function(err, result) {
 		if (err) throw err;
 
 		res.contentType('json');
@@ -1364,7 +1845,7 @@ app.post('/rename-plan', function(req, res){
 	}
 
 
-	con.query("call renamePlan(?,?,?)", [plan_id, user_id, name], function(err, result) {
+	con.query("call renameTrip(?,?,?)", [plan_id, user_id, name], function(err, result) {
 		if (err) throw err;
 
 		res.contentType('json');
@@ -1387,6 +1868,8 @@ app.post('/share-plan', upload_plan.single('picture'), function (req, res, next)
 
 	var plan_id = req.body.plan;
 
+	console.log(plan_id);
+
 	if(isNaN(plan_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The plan is not valid."});
@@ -1395,11 +1878,10 @@ app.post('/share-plan', upload_plan.single('picture'), function (req, res, next)
 
 	var filename = req.file.filename;
 	var description = req.body.description;
-	var category = req.body.category;
 	var rating = req.body.rating;	
 
 
-	con.query("call sharePlan(?,?,?,?,?,?)", [plan_id, user_id, description, filename, category, rating], function (err, result, fields) {
+	con.query("call shareTrip(?,?,?,?,?)", [plan_id, user_id, description, filename, rating], function (err, result, fields) {
 		if (err) throw err;
 
     	res.redirect('http://localhost:8080/trips');
@@ -1441,7 +1923,7 @@ app.post('/review-plan', function(req, res){
 		return;
 	}
 
-	con.query("call reviewPlan(?,?,?,?)", [plan_id, user_id, rating, review], function (err, result, fields) {
+	con.query("call reviewTrip(?,?,?,?)", [plan_id, user_id, rating, review], function (err, result, fields) {
 		if (err) throw err;
 
 		res.contentType('json');
@@ -1468,7 +1950,7 @@ app.post('/archive-plan', function(req, res){
 		return;
 	}
 
-	con.query("call archivePlan(?,?)", [plan_id, user_id], function (err, result, fields) {
+	con.query("call archiveTrip(?,?)", [plan_id, user_id], function (err, result, fields) {
 		if (err) throw err;
 
     	res.contentType('json');
@@ -1515,7 +1997,7 @@ app.post('/save-plan', function(req, res){
 	}).then(function(result){
 
 		if(result[0][0].user == user){
-			connection.query("call savePlanManual(?)", [plan_id]);
+			connection.query("call saveTripManual(?)", [plan_id]);
 
 			connection.end();
 
@@ -1551,7 +2033,7 @@ app.post('/favorite-plan', function(req, res){
 		return;
 	}
 
-	con.query("call setFavoritePlan(?,?)", [user_id, plan_id], function (err, result, fields) {
+	con.query("call setFavoriteTrip(?,?)", [user_id, plan_id], function (err, result, fields) {
     	if (err){
     		throw err;
     		res.send(JSON.stringify('error'));
@@ -1582,7 +2064,7 @@ app.post('/unfavorite-plan', function(req, res){
 		return;
 	}
 
-	con.query("call unfavoritePlan(?,?)", [user_id, plan_id], function (err, result, fields) {
+	con.query("call unfavoriteTrip(?,?)", [user_id, plan_id], function (err, result, fields) {
     	if (err){
     		throw err;
     		res.send(JSON.stringify('error'));
@@ -1700,7 +2182,7 @@ app.post('/add-visit', function(req, res){
     }).then(function(conn){
     	connection = conn;
 
-		return connection.query("call isPlanManual(?)", [plan_id]);
+		return connection.query("call isTripManual(?)", [plan_id]);
 
 	}).then(function(result){
 
@@ -1750,7 +2232,7 @@ app.post('/add-visit', function(req, res){
 
 	    	if(chosen_schedule != false){
 
-				connection.query("call addVisitToPlan(?,?,?,?,?)", [plan_id, poi_id, chosen_schedule[0], chosen_schedule[1], isManual], function (err, result) {
+				connection.query("call addVisitToTrip(?,?,?,?,?)", [plan_id, poi_id, chosen_schedule[0], chosen_schedule[1], isManual], function (err, result) {
 		    		if (err) throw err;
 				  	
 		    		res.contentType('json');
@@ -1773,7 +2255,7 @@ app.post('/add-visit', function(req, res){
         }
 
         else{
-        	return connection.query("call getPlanDates(?)", [plan_id]);
+        	return connection.query("call getTripDates(?)", [plan_id]);
 
         }
 
@@ -1801,12 +2283,12 @@ app.post('/add-visit', function(req, res){
 
 		if(chosen_schedule != false){
         	
-        	connection.query("call addVisitToPlan(?,?,?,?,?)", [plan_id, poi_id, chosen_schedule[0], chosen_schedule[1], isManual], function (err, result) {
+        	connection.query("call addVisitToTrip(?,?,?,?,?)", [plan_id, poi_id, chosen_schedule[0], chosen_schedule[1], isManual], function (err, result) {
 	    		if (err) throw err;
 			  	
 	    		res.contentType('json');
 
-				console.log("ADDED VISIT " + req.body.poi + " TO THE PLAN " + req.body.plan);
+				console.log("ADDED VISIT " + req.body.poi + " TO THE TRIP " + req.body.plan);
 
 	    		if(isManual == 1)
 					res.send({result: 'success', isManual: true});
@@ -1868,13 +2350,13 @@ app.post('/delete-visit', function(req, res){
 	}).then(function(conn){
     	connection = conn;
 
-		return connection.query("call isPlanManual(?)", [planId]);
+		return connection.query("call isTripManual(?)", [planId]);
 
 	}).then(function(result){
 
 		isManual = parseInt(result[0][0].isManual[0]);
 
-	    var result = connection.query("call getOwnerOfPlan;", [plan_id]);
+	    var result = connection.query("call getOwnerOfTrip;", [plan_id]);
 
 	    return result;
 
@@ -1921,7 +2403,7 @@ app.get('/plan', function(req, res){
     var source;
     var num_viewers = 0;
 
-	con.query("call getVisitsFromPlan(?, ?)", [user_id, plan_id], function (err, result, fields) {
+	con.query("call getVisitsFromTrip(?, ?)", [user_id, plan_id], function (err, result, fields) {
 		if (err) throw err;
 
 		result = result[0];
@@ -1946,6 +2428,12 @@ app.get('/plan', function(req, res){
 
         	days = getPlanDays(start_date_aux, parseInt(date_diff));
 
+        	var days_shortname = [];
+
+        	for(var i=0; i < days.length; i++){
+        		days_shortname.push(convertToDateFormat(days[i].split(', ')[1]));
+        	}
+
         	if(result[0].plan_name != null && result[0].plan_name.length > 0)
         		name = result[0].plan_name;
         	else
@@ -1959,6 +2447,8 @@ app.get('/plan', function(req, res){
         		source = "viewer";
 
         	num_viewers = result[0].num_viewers;
+
+        	travel_mode = result[0].travel_mode;
 
 		}
 
@@ -1974,7 +2464,7 @@ app.get('/plan', function(req, res){
         	var end_time = new Date(result[i].end_time);
 
         	visit["day"] = (start_time.getDate()<10?'0':'') + start_time.getDate() + " " + convertToTextMonth(start_time.getMonth()) + " " + start_time.getFullYear();
-        	visit["start_time"] = start_time.getHours() + ":" + (start_time.getMinutes()<10?'0':'') + start_time.getMinutes();
+         	visit["start_time"] = start_time.getHours() + ":" + (start_time.getMinutes()<10?'0':'') + start_time.getMinutes();
         	visit["end_time"] = end_time.getHours() + ":" + (end_time.getMinutes()<10?'0':'') + end_time.getMinutes();
         	
         	/* atributos do POI */
@@ -2138,7 +2628,7 @@ app.get('/plan', function(req, res){
 			}).then(function(conn){
 				connection = conn;
 
-				var result = connection.query("call getCityIDFromPlan(?)", [plan_id]);
+				var result = connection.query("call getCityIDFromTrip(?)", [plan_id]);
 
 				return result;
 
@@ -2147,7 +2637,7 @@ app.get('/plan', function(req, res){
 
 				/* obter sugestões */
 
-		        con.query("call getOtherSuggestionsFromPlan(?, ?)", [plan_id, city_id], function (err, result, fields) {
+		        con.query("call getOtherSuggestionsFromTrip(?, ?)", [plan_id, city_id], function (err, result, fields) {
 		        	if (err) throw err;
 
 		        	result = result[0];
@@ -2181,7 +2671,7 @@ app.get('/plan', function(req, res){
 			        	i = (i + 1) % result.length;
 			        }
 
-					con.query("call getPlanReviews(?)", plan_id, function (err, result, fields) {
+					con.query("call getTripReviews(?)", plan_id, function (err, result, fields) {
 				    	if (err) throw err;
 
 				    	result = result[0];
@@ -2199,7 +2689,7 @@ app.get('/plan', function(req, res){
 				    	}
 
 							    
-				        con.query("call getPlanStats(?)", plan_id, function (err, result, fields) {
+				        con.query("call getTripStats(?)", plan_id, function (err, result, fields) {
 			        		if (err) throw err;
 
 			        		result = result[0];
@@ -2213,7 +2703,7 @@ app.get('/plan', function(req, res){
 			        				rating = result[0].rating.toFixed(1);
 			        		}
 
-					        con.query("call getSharedPlansFromPlan(?)", plan_id, function (err, result, fields) {
+					        con.query("call getSharedPlansFromTrip(?)", plan_id, function (err, result, fields) {
 				        		if (err) throw err;
 
 				        		result = result[0];
@@ -2230,7 +2720,7 @@ app.get('/plan', function(req, res){
 
 					        				isInterested = result[0][0].isInterested;
 
-					        				data = {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, city_latitude: city_latitude, city_longitude: city_longitude, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, num_reviews: num_reviews, num_plans: num_plans, isInterested: isInterested};
+					        				data = {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, city_latitude: city_latitude, city_longitude: city_longitude, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, num_reviews: num_reviews, num_plans: num_plans, isInterested: isInterested, travel_mode: travel_mode};
 
 					        				if(view_method == "full")
 					        					res.render(path.join(__dirname+'/templates/full-plan.html'), data);
@@ -2248,7 +2738,7 @@ app.get('/plan', function(req, res){
 
 				        		else{
 
-				        			data = {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, city_latitude: city_latitude, city_longitude: city_longitude, days: days, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, num_reviews: num_reviews, num_plans: num_plans, isInterested: 0};
+				        			data = {plan_id: plan_id, name: name, plan: plan, start_date: start_date, end_date: end_date, city: city, city_latitude: city_latitude, city_longitude: city_longitude, days: days, days_shortname: days_shortname, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, num_reviews: num_reviews, num_plans: num_plans, isInterested: 0, travel_mode: travel_mode};
 
 				        			if(view_method == "full")
 			        					res.render(path.join(__dirname+'/templates/full-plan.html'), data);
@@ -2264,7 +2754,7 @@ app.get('/plan', function(req, res){
 	        		});
         		});
 			}).then(function(result){
-			    result = connection.query("call updatePlanViewers (?)", [plan_id]);
+			    result = connection.query("call updateTripViewers (?)", [plan_id]);
 			    connection.end();
 			});
 		});
@@ -2304,7 +2794,7 @@ app.get('/plan-m', function(req,res){
     var num_viewers = 0;
 
 
-	con.query("call getVisitsFromPlan(?, ?)", [user_id, plan_id], function (err, result, fields) {
+	con.query("call getVisitsFromTrip(?, ?)", [user_id, plan_id], function (err, result, fields) {
 		if (err) throw err;
 
 		result = result[0];
@@ -2347,7 +2837,7 @@ app.get('/plan-m', function(req,res){
 
 		else{
 
-			con.query("call getPlanDates(?)", [plan_id], function (err, result, fields) {
+			con.query("call getTripDates(?)", [plan_id], function (err, result, fields) {
 		        if (err) throw err;
 
 		        result = result[0];
@@ -2484,7 +2974,7 @@ app.get('/plan-m', function(req,res){
 		}).then(function(conn){
 			connection = conn;
 
-			var result = connection.query("call getCityIDFromPlan(?)", [plan_id]);
+			var result = connection.query("call getCityIDFromTrip(?)", [plan_id]);
 
 			return result;
 
@@ -2493,7 +2983,7 @@ app.get('/plan-m', function(req,res){
 
 			/* obter sugestões */
 
-	        con.query("call getOtherSuggestionsFromPlan(?, ?)", [plan_id, city_id], function (err, result, fields) {
+	        con.query("call getOtherSuggestionsFromTrip(?, ?)", [plan_id, city_id], function (err, result, fields) {
 	        	if (err) throw err;
 
 	        	result = result[0];
@@ -2558,7 +3048,7 @@ app.get('/trips', function(req, res){
 
 	if(user_id != -1){
 
-		con.query("call getUserPlans(?)", user_id, function (err, result, fields) {
+		con.query("call getUserTrips(?)", user_id, function (err, result, fields) {
 	        if (err) throw err;
 
 	        result = result[0];
@@ -2954,6 +3444,23 @@ app.post('/request-poi', upload_poi.single('photo'), function(req, res){
 	var poi_photo = req.file.path;
 	var poi_city = req.body.city;
 
+	var google_place_id = req.body.google_place_id;
+	var google_rating = parseFloat(req.body.google_rating).toFixed(1);
+	var google_num_reviews = parseInt(req.body.google_reviews);
+
+	if(google_place_id == "None")
+		google_place_id = null;
+
+	if(isNaN(google_rating)){
+		res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
+		return;
+	}
+
+	if(isNaN(google_num_reviews)){
+		res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
+		return;
+	}
+
 	if(isNaN(poi_latitude)){
 		res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
 		return;
@@ -2978,8 +3485,8 @@ app.post('/request-poi', upload_poi.single('photo'), function(req, res){
 	}
 
 
-	var sql = "call submitPOI(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-	var values = [poi_name, poi_description, poi_latitude, poi_longitude, poi_address, poi_type, poi_website, poi_phone_number, poi_city, user_id];
+	var sql = "call submitPOI(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+	var values = [poi_name, poi_description, poi_latitude, poi_longitude, poi_address, poi_type, poi_website, poi_phone_number, poi_city, user_id, google_place_id, google_rating, google_num_reviews];
 
 	con.query(sql, values, function (err, result, fields) {
 		if (err){
@@ -3120,6 +3627,7 @@ app.post('/accept-poi', function(req, res){
 
 	if(poi_phone_number == "")
 		poi_phone_number = null;
+
 	else if(isNaN(parseInt(poi_phone_number))){
 		res.send(JSON.stringify('error'));
 		return;
@@ -3131,7 +3639,10 @@ app.post('/accept-poi', function(req, res){
 			res.send(JSON.stringify('error'));
     	} 
 
-    	res.redirect('http://localhost:8080/place?id=' + poi_id);
+    	if(result[0][0].isAproved[0] == 1){
+    		res.redirect('http://localhost:8080/place?id=' + poi_id);
+    		console.log("POI ACCEPTED: ", poi_id);
+    	}
     
     });
 
@@ -3155,7 +3666,10 @@ app.post('/reject-poi', function(req, res){
 			res.send(JSON.stringify('error'));
     	} 
 
+
+
     	res.redirect('http://localhost:8080/review-poi');
+    	console.log("POI REJECTED: ", poi_id);
     
     });
 
@@ -3354,7 +3868,7 @@ app.post('/update-info-poi-automatically', function(req, res){
 
 	// update price level 
 	if(poi_field_name == "price_level"){
-		price_level = parseInt(poi_field_value);
+		var price_level = parseInt(poi_field_value);
 
 		if(isNaN(price_level))
 			return;
@@ -3368,7 +3882,7 @@ app.post('/update-info-poi-automatically', function(req, res){
 
 	// update address 
 	else if(poi_field_name == "address"){
-		address = poi_field_value;
+		var address = poi_field_value;
 
 		if(address == "" || address == null)
 			return;
@@ -3378,11 +3892,85 @@ app.post('/update-info-poi-automatically', function(req, res){
 
 			res.contentType('json');
 			res.send({result: result[0][0].result});
-
-
 		});
 	}
 
+	// update google rating 
+	else if(poi_field_name == "rating"){
+		var rating = poi_field_value;
+
+		if(rating == "" || rating == null)
+			return;
+
+		con.query("call updatePOIGoogleRating(?,?)", [poi_id, rating], function (err, result, fields) {
+    		if (err) throw err;
+
+			res.contentType('json');
+			res.send({result: result[0][0].result});
+		});
+	}
+
+	// update number of reviews 
+	else if(poi_field_name == "num_reviews"){
+		var num_reviews = poi_field_value;
+
+		if(num_reviews == "" || num_reviews == null)
+			return;
+
+		con.query("call updatePOINumberOfReviews(?,?)", [poi_id, num_reviews], function (err, result, fields) {
+    		if (err) throw err;
+
+			res.contentType('json');
+			res.send({result: result[0][0].result});
+		});
+	}
+
+
+	// update opening hours 
+	else if(poi_field_name == "opening_hours"){
+		var opening_hours = poi_field_value;
+
+		if(opening_hours == "" || opening_hours == null)
+			return;
+
+		con.query("call updatePOIOpeningHours(?,?)", [poi_id, opening_hours], function (err, result, fields) {
+    		if (err) throw err;
+
+    		console.log(result);
+
+			res.contentType('json');
+			res.send({result: result[0][0].result});
+		});
+	}
+
+});
+
+// update POI price
+app.post('/update-poi-price', function(req, res){
+
+	var poi_id = parseInt(req.body['poi']);
+
+	if(isNaN(poi_id))
+		return;
+
+	var price_adults = parseFloat(req.body['price_adults']);
+	if(isNaN(price_adults)){
+		price_adults = null;
+	}
+
+	var price_children = parseFloat(req.body['price_children']);
+	if(isNaN(price_children)){
+		price_children = null;
+	}
+
+	con.query("call updatePOIPrice(?,?,?)", [poi_id, price_adults, price_children], function (err, result, fields) {
+		if (err){
+			throw err;
+			res.send(JSON.stringify('error'));
+		} 
+
+		res.send(JSON.stringify('success'));
+	});
 });
 
 
@@ -3453,7 +4041,25 @@ app.get('/discover', function(req, res){
 
 app.get('/teste', function(req, res){
 
-	getPoiOpeningHours();
+	var soma = edge.func({
+    source: function () {/*
+        async (dynamic input) =>
+        {
+            var soma = new Matematica.OperacoesMatematicas().Soma(input.a, input.b);
+            return soma;
+        }
+    */},
+    references: ["Matematica.dll"]
+	});
+
+	soma({a: 10, b: 30}, function (error, result) {
+	    if (error) throw error;
+	    console.log(result);
+	});
+
+
+	res.render(path.join(__dirname+'/templates/404page.html'));
+
 
 });
 
@@ -3477,7 +4083,7 @@ console.log("Running at Port 8080");
 /* Auxiliar Functions */
 
 function getPlanDays(start_date, number_days, convert=true){
-	days = [];
+	var days = [];
 
 	days.push(start_date);
 
@@ -3521,6 +4127,8 @@ function getPlanDays(start_date, number_days, convert=true){
 		number_days--;		
 
 	}
+
+
 
 	if(convert)
 		days = convertToDate(days);
@@ -3967,40 +4575,58 @@ function getWeatherClosestHour(visit_schedule){
 
 
 
-
-function getPoiOpeningHours(place_id){
-	place_id = 'ChIJLU7jZClu5kcR4PcOOO6p3I0';
-
-	var url = "https://maps.googleapis.com/maps/api/place/details/json?" + "key=" + GOOGLE_API_KEY + "&placeid=" + place_id + "&fields=opening_hours";
-	console.log(url);
-
-	https.get(url, function(response) {
-    	var body ='';
-    	response.on('data', function(chunk) {
-      		body += chunk;
-		});
-
-		response.on('end', function() {
-      		var places = JSON.parse(body);
-
-      		var opening_hours = places['result']['opening_hours']['weekday_text'];
-
-      		return parsePoiOpeningHours(opening_hours);
-    	});
- 	 }).on('error', function(e) {
-    	console.log("Got error: " + e.message);
-    	return null;
-  	});
-}
-
-
 function parsePoiOpeningHours(poi_op_hours){
-
 	var poi_hours = {};
 
-	for(var i=0; i<poi_op_hours.length;i++){
+	poi_op_hours = JSON.parse(poi_op_hours);
+
+	var visits_start_time = 9 * 3600; // 9:00 in number of seconds after midnight
+	var visits_end_time = 20 * 3600; // 20:00 in number of seconds after midnight
+
+	var opening_hours = poi_op_hours[0].substring(poi_op_hours[0].indexOf(':')+1);
+
+
+	if(opening_hours == 'Closed')
+    	poi_hours["Monday"] = [0,0];
+
+ 	else if(opening_hours == 'Open 24 hours')
+		poi_hours["Monday"] = [0, visits_end_time-visits_start_time];
+
+	else{
+		var start_time = opening_hours.split('–')[0];
+    	if(start_time.includes('PM'))
+    		start_time = ((parseInt(start_time.split(':')[0]) % 12) + 12) * 3600 + parseInt(start_time.split(':')[1].replace(' PM', '')) * 60;
+
+    	else if(start_time.includes('AM'))
+    		start_time = (parseInt(start_time.split(':')[0])) * 3600 + parseInt(start_time.split(':')[1].replace(' AM', '')) * 60;
+
+    	var end_time = opening_hours.split('–')[1];
+    	if(end_time.includes('PM'))
+    		end_time = ((parseInt(end_time.split(':')[0]) % 12) + 12) * 3600 + parseInt(end_time.split(':')[1].replace(' PM', '')) * 60;
+
+    	else if(end_time.includes('AM'))
+    		end_time = (parseInt(end_time.split(':')[0])) * 3600 + parseInt(end_time.split(':')[1].replace(' AM', '')) * 60;
+
+    	if(start_time < visits_start_time)
+    		start_time = visits_start_time;
+    	else
+    		start_time = start_time - visits_start_time;
+
+    	if(end_time > visits_end_time)
+    		end_time = visits_end_time;
+
+    	else
+    		end_time = end_time - visits_start_time;
+
+    	poi_hours["Monday"] = [start_time, end_time];
+	}
+
+	console.log(poi_hours);
+
+	/*for(var i=0; i<poi_op_hours.length;i++){
         var weekday = poi_op_hours[i].split(':')[0];
         var opening_hours = poi_op_hours[i].substring(poi_op_hours[i].indexOf(':')+1);
+
 
         if(opening_hours == 'Closed')
         	poi_hours[weekday] = 'Closed';
@@ -4025,13 +4651,22 @@ function parsePoiOpeningHours(poi_op_hours){
         
         }
 
-	}
-
-	console.log(poi_hours);
-
-
+	}*/
 
 }
+
+
+
+/* sort POIs by its score 
+code adapted from https://stackoverflow.com/questions/8175093/simple-function-to-sort-an-array-of-objects/8175221#8175221 */
+function sortPOIs (pois, score){
+	return pois.sort(function(a, b)
+ 	{
+  		var x = a[score]; var y = b[score];
+  		return ((x < y) ? 1 : ((x > y) ? -1 : 0));
+ 	});
+}
+
 
 
 function sleep (time) {

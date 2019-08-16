@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<Hotels>
+  <Hotel>
+    <Number>14583</Number>
+    <Name>Hotel Novotel Paris les Halles</Name>
+    <Latitude>48.861013</Latitude>
+    <Longitude>2.346493</Longitude>
+  </Hotel>
+  <Hotel>
+    <Number>14576</Number>
+    <Name>Hotel de Lutèce</Name>
+    <Latitude>48.8524553</Latitude>
+    <Longitude>2.3546496</Longitude>
+  </Hotel>
+  <Hotel>
+    <Number>14579</Number>
+    <Name>Hotel Du Jeu De Paume</Name>
+    <Latitude>48.8520735</Latitude>
+    <Longitude>2.356212</Longitude>
+  </Hotel>
+</Hotels>

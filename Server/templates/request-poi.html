@@ -145,18 +145,23 @@
                             <br>
 
                             <div class="form-group">
-                              <label for="input-poi-title"><h4>Title <sup aria-describedby="mandatoryHelp">*</sup></h4></label>
+                              <label for="input-poi-title"><h5>Title <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
                               <input type="text" class="form-control" id="input-poi-title" name="title" placeholder="Enter a title for the POI" required>
+                            </div>
+
+                            <div class="form-group">
+                              <label for="input-google-place-id"><h5>Google Place ID <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
+                              <input type="text" class="form-control" id="input-google-place-id" name="google_place_id" placeholder="Google Place ID (None if it's unknown)" required>
                             </div>
                             
 
                             <div class="form-group">
-                              <label for="input-poi-address"><h4>Address <sup aria-describedby="mandatoryHelp">*</sup></h4></label>
+                              <label for="input-poi-address"><h5>Address <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
                               <input type="text" class="form-control" id="input-poi-address" name="address" placeholder="Enter an address for the POI" required>
                             </div>
 
                             <div class="form-group">
-                              <label for="input-poi-type"><h4>Type <sup aria-describedby="mandatoryHelp">*</sup></h4></label>
+                              <label for="input-poi-type"><h5>Type <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
                               <select class="form-control" id="input-poi-type" name="poi_type" required>
                                 <option>Select a type</option>
                                 <option>Museum</option>
@@ -172,11 +177,12 @@
                                 <option>Sports Venue</option>
                                 <option>Aquarium</option>
                                 <option>Point of Interest</option>
+                                <option>Shopping</option>
                               </select>
                             </div>
 
                             <div class="form-group">
-                              <label for="input-poi-city"><h4>City <sup aria-describedby="mandatoryHelp">*</sup></h4></label>
+                              <label for="input-poi-city"><h5>City <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
                               <select class="form-control" id="input-poi-city" name="city" required>
                                   <option>Select a city</option>
                               </select>
@@ -185,22 +191,32 @@
                             <br>
 
                             <div class="form-group">
-                                <label for="input-poi-description"><h4>Description</h4></label>
+                                <label for="input-poi-description"><h5>Description</h5></label>
                                 <textarea class="form-control" id="input-poi-description" name="description" rows="3" placeholder="Enter a description for the POI"></textarea>
                             </div>
 
                             <div class="form-group">
-                              <label for="input-poi-website"><h4>Website</h4></label>
+                              <label for="input-poi-website"><h5>Website</h5></label>
                               <input type="url" class="form-control" id="input-poi-website" name="website" placeholder="Enter the URL for the website of the POI ">
                             </div>
 
                             <div class="form-group">
-                              <label for="input-poi-phone"><h4>Phone Number</h4></label>
+                              <label for="input-poi-phone"><h5>Phone Number</h5></label>
                               <input type="tel" class="form-control" id="input-poi-phone" name="phone_number" placeholder="Enter the phone number of the POI ">
+                            </div>
+        
+                            <div class="form-group">
+                                <label for="input-google-rating"><h5>Google Rating <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
+                                <input type="text" class="form-control" id="input-google-rating" name="google_rating" placeholder="Google Rating" required>
+                            </div>
+          
+                            <div class="form-group">
+                                <label for="input-google-reviews"><h5>Google Number of Reviews <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
+                                <input type="text" class="form-control" id="input-google-reviews" name="google_reviews" placeholder="Google Number of Reviews" required>
                             </div>
 
                             <div class="form-group">
-                              <label><h4>Coordinates <sup aria-describedby="mandatoryHelp">*</sup></h4></label>
+                              <label><h5>Coordinates <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
                               <div class="form-row">
                                 <div class="col">
                                   <input type="text" class="form-control" id="input-poi-latitude" name="latitude" placeholder="Latitude" required>

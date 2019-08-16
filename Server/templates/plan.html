@@ -99,20 +99,22 @@
             <div class="cont">
                 <div class="card card-body bg-light">
                     <div class="row">
-                        <div class="col-md-9">
+                        <div class="col-md-9 col-12">
                             <div class="text-left">
-                                <h3 id="place_name"><b><%= name %></b></h3><h8 id="place_name"><%= start_date %>  - <%= end_date %></h8>                      
+                                <h3><b><%= name %></b></h3>
+                                <p><h8><%= start_date %>  - <%= end_date %></h8></p>
+                                <p><i class="far fa-user"></i><span style="padding-left: 10px;">2 Adults</span></p>                    
                             </div>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-3 col-12">
                             <div class="row">
-                                <div class="col-md-6 text-center">
+                                <div class="col-md-6 col-6 text-center">
                                     <button class="change-view" onclick="changeView('full');"><img class="img-responsive change-view-img" src="img/view-full.jpg" /></button>
                                     <br>
                                     <button class="change-view" onclick="changeView('full');">Plan view only</button>
                                 </div>
-                                <div class="col-md-6 text-center">
+                                <div class="col-md-6 col-6 text-center">
                                     <button class="change-view" onclick="changeView('map');"><img class="img-responsive change-view-img" src="img/view-map.jpg" /></button>
                                     <br>
                                     <button class="change-view" onclick="changeView('map');">Map view only</button>
@@ -130,19 +132,26 @@
                         <% day_no = 0 %>
                     <% } %>
                     <% day = days[day_no] %>
+                    <% day_shortname = days_shortname[day_no] %>
+
                     <div class="card card-body" style="height: 70px;">
                         <div class="row" id="plan-day-<%= day_no %>">
-                            <div class="col-md-2">
+                            <div class="col-md-2 col-4">
                                 <div class="text-center">
                                     <button id="previous-day-btn" class="change-plan-day-btn" onclick="previousDay();"><i class="fas fa-arrow-alt-circle-left fa-lg"></i></button>
                                 </div>
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-8 col-4">
                                 <div class="text-center">
                                     <h5 id="visit-day" style="font-weight: bold;"><%= day %></h5>
                                 </div>
+
+                                <div class="text-center">
+                                    <h5 id="visit-day-mobile" style="font-weight: bold;"><%= day_shortname %></h5>
+                                </div>
+
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-2 col-4">
                                 <div class="text-center">
                                     <button id="next-day-btn" class="change-plan-day-btn" onclick="nextDay();"><i class="fas fa-arrow-alt-circle-right fa-lg"></i></button>
                                 </div>
@@ -157,34 +166,46 @@
                         <div id="place-<%= count %>">
                             <div class="card visit-loaded" style="height: 150px;">
                                 <div class="row">
-                                    <div class="col-md-4">
-                                        <img id="place-<%= count %>-img" class="img-fluid" alt="" style="height: 150px; width: 100%;">
+                                    <div class="col-md-4 col-5">
+                                        <img id="place-<%= count %>-img" class="img-fluid visit-img" alt="">
                                     </div>
-                                    <div class="col-md-8 ">
-                                        <div class="card-body row">
-                                            <div class="col-md-7">
-                                                <div class="text-left">
+                                    <div class="col-md-8 col-7">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-7">
                                                     <h6 id="place-<%= count %>-name" class="card-title plan-title" ><b></b></h6>
-
-                                                    <span id="place-<%= count %>-type" style="color: #767676;"></span>
-                                                    <p></p>
-
-                                                    <span id="place-<%= count %>-start-hour" class="hours-text"></span>
-                                                    -
-                                                    <span id="place-<%= count %>-end-hour" class="hours-text-2"></span>
-
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <div class="text-right">
+                                                        <span id="place-<%= count %>-weather" style="padding-left: 10px; color: #767676;"></span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-5">
-                                                <div class="text-right">
-                                                    <span id="place-<%= count %>-weather" style="padding-left: 10px; color: #767676;"></span>
+
+                                            <div class="row">
+                                                <div class="col-md-7">
+                                                    <div class="text-left">
+
+                                                        <span id="place-<%= count %>-type" style="color: #767676;"></span>
+                                                        <p></p>
+
+                                                        <div style="padding-bottom: 10px;">
+                                                            <span id="place-<%= count %>-start-hour" class="hours-text"></span>
+                                                            -
+                                                            <span id="place-<%= count %>-end-hour" class="hours-text-2"></span>
+                                                        </div>
+
+                                                    </div>
                                                 </div>
-                                                <div class="plan-table-icons text-right"> 
-                                                    <button type="button" class="plan-table-btn-icons btn-info-modal" id="place-<%= count %>-info" data-toggle="modal" data-target="#info-modal" ><i title="Get info" class="fas fa-info-circle fa-lg"></i></button>
-                                                    <button type="button" class="plan-table-btn-icons btn-remove-modal" id="place-<%= count %>-remove" data-toggle="modal" data-target="#remove-modal"><i title="Remove visit" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
-                                                    <button type="button" class="plan-table-btn-icons btn-edit-modal" id="place-<%= count %>-edit" data-toggle="modal" data-target="#edit-modal"><i title="Edit visit" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
+                                                <div class="col-md-5">
+                                                    <div class="plan-table-icons text-right"> 
+                                                        <button type="button" class="plan-table-btn-icons btn-info-modal" id="place-<%= count %>-info" data-toggle="modal" data-target="#info-modal" ><i title="Get info" class="fas fa-info-circle fa-lg"></i></button>
+                                                        <button type="button" class="plan-table-btn-icons btn-remove-modal" id="place-<%= count %>-remove" data-toggle="modal" data-target="#remove-modal"><i title="Remove visit" class="fas fa-trash fa-lg" style="padding-left: 10px;"></i></button>
+                                                        <button type="button" class="plan-table-btn-icons btn-edit-modal" id="place-<%= count %>-edit" data-toggle="modal" data-target="#edit-modal"><i title="Edit visit" class="fas fa-edit fa-lg" style="padding-left: 10px;"></i></button>
+                                                    </div>
                                                 </div>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -211,7 +232,7 @@
 
             <div class="card card-body bg-light">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-6 col-12">
                         <% if(isPublic == 0) { %>
                             <div class="dropdown" id="add-visit-div">
                                 <button class="btn btn-info dropdown-toggle" type="button" id="add-visit-dropdown-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -238,7 +259,7 @@
                         <% } %>
 
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 col-12">
                         <div class="form-group text-right">
                             <% if(source == "author") { %>
                                 <button type="button" class="btn btn-success btn-stats-modal" data-toggle="modal" data-target="#stats-modal" data-title="<%= name %>"><i class="fas fa-chart-bar"></i><span style="padding-left: 10px;">View Stats</span></button>
@@ -597,7 +618,7 @@
 
                         <div class="tab-content" id="pills-tabContent">
                             <div class="tab-pane fade show active" id="review-modal-general-info" role="tabpanel" aria-labelledby="pills-review-general-info-tab">
-            
+                                
                                 <label for="review-text">Review:</label>
                                 <textarea class="form-control" rows="5" id="review-text"></textarea>  
                                 
@@ -719,8 +740,10 @@
                                 <textarea type="text" id="inputDescription" class="form-control" name="description" required></textarea>
 
                                 <br>
+                                
+                                <input type="text" name="plan" value="<%= plan_id %>" style="display: none;" >
 
-                                <div class="form-group">
+                                <!--<div class="form-group">
                                     <label for="select-category-plan">Category for you plan</label>
                                     <select class="form-control" id="select-category-plan" name="category">
                                         <option selected>Overall</option>
@@ -729,7 +752,7 @@
                                         <option>Culture</option>
                                         <option>Sports</option>
                                     </select>
-                                </div>
+                                </div>-->
                                 
                                 <br>
 
@@ -841,7 +864,8 @@
             suggested_hotels.push('<%- JSON.stringify(hotel) %>');
         '<% }); %>'
 
-        loadPlan(plan, '<%= days %>');
+
+        loadPlan(plan, '<%= days %>', '<%= days_shortname %>', '<%= travel_mode %>');
         loadSuggestions(suggested_visits);
         loadHotels(suggested_hotels);
     

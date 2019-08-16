@@ -27,6 +27,9 @@ function initMap() {
             lng: position.coords.longitude
         };
 
+        $('#input-poi-latitude').val(position.coords.latitude);
+        $('#input-poi-longitude').val(position.coords.longitude);
+
         //infoWindow.setPosition(pos);
         infoWindow.open(map);
 
@@ -146,10 +149,62 @@ function loadCities(cities){
 
         input_city.append(option);
     }
-
 }
 
 
+$(function () {
+    $('#input-google-place-id').focusout(function() {
+
+        var request = {
+            placeId: $('#input-google-place-id').val(),
+            fields: ["formatted_address", "formatted_phone_number", "website", "rating", "user_ratings_total", "geometry"]
+        };
+      
+      
+        var service = new google.maps.places.PlacesService(document.createElement('places-map'));
+    
+        service.getDetails(request, function(place, status) {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+        
+                if(place.formatted_address != null)
+                    $('#input-poi-address').val(place.formatted_address);
+
+                if(place.website != null)
+                    $('#input-poi-website').val(place.website);
+
+                if(place.formatted_phone_number != null)
+                    $('#input-poi-phone').val(place.formatted_phone_number);
+
+                if(place.rating != null)
+                    $('#input-google-rating').val(place.rating);
+
+                if(place.user_ratings_total != null)
+                    $('#input-google-reviews').val(place.user_ratings_total);
+
+                if(place.geometry.location != null){
+                    $('#input-poi-latitude').val(place.geometry.location.lat);
+                    $('#input-poi-longitude').val(place.geometry.location.lng);
+                    marker.setPosition(new google.maps.LatLng($('#input-poi-latitude').val(), $('#input-poi-longitude').val()));
+                    map.setCenter(new google.maps.LatLng($('#input-poi-latitude').val(), $('#input-poi-longitude').val()));
+                }
+
+
+            }
+        });
+    });
+
+    $('#input-poi-latitude').focusout(function() {
+        marker.setPosition(new google.maps.LatLng($('#input-poi-latitude').val(), $('#input-poi-longitude').val()));
+        map.setCenter(new google.maps.LatLng($('#input-poi-latitude').val(), $('#input-poi-longitude').val()));
+    });
+
+    $('#input-poi-longitude').focusout(function() {
+        marker.setPosition(new google.maps.LatLng($('#input-poi-latitude').val(), $('#input-poi-longitude').val()));
+        map.setCenter(new google.maps.LatLng($('#input-poi-latitude').val(), $('#input-poi-longitude').val()));
+    });
+
+
+});
 
 
 function verify(){

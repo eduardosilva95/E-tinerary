@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<POIs>
+  <POI>
+    <Number>3067</Number>
+    <Name>Eiffel Tower</Name>
+    <Latitude>48.8583701</Latitude>
+    <Longitude>2.2944813</Longitude>
+    <Longitude>2.2944813</Longitude>
+  </POI>
+  <POI>
+    <Number>3127</Number>
+    <Name>Louvre Museum</Name>
+    <Latitude>48.8606111</Latitude>
+    <Longitude>2.337644</Longitude>
+    <Longitude>2.337644</Longitude>
+  </POI>
+  <POI>
+    <Number>3154</Number>
+    <Name>Disneyland Paris</Name>
+    <Latitude>48.8671769</Latitude>
+    <Longitude>2.7838265</Longitude>
+    <Longitude>2.7838265</Longitude>
+  </POI>
+  <POI>
+    <Number>3161</Number>
+    <Name>Arc de Triomphe</Name>
+    <Latitude>48.8737917</Latitude>
+    <Longitude>2.2950275</Longitude>
+    <Longitude>2.2950275</Longitude>
+  </POI>
+  <POI>
+    <Number>3296</Number>
+    <Name>Trocadéro Gardens</Name>
+    <Latitude>48.8615963</Latitude>
+    <Longitude>2.2892823</Longitude>
+    <Longitude>2.2892823</Longitude>
+  </POI>
+  <POI>
+    <Number>3087</Number>
+    <Name>Palace of Versailles</Name>
+    <Latitude>48.8048649</Latitude>
+    <Longitude>2.1203554</Longitude>
+    <Longitude>2.1203554</Longitude>
+  </POI>
+  <POI>
+    <Number>3265</Number>
+    <Name>Luxembourg Gardens</Name>
+    <Latitude>48.8462217</Latitude>
+    <Longitude>2.3371605</Longitude>
+    <Longitude>2.3371605</Longitude>
+  </POI>
+</POIs>

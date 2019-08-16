@@ -86,7 +86,7 @@ function getPlaceDetails(place_id){
 
     var request = {
       placeId: place_id,
-      fields: ["photos", "opening_hours", "review", "name", "price_level", "formatted_address"]
+      fields: ["photos", "opening_hours", "review", "name", "price_level", "formatted_address", "user_ratings_total", "rating"]
     };
 
 
@@ -94,8 +94,17 @@ function getPlaceDetails(place_id){
 
     service.getDetails(request, function(place, status) {
       if (status === google.maps.places.PlacesServiceStatus.OK) {
+        
         if(place.opening_hours != null){
           createOpeningHoursTable(place.opening_hours.weekday_text);
+
+          $.post("/update-info-poi-automatically", {poi: poi_id, field: "opening_hours", value: JSON.stringify(place.opening_hours.weekday_text)}, function(result){
+            // if there are changes, refresh the page
+            if(result.result == 1){
+              window.location.reload();
+            }
+
+          });
         }
 
         else{
@@ -199,6 +208,30 @@ function getPlaceDetails(place_id){
           });
         }
 
+        if(place.rating != undefined){
+
+          $.post("/update-info-poi-automatically", {poi: poi_id, field: "rating", value: place.rating}, function(result){
+            
+            // if there are changes, refresh the page
+            if(result.result == 1){
+              window.location.reload();
+            }
+
+          });
+        }
+
+        if(place.user_ratings_total != undefined){
+
+          $.post("/update-info-poi-automatically", {poi: poi_id, field: "num_reviews", value: place.user_ratings_total}, function(result){
+            
+            // if there are changes, refresh the page
+            if(result.result == 1){
+              window.location.reload();
+            }
+
+          });
+        }
+
       }
     });
 
@@ -278,6 +311,15 @@ function getPlaceDetails(place_id){
 
     });
   });
+
+  $(function () {
+    $('.btn-update-price-modal').on('click', function () {
+        $('#modal-update-price-title').text($(this).data('title'));
+
+        
+    });
+  });
+
 
 
   $(function () {
@@ -423,7 +465,28 @@ function getPlaceDetails(place_id){
     $.post("/edit-description-poi", {poi: poi_id, description: description}, function(result){
         window.location.reload();
     });
+  }
 
+  function updatePrice(){
+    var poi_id = /id=([^&]+)/.exec(location.search)[1];
+
+    var price_adults = document.getElementById("input-adult-price").value;
+    var price_children = document.getElementById("input-children-price").value;
+
+    if(price_adults == '' && price_children == ''){
+      $("#input-price-error").css("display", "block");
+      return;
+    }
+
+    $.post("/update-poi-price", {poi: poi_id, price_adults: price_adults, price_children: price_children}, function(result){
+      if(result == "success"){
+        $("#update-price-success").css("display", "block");
+      }
+
+      else{
+        $("#update-price-error").css("display", "block");
+      }
+    });
   }
 
   

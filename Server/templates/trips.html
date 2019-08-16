@@ -170,12 +170,12 @@
 
                         <div class="card" style="height: 150px;">
                             <div class="row">
-                                <div class="col-md-3">
+                                <div class="col-md-3 col-5">
                                     <img id="past-trip-<%= count %>-img" class="img-fluid card-img" alt="" style="height: 148px; width: 100%;">
                                 </div>
-                                <div class="col-md-9">
+                                <div class="col-md-9 col-7">
                                     <div class="card-body row">
-                                        <div class="col-md-8">
+                                        <div class="col-md-8 col-12">
                                             <div class="text-left">
                                                 <a href="/plan?id=<%= trip.id %>" class="trip-link"><span class="card-title"><b><%= trip.name %></b></span></a>
                                                 <button type="button" class="plan-table-btn-icons btn-rename-modal" data-toggle="modal" data-target="#rename-modal" data-name="<%= trip.name %>" data-id="<%= trip.id %>"><i title="Rename the trip" class="fas fa-pen fa-lg" style="padding-left: 10px;"></i></button>
@@ -183,7 +183,7 @@
                                                 <span class="text-bottom"><%= trip.start %> - <%= trip.end %></span> 
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-4" id="favorite-trip-div">
                                             <% if(trip.isFavorite == 1) { %>
                                                 <div class="text-right" style="color: #ffc107; font-size: 18px;">
                                                     <span style="padding-right: 10px;">Favorite Trip</span><button type="button" id="unfavorite-<%= count %>" class="plan-table-btn-icons unfavorite-btn" onclick="unfavoriteTrip('<%= trip.id %>');"><i title="Unfavorite" id="unfavorite-<%= count %>-icon" class="fas fa-star fa-lg" style="padding-left: 10px;"></i></button>
