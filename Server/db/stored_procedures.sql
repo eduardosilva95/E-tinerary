@@ -18,6 +18,7 @@ DROP PROCEDURE getHotels;
 DROP PROCEDURE getPOIsIDFromCity;
 DROP PROCEDURE addVisitToTrip;
 DROP PROCEDURE getInfoUser;
+DROP PROCEDURE getUserStats;
 DROP PROCEDURE setUserInterested;
 DROP PROCEDURE unsetUserInterested;
 DROP PROCEDURE isUserInterested;
@@ -25,7 +26,9 @@ DROP PROCEDURE setFavoriteTrip;
 DROP PROCEDURE unfavoriteTrip;
 DROP PROCEDURE reviewPOI;
 DROP PROCEDURE uploadPOIPhoto;
+DROP PROCEDURE uploadCityPhoto;
 DROP PROCEDURE getPOIPhotos;
+DROP PROCEDURE getCityPhotos;
 DROP PROCEDURE submitPOI;
 DROP PROCEDURE getSubmittedPOIs;
 DROP PROCEDURE getSubmittedPOIByID;
@@ -66,6 +69,9 @@ DROP PROCEDURE updatePOINumberOfReviews;
 DROP PROCEDURE updatePOIPrice;
 DROP PROCEDURE updatePOIOpeningHours;
 DROP PROCEDURE getCityTrips;
+DROP PROCEDURE getCityStats;
+DROP PROCEDURE discover;
+DROP PROCEDURE tripExists;
 
 DELIMITER //
 
@@ -92,11 +98,9 @@ END //
 # obter os N POIs com mais itinerarios criados
 CREATE PROCEDURE getTopPOIs (num_results INT)
 BEGIN
-	#select id, name, place_id, city, count(name) as trips from 
-    #(select distinct poi.id, poi.name, poi.place_id, city.name as city, trip.id as trip from trip join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on trip.id = visit.trip_id where trip.isActive = 1 and poi.isAproved = 1) t 
-    #group by name order by trips desc limit num_results;
-    
-    select poi.id as id, poi.name as name, poi.place_id as place_id, city.name as city, num_reviews as trips from poi join city on poi.city = city.id order by num_reviews desc limit num_results;
+	select id, name, place_id, city, count(name) as trips from 
+    (select distinct poi.id, poi.name, poi.place_id, city.name as city, trip.id as trip from trip join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on trip.id = visit.trip_id where trip.isActive = 1 and poi.isAproved = 1) t 
+    group by name order by trips desc limit num_results;
 END //
 
 # obter N cidades random
@@ -107,22 +111,30 @@ BEGIN
     group by name order by rand() limit num_results;
 END //
 
+
 # obter todos os POI de uma determinada cidade
 CREATE PROCEDURE getPOIsFromCity (destination VARCHAR(255), query_text VARCHAR(255), tripID INT, sort VARCHAR(255)) 
 BEGIN
 	DECLARE number_results INT;
+    DECLARE number_visits_trip INT;
     SET number_results = 0;
+
+
+    IF tripID != -1 THEN
+    	SELECT count(*) INTO number_visits_trip FROM visit WHERE trip_id = tripID;
+	END IF;
+
     
-    IF tripID = -1 THEN
+    IF tripID = -1 || number_visits_trip = 0 THEN
 		IF query_text = "" THEN
 			IF sort = "az" THEN
-				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 ORDER BY poi.name ASC;
+				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 ORDER BY poi.name ASC;
             ELSEIF sort = "za" THEN
-				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 ORDER BY poi.name DESC;
+				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 ORDER BY poi.name DESC;
             ELSEIF sort = "rating" THEN
-				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 ORDER BY poi.google_rating DESC;
+				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 ORDER BY poi.google_rating DESC;
             ELSE
-				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 ORDER BY poi.num_reviews DESC;
+				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 ORDER BY poi.num_reviews DESC;
 			END IF;
         ELSE
 			SET query_text = CONCAT('%', query_text,'%');
@@ -131,13 +143,13 @@ BEGIN
 			
 			IF number_results > 0 THEN
 				IF sort = "az" THEN
-					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 ORDER BY poi.name ASC;
+					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 ORDER BY poi.name ASC;
 				ELSEIF sort = "za" THEN
-					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 ORDER BY poi.name DESC;
+					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 ORDER BY poi.name DESC;
 				ELSEIF sort = "rating" THEN
-					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 ORDER BY poi.google_rating DESC;
+					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 ORDER BY poi.google_rating DESC;
 				ELSE
-					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 ORDER BY poi.num_reviews DESC;
+					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, photo_poi_tmp.photo_url as photo FROM (poi JOIN city ON poi.city = city.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 ORDER BY poi.num_reviews DESC;
 				END IF;
             ELSE
 				SELECT name as city, country FROM city WHERE city.name = destination;
@@ -147,13 +159,13 @@ BEGIN
 	ELSE
 		IF query_text = "" THEN
 			IF sort = "az" THEN
-				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM (((poi JOIN city ON poi.city = city.id) JOIN visit ON poi.id = visit.poi_id) JOIN trip on visit.trip_id = trip.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.name ASC;
+				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM ((poi JOIN city ON poi.city = city.id) LEFT JOIN (visit JOIN trip on visit.trip_id = trip.id) ON poi.id = visit.poi_id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.name ASC;
 			ELSEIF sort = "za" THEN
-				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM (((poi JOIN city ON poi.city = city.id) JOIN visit ON poi.id = visit.poi_id) JOIN trip on visit.trip_id = trip.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.name DESC;
+				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM ((poi JOIN city ON poi.city = city.id) LEFT JOIN (visit JOIN trip on visit.trip_id = trip.id) ON poi.id = visit.poi_id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.name DESC;
 			ELSEIF sort = "rating" THEN
-				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM (((poi JOIN city ON poi.city = city.id) JOIN visit ON poi.id = visit.poi_id) JOIN trip on visit.trip_id = trip.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.google_rating DESC;
+				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM ((poi JOIN city ON poi.city = city.id) LEFT JOIN (visit JOIN trip on visit.trip_id = trip.id) ON poi.id = visit.poi_id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.google_rating DESC;
 			ELSE
-				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM (((poi JOIN city ON poi.city = city.id) JOIN visit ON poi.id = visit.poi_id) JOIN trip on visit.trip_id = trip.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.num_reviews DESC;
+				SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM ((poi JOIN city ON poi.city = city.id) LEFT JOIN (visit JOIN trip on visit.trip_id = trip.id) ON poi.id = visit.poi_id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.isAproved = 1 AND (trip.id = tripID OR trip.id IS NULL) ORDER BY poi.num_reviews DESC;
 			END IF;
 		ELSE
 			SET query_text = CONCAT('%', query_text,'%');
@@ -162,13 +174,13 @@ BEGIN
 			
 			IF number_results > 0 THEN
 				IF sort = "az" THEN
-					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM (((poi JOIN city ON poi.city = city.id) JOIN visit ON poi.id = visit.poi_id) JOIN trip on visit.trip_id = trip.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.name ASC;
+					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM ((poi JOIN city ON poi.city = city.id) LEFT JOIN (visit JOIN trip on visit.trip_id = trip.id) ON poi.id = visit.poi_id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.name ASC;
 				ELSEIF sort = "za" THEN
-					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM (((poi JOIN city ON poi.city = city.id) JOIN visit ON poi.id = visit.poi_id) JOIN trip on visit.trip_id = trip.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.name DESC;
+					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM ((poi JOIN city ON poi.city = city.id) LEFT JOIN (visit JOIN trip on visit.trip_id = trip.id) ON poi.id = visit.poi_id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.name DESC;
 				ELSEIF sort = "rating" THEN
-					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM (((poi JOIN city ON poi.city = city.id) JOIN visit ON poi.id = visit.poi_id) JOIN trip on visit.trip_id = trip.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.google_rating DESC;
+					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM ((poi JOIN city ON poi.city = city.id) LEFT JOIN (visit JOIN trip on visit.trip_id = trip.id) ON poi.id = visit.poi_id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.google_rating DESC;
 				ELSE
-					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM (((poi JOIN city ON poi.city = city.id) JOIN visit ON poi.id = visit.poi_id) JOIN trip on visit.trip_id = trip.id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.num_reviews DESC;
+					SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.num_reviews as num_reviews, poi.price_level as price_level, poi.price as price, poi.latitude as latitude, poi.longitude as longitude, visit.start_time as start_time, visit.end_time as end_time, photo_poi_tmp.photo_url as photo FROM ((poi JOIN city ON poi.city = city.id) LEFT JOIN (visit JOIN trip on visit.trip_id = trip.id) ON poi.id = visit.poi_id) left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id WHERE city.name = destination AND poi.name LIKE query_text AND poi.isAproved = 1 AND trip.id = tripID ORDER BY poi.num_reviews DESC;
 				END IF;
 			ELSE
 				SELECT name as city, country FROM city WHERE city.name = destination;
@@ -216,7 +228,7 @@ END //
 # obter as datas (inicio e fim) de uma viagem 
 CREATE PROCEDURE getTripDates (tripID INT)
 BEGIN
-	select trip.name as name, trip.start_date as start_date, trip.end_date as end_date, datediff(trip.end_date, trip.start_date) as date_diff, city.name as city from trip join city on trip.city = city.id where trip.id = tripID;
+	select trip.name as name, trip.start_date as start_date, trip.end_date as end_date, datediff(trip.end_date, trip.start_date) as date_diff, trip.travel_mode as travel_mode, trip.num_adults as num_adults, trip.num_children as num_children, expiration_time, city.name as city from trip join city on trip.city = city.id where trip.id = tripID;
 END //
 
 # obter toda a informação de uma cidade
@@ -267,7 +279,7 @@ END //
 # obter todos os Hoteis de uma cidade
 CREATE PROCEDURE getHotels (destination VARCHAR(255)) 
 BEGIN
-	SELECT city.name AS city, city.country AS country, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.latitude as latitude, poi.longitude as longitude, poi.price as price FROM poi JOIN city ON poi.city = city.id WHERE city.name = destination AND poi.poi_type = 'Hotel' ORDER BY poi.num_reviews DESC;
+	SELECT city.name AS city, city.country AS country, city.latitude as city_latitude, city.longitude as city_longitude, poi.id AS id, poi.place_id AS place_id, poi.name AS place, poi.address AS address, poi.google_rating AS rating, poi.poi_type AS poi_type, poi.description as description, poi.latitude as latitude, poi.longitude as longitude, poi.price as price, poi.phone_number as phone_number, poi.website as website, photo_poi_tmp.photo_url as photo from (poi left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id) JOIN city ON poi.city = city.id WHERE city.name = destination AND poi.poi_type = 'Hotel' ORDER BY poi.num_reviews DESC;
 END //
 
 
@@ -298,6 +310,23 @@ BEGIN
 	ELSE
 		SELECT * FROM user JOIN user_e ON user.id = user_e.user_id WHERE user.id = userID;
 	END IF;
+    
+END //
+
+# obter estatisticas de um utilizador
+CREATE PROCEDURE getUserStats (userID INT)
+BEGIN
+	DECLARE num_trips INT;
+	DECLARE num_trips_used INT;
+	DECLARE num_reviews INT;
+	DECLARE num_photos INT;
+
+	SELECT count(*) INTO num_trips FROM trip WHERE user = userID;
+	SELECT count(*) INTO num_trips_used FROM trip as t1 JOIN trip as t2 on t1.id = t2.parent_trip WHERE t1.user = userID;
+	SELECT count(*) INTO num_reviews FROM review WHERE user_id = userID;
+	SELECT count(*) INTO num_photos FROM photo_poi WHERE user_id = userID;
+
+	SELECT num_trips, num_trips_used, num_reviews, num_photos;
     
 END //
 
@@ -418,12 +447,29 @@ BEGIN
     
 END //
 
+# fazer upload de uma foto de uma cidade
+CREATE PROCEDURE uploadCityPhoto (cityID INT, userID INT, photoURL VARCHAR(255))
+BEGIN
+	DECLARE isPremium INT;
+    SELECT count(*) INTO isPremium FROM user WHERE id = userID AND type_use = 'Premium';
+	
+    IF isPremium = 1 THEN
+		INSERT INTO photo_city (city_id, user_id, photo_url) VALUES (cityID, userID, photoURL);
+	END IF;
+    
+END //
+
 # obter as fotos de um POI
 CREATE PROCEDURE getPOIPhotos (poiID INT)
 BEGIN
 	SELECT photo_url FROM photo_poi WHERE poi_id = poiID;
 END // 
 
+# obter as fotos de uma cidade
+CREATE PROCEDURE getCityPhotos (cityID INT)
+BEGIN
+	SELECT photo_url FROM photo_city WHERE city_id = cityID;
+END // 
 
 # submeter um poi
 CREATE PROCEDURE submitPOI (poiName VARCHAR(255), poiDescription TEXT, poiLatitude DECIMAL(11,8), poiLongitude DECIMAL(11,8), poiAddress VARCHAR(255), poiType VARCHAR(255), poiWebsite VARCHAR(255), poiPhoneNumber VARCHAR(255), poiCity VARCHAR(255), userID INT, googlePlaceID VARCHAR(255), googleRating DECIMAL(2,1), googleNumberReviews INT)
@@ -514,13 +560,13 @@ CREATE PROCEDURE getVisitsFromTrip (userID INT, tripID INT)
 BEGIN
 	SELECT * FROM
 	(SELECT trip.name as trip_name, trip.user as user, trip.start_date as start_date, trip.end_date as end_date, 
-		datediff(trip.end_date, trip.start_date) as date_diff, trip.isPublic as isPublic, trip.num_viewers as num_viewers, trip.travel_mode as travel_mode,
+		datediff(trip.end_date, trip.start_date) as date_diff, trip.isPublic as isPublic, trip.num_viewers as num_viewers, trip.travel_mode as travel_mode, trip.num_adults as num_adults, trip.num_children as num_children, trip.expiration_time as expiration_time,
 		visit.start_time as start_time, visit.end_time as end_time, visit.poi_id as poi, city.name as city, city.latitude as city_latitude, city.longitude as city_longitude, photo_poi.photo_url as photo
 		FROM ((trip JOIN city ON trip.city = city.id) JOIN visit ON trip.id = visit.trip_id) LEFT JOIN photo_poi on visit.poi_id = photo_poi.poi_id
 		WHERE trip.id = tripID AND ((trip.isActive = 1 AND visit.isActive = 1) or (trip.isManual = 1)) ORDER BY start_time
     ) AS E
     JOIN
-    ( SELECT a.id as id, name, place_id, address, latitude, longitude, website, phone_number, poi_type, no_trips, rating, accessibility, security, rating_price, duration FROM
+    ( SELECT a.id as id, name, place_id, address, latitude, longitude, website, phone_number, poi_type, google_rating, no_trips, rating, accessibility, security, rating_price, duration FROM
 		(SELECT * FROM poi) AS A 
 		LEFT JOIN
 		(SELECT count(*) as no_trips, poi.id as id2 from trip join visit join poi on visit.poi_id = poi.id on trip.id = visit.trip_id group by poi.id) AS B
@@ -542,7 +588,7 @@ END //
 # obter lista de POIs sugeridos que não fazem parte de um determinado itinerario 
 CREATE PROCEDURE getOtherSuggestionsFromTrip (tripID INT, cityID INT)
 BEGIN
-	SELECT id, place_id, name, poi_type from poi where city = cityID and id not in (select poi_id from visit where trip_id = tripID) order by num_reviews desc;
+	SELECT id, place_id, name, poi_type, photo_poi_tmp.photo_url as photo from poi left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id where city = cityID and id not in (select poi_id from visit where trip_id = tripID) order by num_reviews desc;
 END // 
 
 # obter as reviews de um determinado itinerario
@@ -592,7 +638,7 @@ BEGIN
     
     SELECT id INTO cityID FROM city WHERE name = destination;
 		
-    INSERT INTO trip (start_date, end_date, user, isActive, city, isManual) VALUES (arrival, departure, userID, 0, cityID, 1);
+    INSERT INTO trip (start_date, end_date, user, isActive, city, isManual, expiration_time) VALUES (arrival, departure, userID, 0, cityID, 1, ADDTIME(CURRENT_TIMESTAMP, '02:00:00'));
 	SET tripID = LAST_INSERT_ID();
     SELECT tripID;
 END //
@@ -618,7 +664,7 @@ END //
 # obter os itinerarios de um utilizador
 CREATE PROCEDURE getUserTrips (userID INT)
 BEGIN
-	SELECT DISTINCT trip.name as name, city.name as city, trip.start_date as start, trip.end_date as end, trip.id as trip_id, trip.isPublic as isPublic, trip.photo as photo, trip.isFavorite as isFavorite from trip join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on trip.id = visit.trip_id where trip.user = userID and trip.isActive = 1 and trip.isArchived = 0;
+	SELECT DISTINCT trip.name as name, city.name as city, trip.start_date as start, trip.end_date as end, trip.id as trip_id, trip.isPublic as isPublic, trip.photo as photo, trip.isFavorite as isFavorite, trip.isManual as isManual, trip.isActive as isActive, trip.expiration_time as expiration_time, photo_city_tmp.photo_url as city_photo from (trip join (city left join (SELECT ph1.* FROM photo_city as ph1 LEFT JOIN photo_city as ph2 ON ph1.city_id = ph2.city_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.city_id IS NULL) as photo_city_tmp on city.id = photo_city_tmp.city_id) on trip.city = city.id) left join visit on trip.id = visit.trip_id where trip.user = userID and (trip.isActive = 1 or trip.isManual = 1) and trip.isArchived = 0;
 END //
 
 # obter dados do itinerario para criar um novo itinerario a partir desse
@@ -640,7 +686,15 @@ END //
 # apagar um itinerario
 CREATE PROCEDURE deleteTrip (tripID INT, userID INT)
 BEGIN
-	UPDATE trip SET isActive = 0 where id = tripID and user = userID;
+	declare active INT;
+
+	SELECT isActive INTO active FROM trip WHERE id = tripID AND user = userID;
+
+	IF active = 0 THEN
+		DELETE FROM trip WHERE id = tripID AND user = userID;
+	ELSE 
+		UPDATE trip SET isActive = 0 WHERE id = tripID AND user = userID;
+	END IF;
 END //
 
 # mudar o nome de um itinerario
@@ -900,5 +954,47 @@ BEGIN
 END //
 
 
+# obter algumas estatisticas de uma cidade
+CREATE PROCEDURE getCityStats (cityID INT)
+BEGIN
+	DECLARE num_pois INT;
+	DECLARE num_hotels INT;
+	DECLARE num_trips INT;
+
+	SELECT count(*) INTO num_pois FROM poi WHERE city = cityID AND poi_type != 'Hotel';
+	SELECT count(*) INTO num_hotels FROM poi WHERE city = cityID AND poi_type = 'Hotel';
+	SELECT count(*) INTO num_trips FROM trip where city = cityID;
+
+	SELECT num_pois, num_hotels, num_trips;
+END //
+
+
+
+# obter os itinerarios partilhadas pelos utilizadores
+CREATE PROCEDURE discover ()
+BEGIN
+	SELECT * from
+	((select trip.id as id, trip.name, trip.description, trip.photo, trip.trip_timestamp, trip.num_viewers, user.name as user, user.type_use as type, city.name as city, avg(review_rating) as rating, trip.category as category
+	from trip join user on trip.user = user.id join city on trip.city = city.id left outer join review_trip on trip.id = review_trip.trip_id
+	where isPublic = 1 group by id)
+	union distinct
+	(select trip.id as id, trip.name, trip.description, trip.photo, trip.trip_timestamp, trip.num_viewers, user.name as user, user.type_use as type, city.name as city, review_rating as rating, trip.category as category
+	from trip join user on trip.user = user.id join city on trip.city = city.id left outer join review_trip on trip.id = review_trip.trip_id
+	where isPublic = 1 and review_rating is null)) t1
+	left outer join
+	(select trip.id as id2, count(trip2.id) as num_trips
+	from trip join user on trip.user = user.id join city on trip.city = city.id join trip as trip2 on trip.id = trip2.parent_trip
+	where trip.isPublic = 1 group by id2) t2
+	on t1.id = t2.id2
+    order by num_trips desc, num_viewers desc;
+END //
+
+
+# verificar se uma viagem existe
+CREATE PROCEDURE tripExists (tripID INT)
+BEGIN
+	SELECT count(*) as trip_exists from trip where id = tripID; 
+END //
+ 
 
 DELIMITER ;

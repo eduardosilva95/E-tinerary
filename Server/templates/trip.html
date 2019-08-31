@@ -6,7 +6,8 @@
     <meta name="author" content="Eduardo Silva">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Simple Map</title>
+    <title>e-tinerary</title>
+    <link rel="icon" href="img/logo-icon.ico">
 
     <!-- Custom styles -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
@@ -25,7 +26,7 @@
     <script src="https://unpkg.com/gijgo@1.9.11/js/gijgo.min.js" type="text/javascript"></script>
     <link href="https://unpkg.com/gijgo@1.9.11/css/gijgo.min.css" rel="stylesheet" type="text/css" />
     
-    <script type="text/javascript" src="js/plan.js"></script>
+    <script type="text/javascript" src="js/trip.js"></script>
     <script type="text/javascript" src="js/login.js"></script>
 
     
@@ -82,7 +83,6 @@
                         <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
                         <a class="dropdown-item header" href="./trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
                         <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
-                        <a class="dropdown-item header" href="./review-poi"><i class="fas fa-edit"></i><span style="padding-left: 10px;">Review POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
                         </div>   
@@ -94,16 +94,15 @@
         </nav>
 
 
-
         <div class="container-fluid">
             <div class="cont">
                 <div class="card card-body bg-light">
                     <div class="row">
                         <div class="col-md-9 col-12">
                             <div class="text-left">
-                                <h3><b><%= name %></b></h3>
+                                <h3><b><%= name %></b><a href="/city?name=<%= city %>" style="padding-left: 10px; font-style: italic; color: #ffc107;">( <%= city %> )</a></h3>
                                 <p><h8><%= start_date %>  - <%= end_date %></h8></p>
-                                <p><i class="far fa-user"></i><span style="padding-left: 10px;">2 Adults</span></p>                    
+                                <p><i class="far fa-user"></i><span style="padding-left: 10px;"><%= num_persons %></span></p>                    
                             </div>
                         </div>
 
@@ -112,12 +111,12 @@
                                 <div class="col-md-6 col-6 text-center">
                                     <button class="change-view" onclick="changeView('full');"><img class="img-responsive change-view-img" src="img/view-full.jpg" /></button>
                                     <br>
-                                    <button class="change-view" onclick="changeView('full');">Plan view only</button>
+                                    <button class="change-view" onclick="changeView('full');">Plan view</button>
                                 </div>
                                 <div class="col-md-6 col-6 text-center">
                                     <button class="change-view" onclick="changeView('map');"><img class="img-responsive change-view-img" src="img/view-map.jpg" /></button>
                                     <br>
-                                    <button class="change-view" onclick="changeView('map');">Map view only</button>
+                                    <button class="change-view" onclick="changeView('map');">Map view</button>
                                 </div>
                             </div>
                         </div>
@@ -135,12 +134,13 @@
                     <% day_shortname = days_shortname[day_no] %>
 
                     <div class="card card-body" style="height: 70px;">
-                        <div class="row" id="plan-day-<%= day_no %>">
+                        <div class="row" id="trip-day-<%= day_no %>">
                             <div class="col-md-2 col-4">
                                 <div class="text-center">
-                                    <button id="previous-day-btn" class="change-plan-day-btn" onclick="previousDay();"><i class="fas fa-arrow-alt-circle-left fa-lg"></i></button>
+                                    <button id="previous-day-btn" class="change-trip-day-btn" onclick="previousDay();"><i class="fas fa-arrow-alt-circle-left fa-lg"></i></button>
                                 </div>
                             </div>
+                            
                             <div class="col-md-8 col-4">
                                 <div class="text-center">
                                     <h5 id="visit-day" style="font-weight: bold;"><%= day %></h5>
@@ -149,11 +149,11 @@
                                 <div class="text-center">
                                     <h5 id="visit-day-mobile" style="font-weight: bold;"><%= day_shortname %></h5>
                                 </div>
-
                             </div>
+
                             <div class="col-md-2 col-4">
                                 <div class="text-center">
-                                    <button id="next-day-btn" class="change-plan-day-btn" onclick="nextDay();"><i class="fas fa-arrow-alt-circle-right fa-lg"></i></button>
+                                    <button id="next-day-btn" class="change-trip-day-btn" onclick="nextDay();"><i class="fas fa-arrow-alt-circle-right fa-lg"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -162,7 +162,7 @@
                     <div class="vl" style="border-left: 2px solid #dddddd; height: 40px; margin-left: 50px;"></div>
 
                     <% count = 0 %>
-                    <% plan.forEach(function(visit) { %>
+                    <% trip.forEach(function(visit) { %>
                         <div id="place-<%= count %>">
                             <div class="card visit-loaded" style="height: 150px;">
                                 <div class="row">
@@ -173,7 +173,7 @@
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col-md-7">
-                                                    <h6 id="place-<%= count %>-name" class="card-title plan-title" ><b></b></h6>
+                                                    <h6 id="place-<%= count %>-name" class="card-title trip-title" ><b></b></h6>
                                                 </div>
                                                 <div class="col-md-5">
                                                     <div class="text-right">
@@ -212,14 +212,14 @@
                             </div>
                             <div class="vl" style="border-left: 2px solid #dddddd; height: 70px; margin-left: 50px;">
                                 <br>
-                                <span id="desloc-<%= count %>" style="padding-left: 10px; color: #767676; font-size: 12px; display: none;"><i class="fas fa-car"></i><span id="desloc-<%= count %>-text" style="padding-left: 10px;"></span></span>
+                                <span id="desloc-<%= count %>" style="padding-left: 10px; color: #767676; font-size: 12px; display: none;"><i class="fas fa-car" id="desloc-<%= count %>-travel-mode"></i><span id="desloc-<%= count %>-text" style="padding-left: 10px;"></span></span>
                             </div>
                         </div>
                         <% count = count + 1 %>
                     <% }); %>
                     <div class="vl" style="border-left: 2px solid #dddddd; margin-left: 50px;">
                         <br>
-                        <a id="plan-link-hotels" href="/hotels?dest=<%= city %>"><i class="fas fa-bed"></i><span style="padding-left: 10px;">Discover hotels in <%= city %></span></a>          
+                        <a id="trip-link-hotels" href="/hotels?dest=<%= city %>"><i class="fas fa-bed"></i><span style="padding-left: 10px;">Discover hotels in <%= city %></span></a>          
                     </div>
                     <hr>
                 </div>
@@ -265,19 +265,19 @@
                                 <button type="button" class="btn btn-success btn-stats-modal" data-toggle="modal" data-target="#stats-modal" data-title="<%= name %>"><i class="fas fa-chart-bar"></i><span style="padding-left: 10px;">View Stats</span></button>
                                 <button type="button" class="btn btn-success btn-view-reviews-modal" data-toggle="modal" data-target="#view-reviews-modal" data-title="<%= name %>"><i class="fas fa-comment"></i><span style="padding-left: 10px;">View Reviews</span></button>
                                 <% if(isPublic == 0) { %>
-                                    <button type="button" class="btn btn-success btn-share-modal" data-toggle="modal" data-target="#share-modal" data-name="<%= name %>"><i class="fas fa-share-alt"></i><span style="padding-left: 10px;">Share Plan</span></button>
+                                    <button type="button" class="btn btn-success btn-share-modal" data-toggle="modal" data-target="#share-modal" data-name="<%= name %>"><i class="fas fa-share-alt"></i><span style="padding-left: 10px;">Share Trip</span></button>
                                 <% } else { %> 
-                                    <button type="button" style="background-color: #dcf2e2; color: black;" class="btn btn-success btn-share-modal" disabled><i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Shared plan</span></button>
+                                    <button type="button" style="background-color: #dcf2e2; color: black;" class="btn btn-success btn-share-modal" disabled><i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Shared Trip</span></button>
                                 <% } %>
 
                                 <% if(isManual == 1) { %>
-                                    <a id="save_plan_btn" href="#"><button type="button" class="btn btn-success"><i class="fas fa-save"></i><span style="padding-left: 10px;">Save Plan</span></button></a>
+                                    <a id="save-trip-btn" href="#"><button type="button" class="btn btn-success"><i class="fas fa-save"></i><span style="padding-left: 10px;">Save Trip</span></button></a>
                                 <% } %>
 
                             <% } else { %>
                                 <button type="button" class="btn btn-success btn-stats-modal" data-toggle="modal" data-target="#stats-modal" data-title="<%= name %>"><i class="fas fa-chart-bar"></i><span style="padding-left: 10px;">View Stats</span></button>
                                 <button type="button" class="btn btn-success btn-view-reviews-modal" data-toggle="modal" data-target="#view-reviews-modal" data-title="<%= name %>"><i class="fas fa-comment"></i><span style="padding-left: 10px;">View Reviews</span></button>
-                                <button type="button" class="btn btn-success btn-use-plan-modal" data-toggle="modal" data-target="#use-plan-modal" data-title="<%= name %>"><i class="fas fa-save"></i><span style="padding-left: 10px;">Use this Plan</span></button>
+                                <button type="button" class="btn btn-success btn-use-trip-modal" data-toggle="modal" data-target="#use-trip-modal" data-title="<%= name %>"><i class="fas fa-save"></i><span style="padding-left: 10px;">Use this Trip</span></button>
                             <% } %>                        
                         </div>
                     </div>
@@ -382,7 +382,7 @@
 
                             <div class="tab-pane fade" id="place-more-info" role="tabpanel" aria-labelledby="pills-more-info-tab">
                                 <ul>
-                                    <li><strong><i class="fas fa-map-marked-alt"></i> Plans: </strong><p id="modal-info-number-plans"></p></li>
+                                    <li><strong><i class="fas fa-map-marked-alt"></i> Trips: </strong><p id="modal-info-number-trips"></p></li>
                                     <li><strong>
                                         <i class="fas fa-star"></i> Rating: </strong>
                                         <div class="place-etinerary-div" id="place-rating">
@@ -421,13 +421,13 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Delete visit</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Delete visit: <span id="modal-delete-visit-name-title" style="font-weight: bold;"></span></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        Are you sure that you want to delete <span id="modal-delete-visit-name" style="font-weight: bold;"></span> from the plan ?
+                        Are you sure that you want to delete <span id="modal-delete-visit-name" style="font-weight: bold;"></span> from the trip ?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-success" id="confirm-remove-btn" data-dismiss="modal"><i class="fas fa-trash-alt"></i><span style="padding-left: 10px;">Yes</span></button>
@@ -497,12 +497,12 @@
             </div>
         </div>
 
-        <!-- Use Plan Modal -->
-        <div class="modal fade" id="use-plan-modal" role="dialog">
+        <!-- Use Trip Modal -->
+        <div class="modal fade" id="use-trip-modal" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Use <span id="modal-use-plan-title" style="font-weight: bold;"></span></h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Use <span id="modal-use-trip-title" style="font-weight: bold;"></span></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -522,7 +522,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
-                        <button type="button"  class="btn btn-success" onclick="usePlan();" data-dismiss="modal"><i class="fas fa-check"></i><span style="padding-left: 10px;">Confirm</span></button>
+                        <button type="button"  class="btn btn-success" onclick="useTrip();" data-dismiss="modal"><i class="fas fa-check"></i><span style="padding-left: 10px;">Confirm</span></button>
                     </div>
                 </div>
             </div>
@@ -610,8 +610,8 @@
                     <div class="modal-body">
 
                         <nav class="nav nav-pills flex-column flex-sm-row">
-                            <a class="flex-sm-fill text-sm-center nav-link tab active" id="pills-review-general-info-tab" data-toggle="pill" href="#review-modal-general-info" role="tab" aria-controls="review-plan-general-info" aria-selected="true">General Information</a>
-                            <a class="flex-sm-fill text-sm-center nav-link tab" id="pills-review-more-info-tab" data-toggle="pill" href="#review-modal-more-info" role="tab" aria-controls="review-plan-more-info" aria-selected="false">Help us improve</a>
+                            <a class="flex-sm-fill text-sm-center nav-link tab active" id="pills-review-general-info-tab" data-toggle="pill" href="#review-modal-general-info" role="tab" aria-controls="review-trip-general-info" aria-selected="true">General Information</a>
+                            <a class="flex-sm-fill text-sm-center nav-link tab" id="pills-review-more-info-tab" data-toggle="pill" href="#review-modal-more-info" role="tab" aria-controls="review-trip-more-info" aria-selected="false">Help us improve</a>
                         </nav>
 
                         <br>
@@ -696,7 +696,7 @@
                         <ul>
                             <li><i class="fas fa-eye"></i><strong style="padding-left: 10px;">Viewers: </strong><p><%= num_viewers %></p></li>
                             <li><i class="fas fa-comment"></i><strong style="padding-left: 10px;">Reviews: </strong><p><%= num_reviews %></p></li>
-                            <li><i class="fas fa-retweet"></i><strong style="padding-left: 10px;">Plans: </strong><p><%= num_plans %></p></li>
+                            <li><i class="fas fa-retweet"></i><strong style="padding-left: 10px;">Trips: </strong><p><%= num_trips %></p></li>
                             <li><i class="fas fa-star"></i><strong style="padding-left: 10px;">Rating: </strong><p><%= rating %> / 5.0</p></li>
                         </ul>
 
@@ -713,50 +713,40 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Share <span id="share-modal-title" style="font-weight: bold;"></span></h5>
+                        <h5 class="modal-title">Share <span id="share-modal-title" style="font-weight: bold;"></span></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form id="share-plan-form" action="/share-plan" method="POST" enctype="multipart/form-data">
+
+                    <form id="share-trip-form" action="/share-trip" method="POST" enctype="multipart/form-data">
                         <div class="modal-body">
 
                             <nav class="nav nav-pills flex-column flex-sm-row">
-                                <a class="flex-sm-fill text-sm-center nav-link tab active" id="pills-general-info-tab" data-toggle="pill" href="#share-modal-general-info" role="tab" aria-controls="share-plan-general-info" aria-selected="true">General Information</a>
-                                <a class="flex-sm-fill text-sm-center nav-link tab" id="pills-more-info-tab" data-toggle="pill" href="#share-modal-more-info" role="tab" aria-controls="share-plan-more-info" aria-selected="false">Help us improve</a>
+                                <a class="flex-sm-fill text-sm-center nav-link tab active" id="pills-general-info-tab" data-toggle="pill" href="#" role="tab" aria-controls="share-trip-general-info" aria-selected="true">General Information</a>
+                                <a class="flex-sm-fill text-sm-center nav-link tab" id="pills-more-info-tab" data-toggle="pill" href="#" role="tab" aria-controls="share-trip-more-info" aria-selected="false">Help us improve</a>
                             </nav>
 
                             <br>
 
                             <div class="alert alert-warning" id="are-you-sure-share-msg" role="alert">
-                                <i class="fas fa-exclamation-triangle"></i><span style="padding-left: 10px;">Are you sure that you want to share <span id="are-you-sure-plan-name" style="font-weight: bold;"></span> ?</span>
-                                <p>After the plan is shared, you will not be able to make changes on it.</p>
+                                <i class="fas fa-exclamation-triangle"></i><span style="padding-left: 10px;">Are you sure that you want to share <span id="are-you-sure-trip-name" style="font-weight: bold;"></span> ?</span>
+                                <p>After the trip is shared, you will not be able to make changes on it.</p>
                             </div>
 
                             <div class="tab-content" id="pills-tabContent">
                             <div class="tab-pane fade show active" id="share-modal-general-info" role="tabpanel" aria-labelledby="pills-general-info-tab">
     
-                                <label for="inputDescription">Enter a description for the plan</label>
+                                <label for="inputDescription">Enter a description for your trip:</label>
                                 <textarea type="text" id="inputDescription" class="form-control" name="description" required></textarea>
 
                                 <br>
                                 
-                                <input type="text" name="plan" value="<%= plan_id %>" style="display: none;" >
-
-                                <!--<div class="form-group">
-                                    <label for="select-category-plan">Category for you plan</label>
-                                    <select class="form-control" id="select-category-plan" name="category">
-                                        <option selected>Overall</option>
-                                        <option>Nature</option>
-                                        <option>History</option>
-                                        <option>Culture</option>
-                                        <option>Sports</option>
-                                    </select>
-                                </div>-->
+                                <input type="text" id="share-modal-trip-id" name="trip" style="display: none;" >
                                 
                                 <br>
 
-                                <label>Rate your plan:</label>
+                                <label>Rate your trip:</label>
                                 <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
                                     <input type="radio" id="share-rating-star5" name="rating" value="5" /><label for="share-rating-star5" title="5 star">5</label>
                                     <input type="radio" id="share-rating-star4" name="rating" value="4" /><label for="share-rating-star4" title="4 star">4</label>
@@ -766,12 +756,18 @@
                                 </div>
 
                                 <br>
-
-                                
         
-                                <label for="plan-picture">Submit a picture for the plan</label>
-                                <input type="file" class="form-control-file" accept="image/*" id="plan-picture" name="picture" required>
+                                <label for="trip-picture">Submit a picture for your trip:</label>
 
+                                <div class="input-photo-container">  
+                                    <input class="input-photo" id="my-file" type="file" accept="image/*" name="photo" >
+                                    <label tabindex="0" for="my-file" class="input-photo-trigger"><i class="fas fa-camera"></i><span style="padding-left: 10px;">Upload photo</span></span></label>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <p class="file-return"></p>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="tab-pane fade" id="share-modal-more-info" role="tabpanel" aria-labelledby="pills-more-info-tab">
@@ -808,13 +804,15 @@
                                 </div>
 
                             </div>
-                            </div>
+                        </div>
                             
     
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
-                            <button type="submit" value="upload" id="submit-share-plan-btn" class="btn btn-success"><i class="fas fa-check"></i><span style="padding-left: 10px;">Share</span></button>
+                            <button type="button" onclick="changeReviewPage();" class="btn btn-success" id="change-review-page-btn"><i class="far fa-arrow-alt-circle-right"></i><span style="padding-left: 10px;">Next</span></button>     
+                            <button type="button" onclick="returnReviewPage();" class="btn btn-warning" id="return-review-page-btn" style="display: none; color: white;"><i class="far fa-arrow-alt-circle-left"></i><span style="padding-left: 10px;">Back</span></button>
+                            <button type="submit" value="upload" id="submit-share-trip-btn" class="btn btn-success" style="display: none;"><i class="fas fa-check"></i><span style="padding-left: 10px;">Share</span></button>
                         </div>
                     </form>
                 </div>
@@ -848,12 +846,12 @@
     <script>startGoogleSignIn();</script>
     
     <script>
-        var plan = [];
+        var trip = [];
         var suggested_visits = [];
         var suggested_hotels = [];
         
-        '<% plan.forEach(function(visit) { %>'
-            plan.push('<%- JSON.stringify(visit) %>');
+        '<% trip.forEach(function(visit) { %>'
+            trip.push('<%- JSON.stringify(visit) %>');
         '<% }); %>'
 
         '<% suggested_visits.forEach(function(visit) { %>'
@@ -865,7 +863,7 @@
         '<% }); %>'
 
 
-        loadPlan(plan, '<%= days %>', '<%= days_shortname %>', '<%= travel_mode %>');
+        loadTrip(trip, '<%= days %>', '<%= days_shortname %>', '<%= travel_mode %>');
         loadSuggestions(suggested_visits);
         loadHotels(suggested_hotels);
     

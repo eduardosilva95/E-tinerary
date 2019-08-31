@@ -1,6 +1,13 @@
 
 var slide = 0;
 
+
+$(function () {
+  $('#arrival-date').change(function() { 
+    console.log($('#arrival-date').val());
+  });
+});
+
 $(function () {
   $(document).scroll(function () {
     var $nav = $(".navbar");
@@ -139,6 +146,17 @@ function autocomplete(inp, arr) {
       var destination = document.getElementById('inputDestination').value;
       var queryString = "?name=" + destination;
       window.location.href = "./city" + queryString;
+    }
+    else{
+      alert("Must select a valid destination !");
+    }
+  }
+
+  function submitHotelDestination(){
+    if(document.getElementById('inputDestination').value != undefined && document.getElementById('inputDestination').value != ""){
+      var destination = document.getElementById('inputDestination').value;
+      var queryString = "?dest=" + destination;
+      window.location.href = "./hotels" + queryString;
     }
     else{
       alert("Must select a valid destination !");

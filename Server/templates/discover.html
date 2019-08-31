@@ -32,58 +32,58 @@
   <body onload="loadNavbar();" style="background-image: url('/img/home-image-8.jpg');">
       <!-- header navbar -->
       <nav class="navbar sticky-top navbar-expand-lg navbar-dark navbar-transparent bg-dark justify-content-between">
-          <a class="navbar-brand" href="./"><img src="img/logo-3.png" style="height: 40px"></a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-              
-                <li class="nav-item">
-                  <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
-                </li>
-              
+        <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
               <li class="nav-item">
-                <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link header active" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
-              </li>
-              <li class="nav-item dropdown">
-                  <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
-                  </a>
-                  <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
-                    <a class="dropdown-item header" href="./about-us">Aplicacao</a>
-                    <a class="dropdown-item header" href="./help">Help</a>
-                  </div>
-              </li>
-            </ul>
-            <ul class="navbar-nav ml-auto">
-              <li>
-                <div id="login-user">
-                  <div id="login" style="display: none;">
-                    <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
-                  </div>
-                  <div id="profile" class="dropleft" style="display: none;">
-                    <a class="nav-link header dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img id="user-profile-pic" class="rounded-circle border border-light">
-                    </a>
-                    <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
-                      <a class="dropdown-item header" href="/profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                      <a class="dropdown-item header" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
-                      <div class="dropdown-divider"></div>
-                      <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
-                    </div>   
-                  </div>        
+            
+            <li class="nav-item">
+              <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link header active" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
+                </a>
+                <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
+                  <a class="dropdown-item header" href="./about-us">Aplicacao</a>
+                  <a class="dropdown-item header" href="./help">Help</a>
                 </div>
-              </li>
-            </ul>
-          </div>
-      </nav>
+            </li>
+          </ul>
+          <ul class="navbar-nav ml-auto">
+            <li>
+              <div id="login-user">
+                <div id="login" style="display: none;">
+                  <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                </div>
+                <div id="profile" class="dropleft" style="display: none;">
+                  <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <img id="user-profile-pic" class="rounded-circle border border-light">
+                  </a>
+                  <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
+                    <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                    <a class="dropdown-item header" href="./trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                    <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                  </div>   
+                </div>        
+              </div>
+            </li>
+          </ul>
+        </div>
+    </nav>
 
       <div class="container-fluid discover-image" >
         <br><br>
@@ -97,78 +97,95 @@
 
 
                 <div class="row cont">
-                  <div class="col-md-12">
-                    <div class="discover-search text-center">
+                  <div class="col-md-2"></div>
+                  <div class="col-md-7">
+                    <div class="discover-search">
                       <span class="fa fa-search form-control-feedback"></span>
-                      <input type="text" class="form-control" placeholder="Search by keywords (ex: culture in Lisbon)">
+                      <input type="text" class="form-control" placeholder="Search by keywords (ex: culture in Lisbon)" id="query-input">
                     </div>
+                  </div>
+                  <div class="col-md-3">
+                    <button class="btn btn-success" onclick="search();"><i class="fas fa-search"></i><span style="padding-left: 5px; font-weight: bold;">Search</span></button>
                   </div>
                 </div>
 
                 <br><br>
 
             </div>
-            <div class="col-md-2 col-sm-2"></div>
+            <div class="col-md-2 col-sm-2">
+            </div>
         </div>
       </div>
 
 
 
         <div class="container-fluid" style="background-color: #343a40;">
+
+            <div class="cont ">
+              <div class="row">
+                <div class="col-md-1 col-sm-1"></div>
+                <div class="col-md-11">
+                    <% if(query != null) { %>
+                      <p style="color: #fff; font-size: 26px; opacity: .7">Results for "<%= query %>":</p>
+                    <% }%>
+                </div>
+              </div>
+            </div>
+
+
             <div class="row">
                 <div class="col-md-1 col-sm-1"></div>
                 <div class="col-md-10 col-sm-10">
 
                     <br><br>
 
-                    
-
                     <!-- EXPERTS DIV -->
                     
                     <div class="container cont text-center">
-                        <h2 style="color: white; font-weight: bold;">Discover plans created by experts</h2>
-                        <p style="color: #fff; font-size: 23px; opacity: .7"></p>
+                        <h2 style="color: white; font-weight: bold;">Trips made by experts</h2>
+                        <p style="color: #fff; font-size: 23px; opacity: .7">Discover the itineraries created by specialists in tourism</p>
                     </div>
 
 
                     <div class="row">
-
                       <% trips.forEach(function(trip) { %> 
+                        <% if(trip.isPremium == 1) { %>
 
-                        <a href="/plan?id=<%= trip.id %>" class="card-home-link">
-                        <div class="col-md-3 col-sm-12 cont">
-                            <div class="card card-home" style="width: 18rem; height: 400px;">
-                              <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
-                              <% if(trip.isPremium == 1) { %>
-                                <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
-                              <% } else { %>
-                                <p class="card-text" style="overflow:unset"><small class="text-muted" style="font-weight: 0.6; padding-left: 1.25rem">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
-                              <% } %>
-                          
-                              <div class="card-body" style="padding-top: 0;">
-                                  <h5 class="card-title"><b><%= trip.city %></b></h5>
-                                  <p class="card-text" style="padding-top: 10px; height: 67.2px; font-size: 14px;"><%= trip.description %></p>
+                          <a href="/plan?id=<%= trip.id %>" class="card-home-link">
+                          <div class="col-md-3 col-sm-12 cont">
+                              <div class="card card-home" style="width: 18rem; height: 400px;">
+                                <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
+                                <% if(trip.isPremium == 1) { %>
+                                  <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
+                                <% } else { %>
+                                  <p class="card-text" style="overflow:unset"><small class="text-muted" style="font-weight: 0.6; padding-left: 1.25rem">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
+                                <% } %>
+                            
+                                <div class="card-body" style="padding-top: 0;">
+                                    <h5 class="card-title"><b><%= trip.city %></b></h5>
+                                    <p class="card-text" style="padding-top: 10px; height: 67.2px; font-size: 14px;"><%= trip.description %></p>
 
-                                  <div class="row">
-                                    <div class="col-md-5">
-                                        <div class="text-left">
-                                            <i class="fas fa-star"></i><span style="padding-left: 5px;"><%= trip.rating %> / 5.0</span>
-                                        </div>
+                                    <div class="row">
+                                      <div class="col-md-5">
+                                          <div class="text-left">
+                                              <i class="fas fa-star"></i><span style="padding-left: 5px;"><%= trip.rating %> / 5.0</span>
+                                          </div>
+                                      </div>
+
+                                      <div class="col-md-7">
+                                          <div class="text-right">
+                                              <span id="viewers"><%= trip.num_trips %></span><i style="padding-left: 5px;" class="fas fa-retweet"></i>
+                                              <span id="viewers" style="padding-left: 10px;"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-eye"></i>
+                                          </div>
+                                      </div>
+                                      
                                     </div>
-
-                                    <div class="col-md-7">
-                                        <div class="text-right">
-                                            <span id="viewers"><%= trip.num_plans %></span><i style="padding-left: 5px;" class="fas fa-retweet"></i>
-                                            <span id="viewers" style="padding-left: 10px;"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-eye"></i>
-                                        </div>
-                                    </div>
-                                    
                                   </div>
-                                </div>
-                            </div>
-                        </div>
-                        </a>
+                              </div>
+                          </div>
+                          </a>
 
+                        <% } %>
                       <% }); %>
 
                     </div>
@@ -182,7 +199,7 @@
                     
                     <div class="container cont text-center">
                         <h2 style="color: white; font-weight: bold;">Most popular trips</h2>
-                        <p style="color: #fff; font-size: 23px; opacity: .7">Discover the trips that our users are doing</p>
+                      <p style="color: #fff; font-size: 23px; opacity: .7">Discover the itineraries shared by our users</p>
                     </div>
 
 
@@ -207,13 +224,13 @@
                                   <div class="row">
                                     <div class="col-md-5">
                                         <div class="text-left">
-                                            <i class="fas fa-star"></i><span style="padding-left: 5px;">4.0 / 5.0</span>
+                                            <i class="fas fa-star"></i><span style="padding-left: 5px;"><%= trip.rating %> / 5.0</span>
                                         </div>
                                     </div>
 
                                     <div class="col-md-7">
                                         <div class="text-right">
-                                            <span id="viewers"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-retweet"></i>
+                                            <span id="viewers"><%= trip.num_trips %></span><i style="padding-left: 5px;" class="fas fa-retweet"></i>
                                             <span id="viewers" style="padding-left: 10px;"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-eye"></i>
                                         </div>
                                     </div>
@@ -249,41 +266,42 @@
                     <div class="row">
 
                         <% trips.forEach(function(trip) { %> 
+                          <% if(trip.category == 'NATURE') { %>
   
-                          <a href="/plan?id=<%= trip.id %>" class="card-home-link">
-                          <div class="col-md-3 col-sm-12 cont">
-                              <div class="card card-home" style="width: 18rem; height: 400px;">
-                                <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
-                                <% if(trip.isPremium == 1) { %>
-                                  <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
-                                <% } else { %>
-                                  <p class="card-text" style="overflow:unset"><small class="text-muted" style="font-weight: 0.6; padding-left: 1.25rem">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
-                                <% } %>
-                            
-                                <div class="card-body" style="padding-top: 0;">
-                                    <h5 class="card-title"><b><%= trip.city %></b></h5>
-                                    <p class="card-text" style="padding-top: 10px; height: 67.2px;"><%= trip.description %></p>
-  
-                                    <div class="row">
-                                      <div class="col-md-5">
-                                          <div class="text-left">
-                                              <i class="fas fa-star"></i><span style="padding-left: 5px;">4.0 / 5.0</span>
-                                          </div>
+                            <a href="/plan?id=<%= trip.id %>" class="card-home-link">
+                            <div class="col-md-3 col-sm-12 cont">
+                                <div class="card card-home" style="width: 18rem; height: 400px;">
+                                  <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
+                                  <% if(trip.isPremium == 1) { %>
+                                    <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
+                                  <% } else { %>
+                                    <p class="card-text" style="overflow:unset"><small class="text-muted" style="font-weight: 0.6; padding-left: 1.25rem">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
+                                  <% } %>
+                              
+                                  <div class="card-body" style="padding-top: 0;">
+                                      <h5 class="card-title"><b><%= trip.city %></b></h5>
+                                      <p class="card-text" style="padding-top: 10px; height: 67.2px;"><%= trip.description %></p>
+    
+                                      <div class="row">
+                                        <div class="col-md-5">
+                                            <div class="text-left">
+                                                <i class="fas fa-star"></i><span style="padding-left: 5px;"><%= trip.rating %> / 5.0</span>
+                                            </div>
+                                        </div>
+    
+                                        <div class="col-md-7">
+                                            <div class="text-right">
+                                                <span id="viewers"><%= trip.num_trips %></span><i style="padding-left: 5px;" class="fas fa-retweet"></i>
+                                                <span id="viewers" style="padding-left: 10px;"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-eye"></i>
+                                            </div>
+                                        </div>
+                                        
                                       </div>
-  
-                                      <div class="col-md-7">
-                                          <div class="text-right">
-                                              <span id="viewers"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-retweet"></i>
-                                              <span id="viewers" style="padding-left: 10px;"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-eye"></i>
-                                          </div>
-                                      </div>
-                                      
                                     </div>
-                                  </div>
-                              </div>
-                          </div>
-                          </a>
-  
+                                </div>
+                            </div>
+                            </a>
+                          <% } %>
                         <% }); %>
   
                       </div>
@@ -298,41 +316,42 @@
                     <div class="row">
 
                         <% trips.forEach(function(trip) { %> 
+                          <% if(trip.category == 'HISTORY') { %>
   
-                          <a href="/plan?id=<%= trip.id %>" class="card-home-link">
-                          <div class="col-md-3 col-sm-12 cont">
-                              <div class="card card-home" style="width: 18rem; height: 400px;">
-                                <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
-                                <% if(trip.isPremium == 1) { %>
-                                  <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
-                                <% } else { %>
-                                  <p class="card-text" style="overflow:unset"><small class="text-muted" style="font-weight: 0.6; padding-left: 1.25rem">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
-                                <% } %>
-                            
-                                <div class="card-body" style="padding-top: 0;">
-                                    <h5 class="card-title"><b><%= trip.city %></b></h5>
-                                    <p class="card-text" style="padding-top: 10px; height: 67.2px;"><%= trip.description %></p>
-  
-                                    <div class="row">
-                                      <div class="col-md-5">
-                                          <div class="text-left">
-                                              <i class="fas fa-star"></i><span style="padding-left: 5px;">4.0 / 5.0</span>
-                                          </div>
+                            <a href="/plan?id=<%= trip.id %>" class="card-home-link">
+                            <div class="col-md-3 col-sm-12 cont">
+                                <div class="card card-home" style="width: 18rem; height: 400px;">
+                                  <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
+                                  <% if(trip.isPremium == 1) { %>
+                                    <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
+                                  <% } else { %>
+                                    <p class="card-text" style="overflow:unset"><small class="text-muted" style="font-weight: 0.6; padding-left: 1.25rem">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
+                                  <% } %>
+                              
+                                  <div class="card-body" style="padding-top: 0;">
+                                      <h5 class="card-title"><b><%= trip.city %></b></h5>
+                                      <p class="card-text" style="padding-top: 10px; height: 67.2px;"><%= trip.description %></p>
+    
+                                      <div class="row">
+                                        <div class="col-md-5">
+                                            <div class="text-left">
+                                                <i class="fas fa-star"></i><span style="padding-left: 5px;"><%= trip.rating %> / 5.0</span>
+                                            </div>
+                                        </div>
+    
+                                        <div class="col-md-7">
+                                            <div class="text-right">
+                                                <span id="viewers"><%= trip.num_trips %></span><i style="padding-left: 5px;" class="fas fa-retweet"></i>
+                                                <span id="viewers" style="padding-left: 10px;"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-eye"></i>
+                                            </div>
+                                        </div>
+                                        
                                       </div>
-  
-                                      <div class="col-md-7">
-                                          <div class="text-right">
-                                              <span id="viewers"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-retweet"></i>
-                                              <span id="viewers" style="padding-left: 10px;"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-eye"></i>
-                                          </div>
-                                      </div>
-                                      
                                     </div>
-                                  </div>
-                              </div>
-                          </div>
-                          </a>
-  
+                                </div>
+                            </div>
+                            </a>
+                          <% } %>
                         <% }); %>
   
                       </div>
@@ -347,99 +366,46 @@
                     <div class="row">
 
                         <% trips.forEach(function(trip) { %> 
-  
-                          <a href="/plan?id=<%= trip.id %>" class="card-home-link">
-                          <div class="col-md-3 col-sm-12 cont">
-                              <div class="card card-home" style="width: 18rem; height: 400px;">
-                                <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
-                                <% if(trip.isPremium == 1) { %>
-                                  <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
-                                <% } else { %>
-                                  <p class="card-text" style="overflow:unset"><small class="text-muted" style="font-weight: 0.6; padding-left: 1.25rem">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
-                                <% } %>
-                            
-                                <div class="card-body" style="padding-top: 0;">
-                                    <h5 class="card-title"><b><%= trip.city %></b></h5>
-                                    <p class="card-text" style="padding-top: 10px; height: 67.2px;"><%= trip.description %></p>
-  
-                                    <div class="row">
-                                      <div class="col-md-5">
-                                          <div class="text-left">
-                                              <i class="fas fa-star"></i><span style="padding-left: 5px;">4.0 / 5.0</span>
-                                          </div>
+                          <% if(trip.category == 'CULTURE') { %>
+                            <a href="/plan?id=<%= trip.id %>" class="card-home-link">
+                            <div class="col-md-3 col-sm-12 cont">
+                                <div class="card card-home" style="width: 18rem; height: 400px;">
+                                  <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
+                                  <% if(trip.isPremium == 1) { %>
+                                    <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
+                                  <% } else { %>
+                                    <p class="card-text" style="overflow:unset"><small class="text-muted" style="font-weight: 0.6; padding-left: 1.25rem">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
+                                  <% } %>
+                              
+                                  <div class="card-body" style="padding-top: 0;">
+                                      <h5 class="card-title"><b><%= trip.city %></b></h5>
+                                      <p class="card-text" style="padding-top: 10px; height: 67.2px;"><%= trip.description %></p>
+    
+                                      <div class="row">
+                                        <div class="col-md-5">
+                                            <div class="text-left">
+                                                <i class="fas fa-star"></i><span style="padding-left: 5px;"><%= trip.rating %> / 5.0</span>
+                                            </div>
+                                        </div>
+    
+                                        <div class="col-md-7">
+                                            <div class="text-right">
+                                                <span id="viewers"><%= trip.num_trips %></span><i style="padding-left: 5px;" class="fas fa-retweet"></i>
+                                                <span id="viewers" style="padding-left: 10px;"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-eye"></i>
+                                            </div>
+                                        </div>
+                                        
                                       </div>
-  
-                                      <div class="col-md-7">
-                                          <div class="text-right">
-                                              <span id="viewers"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-retweet"></i>
-                                              <span id="viewers" style="padding-left: 10px;"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-eye"></i>
-                                          </div>
-                                      </div>
-                                      
                                     </div>
-                                  </div>
-                              </div>
-                          </div>
-                          </a>
-  
+                                </div>
+                            </div>
+                            </a>
+                          <% } %>
                         <% }); %>
   
                       </div>
 
                       <br><br>
-
-
-                    <div class="container-fluid cont">
-                        <p style="color: #fff; font-size: 26px; opacity: .7"><i class="fas fa-futbol"></i><span style="padding-left: 15px;">Sports</span></p> 
-                        <hr class="hr-categories text-left">
-                    </div>
-
-                    <div class="row">
-
-                        <% trips.forEach(function(trip) { %> 
-  
-                          <a href="/plan?id=<%= trip.id %>" class="card-home-link">
-                          <div class="col-md-3 col-sm-12 cont">
-                              <div class="card card-home" style="width: 18rem; height: 400px;">
-                                <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
-                                <% if(trip.isPremium == 1) { %>
-                                  <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
-                                <% } else { %>
-                                  <p class="card-text" style="overflow:unset"><small class="text-muted" style="font-weight: 0.6; padding-left: 1.25rem">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
-                                <% } %>
-                            
-                                <div class="card-body" style="padding-top: 0;">
-                                    <h5 class="card-title"><b><%= trip.city %></b></h5>
-                                    <p class="card-text" style="padding-top: 10px; height: 67.2px;"><%= trip.description %></p>
-  
-                                    <div class="row">
-                                      <div class="col-md-5">
-                                          <div class="text-left">
-                                              <i class="fas fa-star"></i><span style="padding-left: 5px;">4.0 / 5.0</span>
-                                          </div>
-                                      </div>
-  
-                                      <div class="col-md-7">
-                                          <div class="text-right">
-                                              <span id="viewers"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-retweet"></i>
-                                              <span id="viewers" style="padding-left: 10px;"><%= trip.num_viewers %></span><i style="padding-left: 5px;" class="fas fa-eye"></i>
-                                          </div>
-                                      </div>
-                                      
-                                    </div>
-                                  </div>
-                              </div>
-                          </div>
-                          </a>
-  
-                        <% }); %>
-  
-                      </div>
-
-                      <br><br>
-
-
-
 
                   </div>
 

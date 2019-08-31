@@ -1,7 +1,7 @@
 document.querySelector("html").classList.add('js');
 
-var fileInput = document.querySelector( ".input-poi-photo" );  
-var button  = document.querySelector( ".input-poi-photo-trigger");
+var fileInput = document.querySelector( ".input-photo" );  
+var button  = document.querySelector( ".input-photo-trigger");
 var the_return = document.querySelector(".file-return");
 
 button.addEventListener("keydown", function( event ) {  
@@ -24,7 +24,7 @@ fileInput.addEventListener( "change", function( event ) {
 
 
 var reviewPhotoInput = document.querySelector( "#review-photo-name" );  
-var reviewPhotoBtn  = document.querySelector( ".input-poi-photo-trigger");
+var reviewPhotoBtn  = document.querySelector( ".input-photo-trigger");
 var reviewPhotoFilename = document.querySelector(".review-photo-filename");
 
 reviewPhotoBtn.addEventListener("keydown", function( event ) {  

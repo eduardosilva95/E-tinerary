@@ -7,7 +7,8 @@
     <meta name="author" content="Eduardo Silva">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Simple Map</title>
+    <title>e-tinerary</title>
+    <link rel="icon" href="img/logo-icon.ico">
 
     <!-- Custom styles -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
@@ -76,7 +77,6 @@
                         <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
                         <a class="dropdown-item header" href="./trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
                         <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
-                        <a class="dropdown-item header" href="./review-poi"><i class="fas fa-edit"></i><span style="padding-left: 10px;">Review POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
                       </div>   
@@ -300,10 +300,10 @@
                               <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
                               <div class="card-body">
                                 <h5 class="card-title"><b><%= dest.name %></b></h5>
-                                <% if(dest.plans == 1) { %>
-                                  <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trip planned for <%= dest.name %></p>
+                                <% if(dest.trips == 1) { %>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trip planned for <%= dest.name %></p>
                                 <% } else { %>
-                                  <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trips planned for <%= dest.name %></p>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trips planned for <%= dest.name %></p>
                                 <% } %>
                               </div>
                             </div>
@@ -338,10 +338,10 @@
                               <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
                               <div class="card-body">
                                 <h5 class="card-title"><b><%= dest.name %></b></h5>
-                                <% if(dest.plans == 1) { %>
-                                  <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trip planned for <%= dest.name %></p>
+                                <% if(dest.trips == 1) { %>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trip planned for <%= dest.name %></p>
                                 <% } else { %>
-                                  <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trips planned for <%= dest.name %></p>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trips planned for <%= dest.name %></p>
                                 <% } %>
                               </div>
                             </div>
@@ -379,10 +379,10 @@
                             <div class="card-body">
                               <h5 class="card-title"><b><%= place.name %></b></h5>
                               <span style="color: #767676;"><%= place.city %></span>
-                              <% if(place.plans == 1) { %>
-                                <p class="card-text" style="padding-top: 10px;"><%= place.plans %> planned trips contain <span><%= place.name %></span></p>
+                              <% if(place.trips == 1) { %>
+                                <p class="card-text" style="padding-top: 10px;"><%= place.trips %> planned trips contain <span><%= place.name %></span></p>
                               <% } else { %>
-                                <p class="card-text" style="padding-top: 10px;"><%= place.plans %> planned trips contain <span><%= place.name %></span></p>
+                                <p class="card-text" style="padding-top: 10px;"><%= place.trips %> planned trips contain <span><%= place.name %></span></p>
                               <% } %>
                             </div>
                           </div>

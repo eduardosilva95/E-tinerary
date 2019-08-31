@@ -6,11 +6,11 @@ var infowindow;
 var directionsService;
 var directionsDisplay;
 
-var plan;
+var trip;
 var weekdays = [];
 var shortdays = [];
 var dif_days;
-var plan_days = [];
+var trip_days = [];
 var day; // index of the day displayed
 var place_info = [];
 
@@ -62,10 +62,13 @@ function initMap(latitude, longitude) {
 
     google.maps.event.addListenerOnce(map, 'idle', function () {
 
+        var count = 1;
+
         for(var key in places){
-            if(places[key].day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
+            if(places[key].day.replace(/\s/g, '') == trip_days[day].replace(/\s/g, '')){
                 data = {color: visits_color, icon: getIcon(places[key]["poi_type"])};
-                createMarker(places[key]['coordinates'], places[key]['name'], data, "visits");
+                createMarker(places[key]['coordinates'], places[key]['name'], data, "visits", count);
+                count++;
             }
         }
 
@@ -90,17 +93,17 @@ function initMap(latitude, longitude) {
     infoWindow = new google.maps.InfoWindow;
     loadNavbar();
 
-    var myPath = window.location.href;
-    var plan_id = /id=([^&]+)/.exec(location.search)[1];
+    var href = new URL(window.location.href);
+    var trip_id = parseInt(href.searchParams.get('id'));
 
-    document.cookie = "plan=" + plan_id + ";path=" + myPath;
+    document.cookie = "trip=" + trip_id + ";path=" + href;
 
     hasMap = true;
 }
 
-
+/*
 function createMarker(local, name, data, type){
-    /* if place has already a marker in the map, ignore */
+    // if place has already a marker in the map, ignore 
     if(markerList.includes(name))
       return;
     
@@ -148,7 +151,51 @@ function createMarker(local, name, data, type){
     
     markers.push(marker);
     markerList.push(marker.title);
-  }
+  }*/
+
+function createMarker(local, name, data, type, position){
+    // if place has already a marker in the map, ignore 
+    if(markerList.includes(name))
+      return;
+    
+    var coordinates = new google.maps.LatLng({lat: parseFloat(local.split(', ')[0]), lng: parseFloat(local.split(', ')[1])}); 
+    
+    marker = new Marker({
+      position: coordinates,
+      map: map,
+      title: name,
+      icon: 'https://raw.githubusercontent.com/Concept211/Google-Maps-Markers/master/images/marker_green' + position + '.png',
+    });
+
+
+    if(type == "visits"){
+        marker.addListener('click', function () {
+            loadModalInMap(places[this.title]);
+            $("#info-modal").modal();
+            $("#add-visit-btn").css("display", "none");
+        });
+    }
+
+    else if(type == "suggestions"){
+        marker.addListener('click', function () {
+            loadModalInMap(suggested_places[this.title]);
+            $("#info-modal").modal();
+            $("#add-visit-btn").css("display", "block");
+        });
+    }
+
+    else if(type == "hotels"){
+        marker.addListener('click', function () {
+            viewPOI(hotels[this.title]);
+            $("#info-modal").modal();
+            $("#add-visit-btn").css("display", "none");
+        });
+
+    }      
+    
+    markers.push(marker);
+    markerList.push(marker.title);
+}
 
 
 // Deletes all markers in the map
@@ -168,10 +215,13 @@ function clearMarkers() {
 function updateMarkers(){
     clearMarkers();
 
+    var count = 1;
+
     for(var key in places){
-        if(places[key].day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
+        if(places[key].day.replace(/\s/g, '') == trip_days[day].replace(/\s/g, '')){
             data = {color: visits_color, icon: getIcon(places[key]["poi_type"])};
-            createMarker(places[key]['coordinates'], places[key]['name'], data, "visits");
+            createMarker(places[key]['coordinates'], places[key]['name'], data, "visits", count);
+            count++;
         }
     }
 
@@ -207,7 +257,9 @@ function calcRoute(start, end, waypts) {
     directionsService.route(request, function(result, status) {
       if (status == 'OK') {
         loadTravelTimesAndDistances(result, start);
-        directionsDisplay.setDirections(result);
+
+        if(hasMap)
+            directionsDisplay.setDirections(result);
         //animateItinerary(result);
       }
     });
@@ -237,9 +289,9 @@ function calcRoute(start, end, waypts) {
 }  
 
 
-function loadPlan(plan_array, days, days_shortname, travel_mode){
+function loadTrip(trip_array, days, days_shortname, travel_mode){
     TRAVEL_MODE = travel_mode;
-    plan = plan_array;
+    trip = trip_array;
     day = 0;
     days = days.split(',');
     days_shortname = days_shortname.split(',');
@@ -247,15 +299,15 @@ function loadPlan(plan_array, days, days_shortname, travel_mode){
     dif_days = days.length / 2 - 1;
 
     for(var i=1; i < days.length ; i+=2){
-        plan_days.push(days[i]);
+        trip_days.push(days[i]);
     }
 
     for(var i=0; i < days.length ; i+=2){
         weekdays.push(days[i] + days[i+1]);
     }
 
-    for(var j=0 ; j < plan.length ; j++){
-        p = JSON.parse(plan[j]);
+    for(var j=0 ; j < trip.length ; j++){
+        p = JSON.parse(trip[j]);
         places[p.name] = p;
     }
 
@@ -272,6 +324,11 @@ function loadPlan(plan_array, days, days_shortname, travel_mode){
     }
 
     loadBottomNavbar();
+
+    if(!hasMap){
+        directionsService = new google.maps.DirectionsService();
+        loadItinerary();
+    }
 }
 
 
@@ -279,7 +336,7 @@ function loadItinerary(){
     var visits_tmp = [];
 
     for(var key in places){
-        if(places[key].day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
+        if(places[key].day.replace(/\s/g, '') == trip_days[day].replace(/\s/g, '')){
             visits_tmp.push(places[key]);
         }
     }
@@ -314,6 +371,20 @@ function loadTravelTimesAndDistances(result, start){
         var txt = result[i].duration.text + " (" + result[i].distance.text + ")";
         $("#desloc-" + (start_index + i)).css("display", "block");
         $("#desloc-" + (start_index + i) + "-text").text(txt);
+
+        if(TRAVEL_MODE == 'WALKING'){
+            document.getElementById("desloc-" + (start_index + i) + "-travel-mode").className = 'fas fa-walking';
+        }
+
+        else if(TRAVEL_MODE == 'BICYCLING'){
+            document.getElementById("desloc-" + (start_index + i) + "-travel-mode").className = 'fas fa-bicycle';
+        }
+
+        else if(TRAVEL_MODE == 'TRANSIT'){
+            document.getElementById("desloc-" + (start_index + i) + "-travel-mode").className = 'fas fa-bus';
+        }
+
+
     }
 
     
@@ -333,7 +404,7 @@ function loadSuggestions(suggested_visits){
 function loadHotels(suggested_hotels){
 
     for(var j=0 ; j < suggested_hotels.length ; j++){
-        p = JSON.parse(suggested_hotels[j]);
+        p = JSON.parse(JSON.stringify(suggested_hotels[j]));
 
         hotels[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number, 'poi_type': p.poi_type};
     }
@@ -342,21 +413,20 @@ function loadHotels(suggested_hotels){
 
 function loadBottomNavbar(){
 
-    var start = new Date(plan_days[0]);
+    var start = new Date(trip_days[0]);
     var now = new Date();
 
     if(now >= start){
         $("#add-visit-div").css("display", "none");
-        $("#save_plan_btn").css("display", "none");
+        $("#save-trip-btn").css("display", "none");
         $("#are-you-sure-share-msg").css("display", "none");
         
     }
-
 }
 
 
 function nextDay(){
-    if(day == plan_days.length){
+    if(day == trip_days.length){
         return;
     }
     day = day + 1;
@@ -371,6 +441,8 @@ function nextDay(){
 
     if(hasMap)
         updateMarkers();
+    else
+        loadItinerary();
 
 }
 
@@ -390,7 +462,8 @@ function previousDay(){
 
     if(hasMap)
         updateMarkers();
-
+    else
+        loadItinerary();
 }
 
 
@@ -400,10 +473,11 @@ function loadVisits(){
 
     var count = 0;
     for(var key in places){
-        if(places[key].day.replace(/\s/g, '') == plan_days[day].replace(/\s/g, '')){
+        if(places[key].day.replace(/\s/g, '') == trip_days[day].replace(/\s/g, '')){
             document.getElementById('place-' + count + '-name').innerText = places[key].name;
             document.getElementById('place-' + count + '-name').title = places[key].name;
             document.getElementById('place-' + count + '-type').innerText = places[key].poi_type;
+
             document.getElementById('place-' + count + '-start-hour').innerText = places[key].start_time;
             document.getElementById('place-' + count + '-end-hour').innerText = places[key].end_time;
         
@@ -472,8 +546,12 @@ function loadImage(place_id, dest){
             if(place.photos != undefined)
                 document.getElementById(dest).src = place.photos[0].getUrl();
             else
-                document.getElementById(dest).src = "";
+                document.getElementById(dest).src = "img/no-photo-found.png";
 
+        }
+
+        else{
+            document.getElementById(dest).src = "img/no-photo-found.png";
         }
     });
 
@@ -498,7 +576,7 @@ function loadModalInMap(place_dict){
     $('#modal-info-website').text(place_dict['website']);
     $('#modal-info-website').attr("href", place_dict['website']);
 
-    $('#modal-info-number-plans').text(place_dict['no_plans']);
+    $('#modal-info-number-trips').text(place_dict['no_trips']);
     $('#modal-info-duration').text(place_dict['duration']);
     $('#modal-info-price').text(place_dict['price']);
 
@@ -506,7 +584,7 @@ function loadModalInMap(place_dict){
     loadRating(place_dict['accessibility'] ,"place-accessibility");
     loadRating(place_dict['security'] ,"place-security");
 
-    var dest =  '/place?id=' + place_dict['id'] + '&plan=' + /id=([^&]+)/.exec(location.search)[1];
+    var dest =  '/place?id=' + place_dict['id'] + '&trip=' + /id=([^&]+)/.exec(location.search)[1];
     $('#modal-find-more-btn').attr("onclick", "window.location.href = " + "'" + dest + "'");
 }
 
@@ -534,7 +612,7 @@ $(function () {
         else
             $('#modal-info-website').attr("href", place_info[id]['website']);
         
-        $('#modal-info-number-plans').text(place_info[id]['no_plans']);
+        $('#modal-info-number-trips').text(place_info[id]['no_trips']);
         $('#modal-info-duration').text(place_info[id]['duration']);
         $('#modal-info-price').text(place_info[id]['price']);
 
@@ -542,7 +620,7 @@ $(function () {
         loadRating(place_info[id]['accessibility'] ,"place-accessibility");
         loadRating(place_info[id]['security'] ,"place-security");
 
-        var dest =  '/place?id=' + place_info[id]['id'] + '&plan=' + /id=([^&]+)/.exec(location.search)[1];
+        var dest =  '/place?id=' + place_info[id]['id'] + '&trip=' + /id=([^&]+)/.exec(location.search)[1];
         $('#modal-find-more-btn').attr("onclick", "window.location.href = " + "'" + dest + "'");
     });
 });
@@ -571,72 +649,63 @@ $(function () {
 
 
 function addVisit(city){
-    var plan_id = /id=([^&]+)/.exec(location.search)[1];
+    var href = new URL(window.location.href);
+    var trip_id = parseInt(href.searchParams.get('id'));
 
-    var queryString = "?dest=" + city + "&plan=" + plan_id;
+    var queryString = "?dest=" + city + "&trip=" + trip_id;
     window.location.href = "./places" + queryString;
 }
 
 function changeView(view){
 
-    var url = window.location.href;
-
-    if(/v=([^&]+)/.exec(window.location.search) != null){
-        url = window.location.href.split('&v')[0];
-    }
-
+    var href = new URL(window.location.href);
+    
     if(view == 'normal'){
-        window.location.href = url;
+        href.searchParams.delete('v');
     }
 
     else if(view == 'full'){
-        window.location.href = url + "&v=full";
+        href.searchParams.set('v', 'full');
     }
 
     else if(view == 'map'){
-        window.location.href = url + "&v=map";
+        href.searchParams.set('v', 'map');
     }
+
+    window.location.href = href;
 
 }
 
 function deleteVisit(poi_id){
-    var user = getUserCookie();
+    var href = new URL(window.location.href);
+    var trip_id = parseInt(href.searchParams.get('id'));
 
-    var plan_id = /id=([^&]+)/.exec(location.search)[1];
-
-    if(user != null){
-        $.post("/delete-visit", {plan: plan_id, user: user, poi: poi_id}, function(result){
-      
-            if(result.result == 'error'){
-            }
-            
-            else{
-              window.location.reload();
-            }
-      
-        });
-    }
+    $.post("/delete-visit", {trip: trip_id, poi: poi_id}, function(result){
+    
+        if(result.result == 'error'){
+        }
+        
+        else{
+            window.location.reload();
+        }
+    });
 }
 
 
-function savePlan(){
-    var user = getUserCookie();
+function saveTrip(){
+    var href = new URL(window.location.href);
+    var trip_id = parseInt(href.searchParams.get('id'));
 
-    var plan_id = /id=([^&]+)/.exec(location.search)[1];
-
-    if(user != null){
-        $.post("/save-plan", {plan: plan_id, user: user}, function(result){
-      
-            if(result.result == 'error'){
-            }
-            
-            else{
-                window.location.href = "/plan?id=" + plan_id;
-            }
-      
-        });
+    $.post("/save-trip", {trip: trip_id, user: user}, function(result){
     
-    }
+        if(result.result == 'error'){
+        }
+        
+        else{
+            window.location.href = "/trip?id=" + trip_id;
+        }
+    
+    });
 }
 
 $(function () {
@@ -649,7 +718,6 @@ $(function () {
 
 $(function () {
     $('.btn-create-review-modal').on('click', function () {
-
         $('#modal-review-title').text($(this).data('title'));
     });
   });
@@ -664,21 +732,19 @@ $(function () {
 
 
 $(function () {
-    $('.btn-use-plan-modal').on('click', function () {
-        $('#modal-use-plan-title').text($(this).data('title'));
+    $('.btn-use-trip-modal').on('click', function () {
+        $('#modal-use-trip-title').text($(this).data('title'));
     });
   });
 
 $(function () {
     $('.btn-share-modal').on('click', function () {
         $('#share-modal-title').text($(this).data('name'));
-        $('#are-you-sure-plan-name').text($(this).data('name'));
+        $('#are-you-sure-trip-name').text($(this).data('name'));
 
-        $('#share-modal-plan-id').val($(this).data('id'));
+        $('#share-modal-trip-id').val($(this).data('id'));
         $('#share-modal-user').val(getUserCookie());
-
-       // document.getElementById('confirm-public-btn').setAttribute( "onClick", "javascript: makePublic("+$(this).data('id')+");");
-
+       
     });
 });
 
@@ -693,8 +759,9 @@ $(function () {
 });
 
 
-function usePlan(){
-    var plan_id = /id=([^&]+)/.exec(location.search)[1];
+function useTrip(){
+    var href = new URL(window.location.href);
+    var trip_id = parseInt(href.searchParams.get('id'));
 
     var start_date = $("#arrival-date").val();
 
@@ -707,13 +774,13 @@ function usePlan(){
     start_date = start_date.getFullYear() + "/" + ((start_date.getMonth()+1).toString()<10?'0':'') + (start_date.getMonth()+1).toString() + "/" + (start_date.getDate()<10?'0':'') + start_date.getDate();
     end_date = end_date.getFullYear() + "/" + ((end_date.getMonth()+1).toString()<10?'0':'') + (end_date.getMonth()+1).toString() + "/" + (end_date.getDate()<10?'0':'') + end_date.getDate();
 
-    $.post("/create-child-plan", {plan: plan_id, start_date: start_date, end_date: end_date}, function(result){
+    $.post("/create-child-trip", {trip: trip_id, start_date: start_date, end_date: end_date}, function(result){
     
         if(result.result == 'error'){
         }
         
         else{
-           window.location.href = "/plan?id=" + result.plan;
+           window.location.href = "/trip?id=" + result.trip;
         }
     
     });
@@ -739,7 +806,8 @@ function getRatingValue(){
 
 
 function submitReview(){
-    var plan_id = /id=([^&]+)/.exec(location.search)[1];
+    var href = new URL(window.location.href);
+    var trip_id = parseInt(href.searchParams.get('id'));
 
     var review = document.getElementById("review-text").value;
 
@@ -750,7 +818,7 @@ function submitReview(){
         return;
     }
 
-    $.post("/review-plan", {plan: plan_id, review: review, rating: rating}, function(result){
+    $.post("/review-trip", {trip: trip_id, review: review, rating: rating}, function(result){
         window.location.reload();
     });
 }
@@ -875,9 +943,10 @@ $(function () {
 
 
 function checkInterest(){
-    var plan_id = /id=([^&]+)/.exec(location.search)[1];
+    var href = new URL(window.location.href);
+    var trip_id = parseInt(href.searchParams.get('id'));
 
-    $.post("/user-interested", {plan: plan_id}, function(result){
+    $.post("/user-interested", {trip: trip_id}, function(result){
         if(result.result == 'error'){
         }
         
@@ -888,9 +957,10 @@ function checkInterest(){
 }
 
 function uncheckInterest(){
-    var plan_id = /id=([^&]+)/.exec(location.search)[1];
+    var href = new URL(window.location.href);
+    var trip_id = parseInt(href.searchParams.get('id'));
 
-    $.post("/user-not-interested", {plan: plan_id}, function(result){
+    $.post("/user-not-interested", {trip: trip_id}, function(result){
         if(result.result == 'error'){
         }
         
@@ -933,4 +1003,38 @@ function loadRating(rating, dest){
   }
 
 
- 
+function changeReviewPage(){
+    $('#share-modal-general-info').removeClass('active');
+    $('#pills-general-info-tab').removeClass('active');
+
+    $('#share-modal-more-info').tab('show');
+    $('#pills-more-info-tab').addClass('active');
+
+    $('#change-review-page-btn').css("display", "none");
+    $('#submit-share-trip-btn').css("display", "block");
+    $('#return-review-page-btn').css("display", "block");
+
+}
+
+$(function () {
+    $('#pills-general-info-tab').click(
+      function(){ returnReviewPage(); return false;})
+});
+
+function returnReviewPage(){
+    $('#share-modal-general-info').tab('show');
+    $('#pills-general-info-tab').addClass('active');
+
+    $('#share-modal-more-info').removeClass('active');
+    $('#pills-more-info-tab').removeClass('active');
+
+    $('#change-review-page-btn').css("display", "block");
+    $('#submit-share-trip-btn').css("display", "none");
+    $('#return-review-page-btn').css("display", "none");
+
+}
+
+$(function () {
+    $('#pills-more-info-tab').click(
+      function(){ changeReviewPage(); return false;})
+});

@@ -405,8 +405,12 @@ function getPlaceDetails(place_id){
     $('#change-review-page-btn').css("display", "none");
     $('#submit-review-btn').css("display", "block");
     $('#return-review-page-btn').css("display", "block");
-
   }
+
+  $(function () {
+    $('#pills-review-info-tab').click(
+      function(){ returnReviewPage(); return false;})
+  });
 
   function returnReviewPage(){
     $('#review-modal-general-info').tab('show');
@@ -421,39 +425,44 @@ function getPlaceDetails(place_id){
 
   }
 
+  $(function () {
+    $('#pills-more-info-tab').click(
+      function(){ changeReviewPage(); return false;})
+  });
+
 
   function submitReview(){
-    if(hasUserCookies()){
-      var poi_id = /id=([^&]+)/.exec(location.search)[1];
+    var href = new URL(window.location.href);
+    var poi_id = parseInt(href.searchParams.get('id'));
 
-      if(document.getElementById("review-text").value == ''){
-        $('#review-text').addClass("is-invalid");
-        $('#review-text-error-msg').css("display", "block");
-        returnReviewPage();
-        return;
-      }
-
-      var review = document.getElementById("review-text").value;
-
-      var rating = getRatingValue();
-      var accessibility = getAccessibilityValue();
-      var security = getSecurityValue();
-
-      var price = document.getElementById("review-price").value;
-
-      var duration = $( "#select-visit-duration option:selected" ).text();
-
-      if(duration == "Duration")
-        duration = null;
-
-      $.post("/review-poi", {poi: poi_id, review: review, rating: rating, accessibility: accessibility, security: security, price: price, duration: duration}, function(result){
-        window.location.reload();
-      });
+    if(document.getElementById("review-text").value == ''){
+      $('#review-text').addClass("is-invalid");
+      $('#review-text-error-msg').css("display", "block");
+      returnReviewPage();
+      return;
     }
+
+    var review = document.getElementById("review-text").value;
+
+    var rating = getRatingValue();
+    var accessibility = getAccessibilityValue();
+    var security = getSecurityValue();
+
+    var price = document.getElementById("review-price").value;
+
+    var duration = $( "#select-visit-duration option:selected" ).text();
+
+    if(duration == "Duration")
+      duration = null;
+
+    $.post("/review-poi", {poi: poi_id, review: review, rating: rating, accessibility: accessibility, security: security, price: price, duration: duration}, function(result){
+      window.location.reload();
+    });
   }
 
   function editDescription(){
-    var poi_id = /id=([^&]+)/.exec(location.search)[1];
+    var href = new URL(window.location.href);
+    var poi_id = parseInt(href.searchParams.get('id'));
 
     if(document.getElementById("add-description-text").value == ''){
       $("#add-description-error").css("display", "block");
@@ -468,7 +477,8 @@ function getPlaceDetails(place_id){
   }
 
   function updatePrice(){
-    var poi_id = /id=([^&]+)/.exec(location.search)[1];
+    var href = new URL(window.location.href);
+    var poi_id = parseInt(href.searchParams.get('id'));
 
     var price_adults = document.getElementById("input-adult-price").value;
     var price_children = document.getElementById("input-children-price").value;
@@ -479,7 +489,7 @@ function getPlaceDetails(place_id){
     }
 
     $.post("/update-poi-price", {poi: poi_id, price_adults: price_adults, price_children: price_children}, function(result){
-      if(result == "success"){
+      if(result.result == "success"){
         $("#update-price-success").css("display", "block");
       }
 
@@ -519,7 +529,8 @@ function getPlaceDetails(place_id){
 
 
   function addVisit(poi_id){
-    var plan = /plan=([^&]+)/.exec(location.search)[1];
+    var href = new URL(window.location.href);
+    var trip_id = parseInt(href.searchParams.get('trip'));
   
     var schedule;
   
@@ -537,20 +548,20 @@ function getPlaceDetails(place_id){
         var hour = $('#visit-start-hour option:selected').val();
         schedule = day + " " + hour;
 
-        $.post("/add-visit", {plan: plan, poi: poi_id, schedule: schedule}, function(result){
+        $.post("/add-visit", {trip: trip_id, poi: poi_id, schedule: schedule}, function(result){
         
           if(result.result == 'error'){
             if(result.msg == 'schedule error'){
               $('#add-visit-error').css("display", "block");
-              $('#add-visit-error-msg').text("Could not find a schedule for the visit in this plan")
+              $('#add-visit-error-msg').text("Could not find a schedule for the visit in this trip")
             }
           }
           
           else{
             if(result.isManual == true)
-              window.location.href = "/plan-m?id=" + plan;
+              window.location.href = "/trip-m?id=" + trip_id;
             else
-              window.location.href = "/plan?id=" + plan;
+              window.location.href = "/trip?id=" + trip_id;
           
           }
         });
@@ -562,20 +573,20 @@ function getPlaceDetails(place_id){
 
       $('#schedule-error').css("display", "none");
   
-      $.post("/add-visit", {plan: plan, poi: poi_id}, function(result){
+      $.post("/add-visit", {trip: trip_id, poi: poi_id}, function(result){
         
         if(result.result == 'error'){
           if(result.msg == 'schedule error'){
             $('#add-visit-error').css("display", "block");
-            $('#add-visit-error-msg').text("Could not find a schedule for the visit in this plan")
+            $('#add-visit-error-msg').text("Could not find a schedule for the visit in this trip")
           }
         }
         
         else{
           if(result.isManual == true)
-            window.location.href = "/plan-m?id=" + plan;
+            window.location.href = "/trip-m?id=" + trip_id;
           else
-            window.location.href = "/plan?id=" + plan;
+            window.location.href = "/trip?id=" + trip_id;
         
         }
       });

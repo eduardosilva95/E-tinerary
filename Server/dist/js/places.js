@@ -241,10 +241,13 @@ function getPlaceDetails(place_id, dest, photo){
         if(place.photos != undefined)
           document.getElementById(dest).src = place.photos[0].getUrl({'maxWidth': 200, 'maxHeight': 180});
         else
-          document.getElementById(dest).src = "";
-
+          document.getElementById(dest).src = "img/no-photo-found.png";
       }
-    });
+
+    else{
+        document.getElementById(dest).src = "img/no-photo-found.png";
+    }
+  });
 
   }
 
@@ -259,12 +262,11 @@ function getPlaceDetails(place_id, dest, photo){
 
 
 function updatePlaceLink(dest){
+  var href = new URL(window.location.href);
+  var trip_id = parseInt(href.searchParams.get('trip'));
 
-  if(window.location.href.includes('plan')){
-    var href = new URL(window.location.href);
-    var plan = parseInt(href.searchParams.get('plan'));
-
-    document.getElementById(dest).getElementsByClassName("places-poi-find-more")[0].href += "&plan=" + plan;
+  if(isNaN(trip_id)){
+    document.getElementById(dest).getElementsByClassName("places-poi-find-more")[0].href += "&trip=" + trip_id;
 
   }
 
@@ -362,8 +364,11 @@ function getIcon(type){
 function loadPlace(place_id){
   var queryString = "?id=" + place_id;
 
-  if(/plan=([^&]+)/.exec(location.search) != null)
-    queryString = queryString + "&plan=" + /plan=([^&]+)/.exec(location.search)[1];
+  var href = new URL(window.location.href);
+  var trip_id = parseInt(href.searchParams.get('trip'));
+
+  if(isNaN(trip_id))
+    queryString = queryString + "&trip=" + trip_id;
 
   window.location.href = "./place" + queryString;
 }
@@ -454,7 +459,8 @@ $(function () {
 
 
 function addVisit(poi_id){
-  var plan = /plan=([^&]+)/.exec(location.search)[1];
+  var href = new URL(window.location.href);
+  var trip_id = parseInt(href.searchParams.get('trip'));
 
   var schedule;
 
@@ -472,20 +478,20 @@ function addVisit(poi_id){
       var hour = $('#visit-start-hour option:selected').val();
       schedule = day + " " + hour;
 
-      $.post("/add-visit", {plan: plan, poi: poi_id, schedule: schedule}, function(result){
+      $.post("/add-visit", {trip: trip_id, poi: poi_id, schedule: schedule}, function(result){
       
         if(result.result == 'error'){
           if(result.msg == 'schedule error'){
             $('#add-visit-error').css("display", "block");
-            $('#add-visit-error-msg').text("Could not find a schedule for the visit in this plan")
+            $('#add-visit-error-msg').text("Could not find a schedule for the visit in this trip")
           }
         }
         
         else{
           if(result.isManual == true)
-            window.location.href = "/plan-m?id=" + plan;
+            window.location.href = "/trip-m?id=" + trip_id;
           else
-            window.location.href = "/plan?id=" + plan;
+            window.location.href = "/trip?id=" + trip_id;
         
         }
       });
@@ -496,20 +502,20 @@ function addVisit(poi_id){
 
     $('#schedule-error').css("display", "none");
 
-    $.post("/add-visit", {plan: plan, poi: poi_id}, function(result){
+    $.post("/add-visit", {trip: trip_id, poi: poi_id}, function(result){
       
       if(result.result == 'error'){
         if(result.msg == 'schedule error'){
           $('#add-visit-error').css("display", "block");
-          $('#add-visit-error-msg').text("Could not find a schedule for the visit in this plan")
+          $('#add-visit-error-msg').text("Could not find a schedule for the visit in this trip")
         }
       }
       
       else{
         if(result.isManual == true)
-          window.location.href = "/plan-m?id=" + plan;
+          window.location.href = "/trip-m?id=" + trip_id;
         else
-          window.location.href = "/plan?id=" + plan;
+          window.location.href = "/trip?id=" + trip_id;
       
       }
     });

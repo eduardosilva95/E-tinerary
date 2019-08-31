@@ -1,13 +1,14 @@
 
 var slideIndex = 1;
 
+var places_list = [];
+var photos_list = [];
+
 $(window).on('load', function() {
     var coordinates = document.getElementById("city-coordinates").innerText;
 
     var lat = coordinates.split(',')[0];
     var lon = coordinates.split(',')[1];
-
-    var place = document.getElementById("city-name").innerText;
   
     mapboxgl.accessToken = 'pk.eyJ1IjoiZWR1ZmNwOTUiLCJhIjoiY2p0ZnFrYjhvMW1vYjN6dGZlczMwYWlzNiJ9.GSWPFYjoMMJp5_GAmA2lUQ';
     var map = new mapboxgl.Map({
@@ -18,39 +19,46 @@ $(window).on('load', function() {
     });
                   
     map.on('load', function () {
-        map.addLayer({
-            "id": "points",
-            "type": "symbol",
-            "source": {
-                "type": "geojson",
-                "data": {
-                    "type": "FeatureCollection",
-                    "features": [{
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "Point",
-                            "coordinates": [lon, lat]
-                        },
-                        "properties": {
-                            "icon": "monument"
-                        }
-                    }]
+        for(var i=0; i<places_list.length; i++){
+            map.addLayer({
+                "id": places_list[i].name,
+                "type": "symbol",
+                "source": {
+                    "type": "geojson",
+                    "data": {
+                        "type": "FeatureCollection",
+                        "features": [{
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [places_list[i].coordinates.split(', ')[1], places_list[i].coordinates.split(', ')[0]]
+                            },
+                            "properties": {
+                                "icon": "monument"
+                            }
+                        }]
+                    }
+                },
+                "layout": {
+                    "icon-image": "{icon}-15",
+                    "icon-size": 1.5,
+                    "icon-allow-overlap": true
                 }
-            },
-            "layout": {
-                "icon-image": "{icon}-15",
-                "icon-size": 1.5,
-                "icon-allow-overlap": true
-            }
-        });
-                      
-        var popup = new mapboxgl.Popup({closeOnClick: false})
-            .setLngLat([lon, lat])
-            .setHTML('<h6>' + place + '</h6>')
-            .addTo(map);
+            });
+
+            var popup = new mapboxgl.Popup()
+                .setLngLat([places_list[i].coordinates.split(', ')[1], places_list[i].coordinates.split(', ')[0]])
+                .setHTML('<h6>' + places_list[i].name + '</h6>')
+                .addTo(map);
+        }  
+        
+        
     });
-  
 });
+
+function addMarker(coordinates, name){
+   
+}
 
 function getCityDetails(place_id){
 
@@ -64,34 +72,61 @@ function getCityDetails(place_id){
 
     service.getDetails(request, function(place, status) {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
+
+            var merge_photos = [];
+
         
-            if(place.photos != undefined){
-                for(var i=0; i<place.photos.length;i++){
+            if(place.photos != undefined && photos_list.length < 10){
 
-                    var img_div = document.createElement("DIV");
-                    img_div.className = "mySlides slideshow-fade";
+            var num_photos_from_google_required = 10-photos_list.length;
 
-                    var img = document.createElement("IMG");
-                    img.src = place.photos[i].getUrl();
-                    img.style.width = "100%";
+            var google_photos = place.photos.slice(0,num_photos_from_google_required);
+            
+            merge_photos = photos_list.concat(google_photos);
 
-                    img_div.appendChild(img);
-
-                    document.getElementById("slideshow-div").appendChild(img_div);
-
-                    var dot = document.createElement("SPAN");
-                    dot.className = "dot";
-                    dot.setAttribute( "onClick", "javascript: currentSlide(" + (i+1) + ");" );
-
-                    document.getElementById("dots-div").appendChild(dot);
-
-                }
-
-                showSlides(slideIndex);
             }
-        
-        }
 
+            else {
+
+            merge_photos = photos_list;
+
+            }
+
+
+            for(var i=0; i<merge_photos.length;i++){
+
+            var img_div = document.createElement("DIV");
+            img_div.className = "mySlides slideshow-fade";
+
+            var img = document.createElement("IMG");
+
+            if(i >= photos_list.length){
+                img.src = merge_photos[i].getUrl();
+            }
+
+            else{
+                img.src = merge_photos[i].replace(/"/g,"");
+            }
+
+            img.style.width = "100%";
+
+            img_div.appendChild(img);
+
+            document.getElementById("slideshow-div").appendChild(img_div);
+
+            var dot = document.createElement("SPAN");
+            dot.className = "dot";
+            dot.setAttribute( "onClick", "javascript: currentSlide(" + (i+1) + ");" );
+
+            document.getElementById("dots-div").appendChild(dot);
+
+            }
+
+            showSlides(slideIndex);
+            
+            
+            
+        }
     });
 
   }
@@ -150,3 +185,19 @@ function loadPhoto(place_id, dest){
   
 
 }
+
+function loadPlacesToMap(places){
+
+    for(var j=0 ; j < places.length ; j++){
+        p = JSON.parse(places[j]);
+        places_list.push(p);
+    }
+
+}
+
+
+function loadPhotos(photos){
+    for(var i=0; i<photos.length;i++){
+       photos_list.push(photos[i]);
+    }
+ }

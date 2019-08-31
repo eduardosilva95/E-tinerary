@@ -151,7 +151,7 @@
         <div class="container" style="padding-top: 30px;">
             <div class="row">
                 <div class="col-md-3">
-                    <% if(fromPlan == true) { %>
+                    <% if(fromTrip == true) { %>
                         <a class="back-btn" href="javascript:history.back()" style="font-size: 20px;"><i class="fas fa-undo"></i><span style="padding-left: 10px;">Back</span></a>
                     <% } %>
                 </div>
@@ -220,7 +220,7 @@
                                             </div>
                                             <div class="col-md text-right">
                                                 <div id="places-poi-<%= count %>-price">
-                                                    <span style="padding-right: 5px; color: #ffc107; font-weight: bold;" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Price Level"></span>
+                                                    <span style="padding-right: 5px; color: #ffc107; font-style: italic;" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Price Level">Visits around <%= place.price %>€</span>
                                                 </div>
                                                 <script>
                                                     loadPriceRating("<%= place.price_level %>", "places-poi-<%= count %>-price");
@@ -241,7 +241,7 @@
 
                                         <div class="row cont">
                                             <div class="col-md">
-                                                <% if(fromPlan == true) { %>
+                                                <% if(fromTrip == true) { %>
                                                     <% if(visits.includes(place.id)){ %>
                                                         <span class="places-poi-in-plan-info"><i class="fas fa-check-circle"></i><span style="padding-left: 10px;">Scheduled for <%= place.schedule %> </span></span>
                                                     <% } else{ %>
@@ -440,7 +440,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Add <span id="modal-title" style="font-weight: bold;"></span> to the plan</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Add <span id="modal-title" style="font-weight: bold;"></span> to the trip</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -450,61 +450,64 @@
                             <i class="fas fa-times-circle"></i><span style="padding-left: 10px;" id="add-visit-error-msg"></span>
                         </div>
 
-                        <div class="custom-control custom-radio">
-                            <input type="radio" id="radio-choose-schedule-auto" name="customRadio" class="custom-control-input" checked>
-                            <label class="custom-control-label" for="radio-choose-schedule-auto">Let us choose the schedule</label>
-                        </div>
-                        <div class="custom-control custom-radio">
-                            <input type="radio" id="radio-choose-schedule-man" name="customRadio" class="custom-control-input">
-                            <label class="custom-control-label" for="radio-choose-schedule-man">Choose the schedule</label>
-                        </div>
+                        <% if(fromTrip && isManual == 0) { %> 
 
-                        <br>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" id="radio-choose-schedule-auto" name="customRadio" class="custom-control-input" checked>
+                                <label class="custom-control-label" for="radio-choose-schedule-auto">Let us choose the schedule</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" id="radio-choose-schedule-man" name="customRadio" class="custom-control-input">
+                                <label class="custom-control-label" for="radio-choose-schedule-man">Choose the schedule</label>
+                            </div>
 
-                        <div class="dr" id="choose-schedule-man">
+                            <br>
 
-                            <p><b>Choose visit schedule: </b></p>
-                            
-                            <% if(fromPlan) { %>
-                                <div class="form-group">
-                                    <div id="schedule-error" class="alert alert-danger text-center" role="alert" style="display: none;">
-                                        <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">Please choose a day and a hour for the visit</span>
+                            <div class="dr" id="choose-schedule-man">
+
+                                <p><b>Choose visit schedule: </b></p>
+                                
+                                <% if(fromTrip) { %>
+                                    <div class="form-group">
+                                        <div id="schedule-error" class="alert alert-danger text-center" role="alert" style="display: none;">
+                                            <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">Please choose a day and a hour for the visit</span>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <select class="form-control" id="visit-day">
+                                                    <option value="null">Day</option>
+
+                                                    <% days.forEach(function(day) { %>
+                                                        <option value='<%= day %>'><%= day %></option>
+                                                    <% }); %>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <select class="form-control" id="visit-start-hour">
+                                                    <option value="null">Begin at</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
+                                <% } %>
+
+                                <!--
+                                <div class="form-group">
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <select class="form-control" id="visit-day">
-                                                <option value="null">Day</option>
-
-                                                <% days.forEach(function(day) { %>
-                                                    <option value='<%= day %>'><%= day %></option>
-                                                <% }); %>
+                                            <select class="form-control" id="visit-start-hour">
+                                                <option>Begin at</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <select class="form-control" id="visit-start-hour">
-                                                <option value="null">Begin at</option>
+                                            <select class="form-control" id="visit-end-hour">
+                                                <option>End at</option>
                                             </select>
                                         </div>
                                     </div>
-                                </div>
-                            <% } %>
-
-                            <!--
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <select class="form-control" id="visit-start-hour">
-                                            <option>Begin at</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <select class="form-control" id="visit-end-hour">
-                                            <option>End at</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>-->
-                        </div>
+                                </div>-->
+                            </div>
+                        <% } %>
 
                     </div>
                     <div class="modal-footer">
@@ -545,9 +548,9 @@
   
     <!-- Scripts -->
     <script>
-        var fromPlan = '<%= (fromPlan) %>';
+        var fromTrip = '<%= (fromTrip) %>';
 
-        if(fromPlan == "true"){
+        if(fromTrip == "true"){
             var openslots = '<%- JSON.stringify(openslots) %>';
             loadOpenSlots(openslots);
         }

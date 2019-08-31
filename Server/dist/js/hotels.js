@@ -8,61 +8,41 @@ var marker_list = [];
 var hotels = {};
 
 
-
-
 /* load map */
-function initMap(city) {
-    var coordinates;
+function initMap(latitude, longitude) {
 
-    if(city == "Barcelona")
-        city = "Barcelona, Spain";
+    var position = {lat: parseFloat(latitude), lng: parseFloat(longitude)};
 
-    // show map in the city specified 
-    var geocoder = new google.maps.Geocoder();
-    geocoder.geocode({
-        'address': city
-    }, function(results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-            var Lat = results[0].geometry.location.lat();
-            var Lng = results[0].geometry.location.lng();
-            var coordinatesFromAddress = {
-                zoom: 12,
-                center: new google.maps.LatLng(Lat, Lng)
-            };
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: position,
+        zoom: 12,
+    });
 
-            map = new google.maps.Map(document.getElementById('map'), coordinatesFromAddress);
+    // Style map
+    var styles = {
+        default: null,
+        hide: [
+            {
+                featureType: 'poi',
+                stylers: [{visibility: 'off'}]
+            },
+        ]
+    };
+    map.setOptions({styles: styles['hide']});
 
-            // Apply new JSON when the user chooses to hide/show features.
-            var styles = {
-                default: null,
-                hide: [
-                    {
-                        featureType: 'poi',
-                        stylers: [{visibility: 'off'}]
-                    },
-                ]
-            };
-            map.setOptions({styles: styles['hide']});
 
-            
+    google.maps.event.addListenerOnce(map, 'idle', function () {
 
-            google.maps.event.addListenerOnce(map, 'idle', function () {
-
-                for(var key in hotels){
-                    data = {color: '#ac48db', icon: 'fas fa-bed'};
-                    createMarker(hotels[key]['coordinates'], hotels[key]['name'], hotels[key]["price"]);
-                }
-
-            /* Markers clustering */
-            var markerCluster = new MarkerClusterer(map, markers,
-            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
-
-            });
-        } 
-
-        else {
-            alert("Something got wrong " + status);
+        for(var key in hotels){
+            console.log(hotels);
+            data = {color: '#ac48db', icon: 'fas fa-bed'};
+            createMarker(hotels[key]['coordinates'], hotels[key]['name'], hotels[key]["price"]);
         }
+
+        /* Markers clustering */
+        var markerCluster = new MarkerClusterer(map, markers,
+        {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+
     });
 
     infoWindow = new google.maps.InfoWindow;
@@ -75,7 +55,7 @@ function initMap(city) {
 function createMarker(local, name, price){
     if(marker_list.includes(name))
       return;
-    
+
     var coordinates = new google.maps.LatLng({lat: parseFloat(local.split(', ')[0]), lng: parseFloat(local.split(', ')[1])}); 
     
     var image = {
@@ -91,6 +71,7 @@ function createMarker(local, name, price){
     var marker = new google.maps.Marker({
     position: coordinates,
     map: map,
+    title: name,
     draggable: true,
     icon: image,
     label: {
@@ -118,8 +99,6 @@ function createMarker(local, name, price){
 
 function loadHotels(hotels_list){
 
-    console.log(hotels_list);
-
     for(var i=0 ; i < hotels_list.length ; i++){
 
         hotel = JSON.parse(hotels_list[i]);
@@ -131,10 +110,17 @@ function loadHotels(hotels_list){
         document.getElementById('hotel-' + i + '-name').innerText = hotel.name;
         document.getElementById('hotel-' + i + '-name').title = hotel.name;
 
-        loadImage(hotel.place_id, 'hotel-' + i + '-img');
+        if(hotel.photo != null){
+            document.getElementById('hotel-' + i + '-img').src = hotel.photo;
+        }
+
+        else{
+            loadImage(hotel.place_id, 'hotel-' + i + '-img');
+        }
+        
 
         document.getElementById('hotel-' + i + '-price').innerText = hotel.price;
-    
+
     }
 }
 
@@ -150,10 +136,14 @@ function loadImage(place_id, dest){
         if (status === google.maps.places.PlacesServiceStatus.OK) {
 
             if(place.photos != undefined)
-            document.getElementById(dest).src = place.photos[0].getUrl();
+                document.getElementById(dest).src = place.photos[0].getUrl();
             else
-            document.getElementById(dest).src = "";
+                document.getElementById(dest).src = "img/no-photo-found.png";
 
+        }
+
+        else{
+            document.getElementById(dest).src = "img/no-photo-found.png";
         }
     });
 }
@@ -161,7 +151,13 @@ function loadImage(place_id, dest){
 function loadModalInMap(hotels_dict){
     $('.modal-title').text(hotels_dict['name']);
 
-    loadImage(hotels_dict['place_id'], "info-modal-img");
+    if(hotels_dict['photo'] != null){
+        document.getElementById("info-modal-img").src = hotels_dict['photo'];
+    }
+
+    else{
+        loadImage(hotels_dict['place_id'], "info-modal-img");
+    }    
     
     $('#modal-info-city').text(hotels_dict['city']);
     $('#modal-info-addr').text(hotels_dict['address']);
@@ -181,7 +177,13 @@ $(function () {
 
         $('.modal-title').text(hotels_dict['name']);
 
-        loadImage(hotels_dict['place_id'], "info-modal-img");
+        if(hotels_dict['photo'] != null){
+            document.getElementById("info-modal-img").src = hotels_dict['photo'];
+        }
+    
+        else{
+            loadImage(hotels_dict['place_id'], "info-modal-img");
+        }    
     
         $('#modal-info-city').text(hotels_dict['city']);
         $('#modal-info-addr').text(hotels_dict['address']);

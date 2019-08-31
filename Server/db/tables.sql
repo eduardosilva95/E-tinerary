@@ -64,7 +64,7 @@ CREATE TABLE Review_POI (
 
 CREATE TABLE Review_Plan (
 	review_id INT NOT NULL,
-    plan_id INT NOT NULL,
+    trip_id INT NOT NULL,
     review_text TEXT,
     review_rating INT NOT NULL,
     review_rating_accessibility INT,
@@ -73,7 +73,7 @@ CREATE TABLE Review_Plan (
     review_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (review_id),
     FOREIGN KEY (review_id) REFERENCES Review(id),
-    FOREIGN KEY (plan_id) REFERENCES Plan(id),
+    FOREIGN KEY (trip_id) REFERENCES Trip(id),
     CHECK(review_rating > 0 and review_rating < 6),
     CHECK(review_rating_accessibility > 0 and review_rating_accessibility < 6),
     CHECK(review_rating_security > 0 and review_rating_security < 6),
@@ -91,12 +91,12 @@ CREATE TABLE Hotel (
 
 CREATE TABLE User_isInterested_Plan (
 	user_id INT NOT NULL,
-    plan_id INT NOT NULL,
+    trip_id INT NOT NULL,
 	isInterested BIT NOT NULL,
-    PRIMARY KEY (user_id, plan_id),
+    PRIMARY KEY (user_id, trip_id),
     FOREIGN KEY (user_id) REFERENCES User(id),
-    FOREIGN KEY (plan_id) REFERENCES Plan(id)
-);*/
+    FOREIGN KEY (trip_id) REFERENCES Trip(id)
+);
 
 CREATE TABLE Photo_POI (
 	photo_id INT AUTO_INCREMENT NOT NULL, 
@@ -107,8 +107,18 @@ CREATE TABLE Photo_POI (
 	PRIMARY KEY (photo_id),
     FOREIGN KEY (user_id) REFERENCES User(id),
     FOREIGN KEY (poi_id) REFERENCES Poi(id)
-);
+);*/
 
+CREATE TABLE Photo_City (
+	photo_id INT AUTO_INCREMENT NOT NULL, 
+    city_id INT NOT NULL,
+    user_id INT NOT NULL,
+    photo_url VARCHAR(255) NOT NULL,
+    photo_timestamp TIMESTAMP DEFAULT current_timestamp,
+	PRIMARY KEY (photo_id),
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (city_id) REFERENCES City(id)
+);
 
 
 

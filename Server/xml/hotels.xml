@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
 <Hotels>
   <Hotel>
-    <Number>14583</Number>
-    <Name>Hotel Novotel Paris les Halles</Name>
-    <Latitude>48.861013</Latitude>
-    <Longitude>2.346493</Longitude>
+    <Number>14306</Number>
+    <Name>HF Ipanema Park</Name>
+    <Latitude>41.15444</Latitude>
+    <Longitude>-8.649802</Longitude>
   </Hotel>
   <Hotel>
-    <Number>14576</Number>
-    <Name>Hotel de Lutèce</Name>
-    <Latitude>48.8524553</Latitude>
-    <Longitude>2.3546496</Longitude>
+    <Number>14301</Number>
+    <Name>Hotel Vila Galé Porto</Name>
+    <Latitude>41.1508296</Latitude>
+    <Longitude>-8.5991137</Longitude>
   </Hotel>
   <Hotel>
-    <Number>14579</Number>
-    <Name>Hotel Du Jeu De Paume</Name>
-    <Latitude>48.8520735</Latitude>
-    <Longitude>2.356212</Longitude>
+    <Number>14307</Number>
+    <Name>Porto Palácio Hotel Congress &amp; Spa</Name>
+    <Latitude>41.1594674</Latitude>
+    <Longitude>-8.6386219</Longitude>
   </Hotel>
 </Hotels>

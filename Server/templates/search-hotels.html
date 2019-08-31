@@ -19,72 +19,70 @@
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script>
 
-    <script type="text/javascript" src="/js/myscript.js"></script> 
     <script type="text/javascript" src="js/login.js"></script>
-
+    <script type="text/javascript" src="js/search.js"></script>   
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     
 
   
   </head>
-  <body onload="loadNavbar();">
+  <body onload="loadNavbar();" style="background-image: url('/img/home-image-4.jpg'); ">
       <!-- header navbar -->
-      <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
-          <a class="navbar-brand" href="./">HomePage</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-              
-                <li class="nav-item">
-                  <a class="nav-link" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
-                </li>
-              
+      <nav class="navbar sticky-top navbar-expand-lg navbar-dark navbar-transparent bg-dark justify-content-between">
+        <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
               <li class="nav-item">
-                <a class="nav-link" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link active" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
-              </li>
-              <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
-                  </a>
-                  <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
-                    <a class="dropdown-item" href="./about-us">Aplicacao</a>
-                    <a class="dropdown-item" href="./help">Help</a>
-                  </div>
-              </li>
-            </ul>
-            <ul class="navbar-nav ml-auto">
-              <li>
-                <div id="login-user">
-                  <div id="login" style="display: none;">
-                    <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
-                  </div>
-                  <div id="profile" class="dropleft" style="display: none;">
-                      <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <img id="user-profile-pic" class="rounded-circle border border-light">
-                      </a>
-                    <div class="dropdown-menu" aria-labelledby="profile-btn">
-                      <a class="dropdown-item" href="#"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                      <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
-                      <div class="dropdown-divider"></div>
-                      <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
-                    </div>   
-                  </div>        
+            
+            <li class="nav-item">
+              <a class="nav-link header active" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
+                </a>
+                <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
+                  <a class="dropdown-item" href="./about-us">Aplicacao</a>
+                  <a class="dropdown-item" href="./help">Help</a>
                 </div>
-              </li>
-            </ul>
-          </div>
+            </li>
+          </ul>
+          <ul class="navbar-nav ml-auto">
+            <li>
+              <div id="login-user">
+                <div id="login" style="display: none;">
+                  <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                </div>
+                <div id="profile" class="dropleft" style="display: none;">
+                  <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <img id="user-profile-pic" class="rounded-circle border border-light">
+                  </a>
+                  <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
+                    <a class="dropdown-item" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                    <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                  </div>   
+                </div>        
+              </div>
+            </li>
+          </ul>
+        </div>
       </nav>
 
 
-        <div class="container-fluid" style="background-image: url('/img/home-image-4.jpg'); background-size: cover;">
+        <div class="container-fluid" style="min-height: 600px;">
           <br><br>
           <div class="row">
               <div class="col-md-1 col-sm-1"></div>
@@ -113,40 +111,48 @@
               </div>
               <div class="col-md-1 col-sm-1"></div>
           </div>
-
-          <br><br>
-
-          <div class="row">
-            <div class="col-md-1 col-sm-1"></div>
-            <div class="col-md-10 col-sm-10">
-                <h3 style="color:white;"><b>Our top destinations</b></h3>
-                <br>
-                <div class="row">
-                    <div class="col-md col-sm-12 cities">
-                        <a href="/hotels?dest=Lisbon"><img class="cities-imgs-2" src="/img/cities/lisbon.jpg"></a>
-                        <h2 class="cities-imgs-label"><span>Lisbon</span></h2>
-                    </div>
-                    <div class="col-md col-sm-12 cities">
-                        <a href="/hotels?dest=Paris"><img class="cities-imgs-2" src="/img/cities/paris.jpg"></a>
-                        <h2 class="cities-imgs-label"><span>Paris</span></h2>
-                    </div>
-                    <div class="col-md col-sm-12 cities">
-                        <a href="/hotels?dest=Rome"><img class="cities-imgs-2" src="/img/cities/rome.jpg"></a>
-                        <h2 class="cities-imgs-label"><span>Rome</span></h2>
-                    </div>
-                    <div class="col-md col-sm-12 cities">
-                        <a href="/hotels?dest=London"><img class="cities-imgs-2" src="/img/cities/london.jpg"></a>
-                        <h2 class="cities-imgs-label"><span>London</span></h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-1 col-sm-1"></div>
-          </div>
-
-          <br><br><br><br>
-
-          
         </div>
+
+          <div class="container-fluid cont" style="background-color: #343a40; ">
+
+            <div class="container cont text-center">
+                <h2 style="color: white; font-weight: bold;">Top Destinations</h2>
+                <p style="color: #fff; font-size: 23px; opacity: .7">Discover the top destinations chosen by our users</p>
+            </div>
+  
+            <div class="row">
+              <div class="col-md-1 col-sm-1"></div>
+              <div class="col-md-10 col-sm-10">
+                  <br>
+                  <div class="row">
+                      <% top_dest.forEach(function(dest) { %>
+                        <a href="/hotels?dest=<%= dest.name %>" class="card-home-link">
+                        <div class="col-md col-sm-12 cont">
+                            <div class="card card-home" style="width: 18rem;">
+                              <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
+                              <div class="card-body">
+                                <h5 class="card-title"><b><%= dest.name %></b></h5>
+                                <% if(dest.plans == 1) { %>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trip planned for <%= dest.name %></p>
+                                <% } else { %>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trips planned for <%= dest.name %></p>
+                                <% } %>
+                              </div>
+                            </div>
+                        </div>
+                        </a>
+                      <% }); %>
+                  </div>
+              </div>
+              <div class="col-md-1 col-sm-1"></div>
+            </div>
+  
+  
+            <br><br><br>
+  
+  
+  
+          </div>
 
         <!-- Login Modal -->
         <div class="modal fade" id="login-modal" role="dialog">

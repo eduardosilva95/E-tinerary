@@ -119,13 +119,35 @@
 
                     <br>
 
+                    <% if(isUserRegistered == true) { %>
+                        <form action="/upload-city-photo" method="POST" enctype="multipart/form-data">
+                            
+                            <input type="text" name="city" value="<%= id %>" style="display: none">
+                            <input type="text" name="name" value="<%= city %>" style="display: none">
+
+                            <div class="input-photo-container">  
+                                <input class="input-photo" id="my-file" type="file" accept="image/*" name="photo" >
+                                <label tabindex="0" for="my-file" class="input-photo-trigger"><i class="fas fa-camera"></i><span style="padding-left: 10px;">Upload photo</span></span></label>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <p class="file-return"></p>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-right" id="update-picture-confirm-btn" style="display: none;">
+                                        <button type="submit" value="upload" class="btn btn-success"><i class="fas fa-check"></i><span style="padding-left: 10px;">Upload</span></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    <% } %>
+                    
+                    <br>
+
 
                     <div class="card" >
                         <div class="card-body" id="place-description">
-
-
                                 <p class="card-text"><%= description %></p>
-                           
                         </div>
                     </div>
                 </div>
@@ -165,6 +187,13 @@
                         <div class="card-body">
                             <h6 class="card-title"><b><%= city %></b> in <span class="logo-letters">e &bull; t</span><span class="logo-letters-2">inerary </span><sup id="input-info-popover"><i class="fas fa-info-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Information provided by our users"></i></sup></h6>
                             <br>
+
+                            <p class="card-text"><i class="fas fa-monument"></i><strong style="padding-left: 10px;">Points of Interest: </strong><span id="" style="padding-left: 10px;"><%= num_pois %></span></p>
+                            
+                            <p class="card-text"><i class="fas fa-bed"></i><strong style="padding-left: 10px;">Hotels: </strong><span id="" style="padding-left: 10px;"><%= num_hotels %></span></p>
+                            
+                            <p class="card-text"><i class="fas fa-map-marked-alt"></i><strong style="padding-left: 10px;">Trips: </strong><span id="" style="padding-left: 10px;"><%= num_trips %></span></p>
+                                      
                         </div>
                     </div>
 
@@ -233,7 +262,7 @@
 
             <h6 class="card-title"><b>Itineraries created for <%= city %></b></h6>
 
-            <% if (plans.length == 0) { %>
+            <% if (trips.length == 0) { %>
                 <br>
                 <div class="text-center" style="margin: auto;">
                     <i class="fas fa-comment-slash fa-3x" style="color: #dddddd;"></i>
@@ -244,13 +273,13 @@
             <% } else { %>
                 <div class="row">
                     <% count = 0 %>
-                    <% plans.forEach(function(plan) { %>
+                    <% trips.forEach(function(trip) { %>
                         <div class="col-md col-12 cont">
                             <div style="width: 255px;" >
-                                <a href="/plan?id=<%= plan.id %>"><img class="card-img-top cities-imgs" id="plans-<%= count %>" src="img/plans/<%= plan.photo %>"></a>
+                                <a href="/plan?id=<%= trip.id %>"><img class="card-img-top cities-imgs" id="plans-<%= count %>" src="img/plans/<%= trip.photo %>"></a>
                                 <br><br>
-                                <a class="city-places-link" href="/plan?id=<%= plan.id %>"><h6><b><%= plan.name %></b></h6></a>
-                                <p class="card-text" style="padding-top: 10px; height: 67.2px; font-size: 14px;"><%= plan.description %></p>
+                                <a class="city-places-link" href="/plan?id=<%= trip.id %>"><h6><b><%= trip.name %></b></h6></a>
+                                <p class="card-text" style="padding-top: 10px; height: 67.2px; font-size: 14px;"><%= trip.description %></p>
                             </div>
                         </div>
                         </a>
@@ -473,11 +502,33 @@
 
   
     <!-- Scripts -->
+    <script type="text/javascript" src="js/upload_photos.js"></script>
     <script>startGoogleSignIn();</script>
+
+    <script>
+        var photos = [];
+
+        '<% photos.forEach(function(photo) { %>'
+            photos.push('<%- JSON.stringify(photo) %>');
+        '<% }); %>'
+
+        loadPhotos(photos);
+    </script>
 
     <script>
         var place_id = "<%= place_id %>";
         getCityDetails(place_id);
+    </script>
+
+    <script>
+        var places = [];
+
+        '<% places.forEach(function(place) { %>'
+            places.push('<%- JSON.stringify(place) %>');
+        '<% }); %>'
+
+        loadPlacesToMap(places);
+
     </script>
 
     

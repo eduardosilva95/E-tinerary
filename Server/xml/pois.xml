@@ -1,52 +1,52 @@
 <?xml version="1.0"?>
 <POIs>
   <POI>
-    <Number>3067</Number>
-    <Name>Eiffel Tower</Name>
-    <Latitude>48.8583701</Latitude>
-    <Longitude>2.2944813</Longitude>
-    <Longitude>2.2944813</Longitude>
+    <Number>14436</Number>
+    <Name>Luís I Bridge</Name>
+    <Latitude>41.1399589</Latitude>
+    <Longitude>-8.6094485</Longitude>
+    <Longitude>-8.6094485</Longitude>
   </POI>
   <POI>
-    <Number>3127</Number>
-    <Name>Louvre Museum</Name>
-    <Latitude>48.8606111</Latitude>
-    <Longitude>2.337644</Longitude>
-    <Longitude>2.337644</Longitude>
+    <Number>14336</Number>
+    <Name>Jardins do Palácio de Cristal</Name>
+    <Latitude>41.1483446</Latitude>
+    <Longitude>-8.6254315</Longitude>
+    <Longitude>-8.6254315</Longitude>
   </POI>
   <POI>
-    <Number>3154</Number>
-    <Name>Disneyland Paris</Name>
-    <Latitude>48.8671769</Latitude>
-    <Longitude>2.7838265</Longitude>
-    <Longitude>2.7838265</Longitude>
+    <Number>14334</Number>
+    <Name>Parque da Cidade do Porto</Name>
+    <Latitude>41.1686739</Latitude>
+    <Longitude>-8.6788358</Longitude>
+    <Longitude>-8.6788358</Longitude>
   </POI>
   <POI>
-    <Number>3161</Number>
-    <Name>Arc de Triomphe</Name>
-    <Latitude>48.8737917</Latitude>
-    <Longitude>2.2950275</Longitude>
-    <Longitude>2.2950275</Longitude>
+    <Number>14382</Number>
+    <Name>Guimarães Castle</Name>
+    <Latitude>41.4478935</Latitude>
+    <Longitude>-8.2903191</Longitude>
+    <Longitude>-8.2903191</Longitude>
   </POI>
   <POI>
-    <Number>3296</Number>
-    <Name>Trocadéro Gardens</Name>
-    <Latitude>48.8615963</Latitude>
-    <Longitude>2.2892823</Longitude>
-    <Longitude>2.2892823</Longitude>
+    <Number>14433</Number>
+    <Name>Casa da Música</Name>
+    <Latitude>41.158881</Latitude>
+    <Longitude>-8.630696</Longitude>
+    <Longitude>-8.630696</Longitude>
   </POI>
   <POI>
-    <Number>3087</Number>
-    <Name>Palace of Versailles</Name>
-    <Latitude>48.8048649</Latitude>
-    <Longitude>2.1203554</Longitude>
-    <Longitude>2.1203554</Longitude>
+    <Number>14438</Number>
+    <Name>Mercado do Bolhão</Name>
+    <Latitude>41.1487167</Latitude>
+    <Longitude>-8.6074698</Longitude>
+    <Longitude>-8.6074698</Longitude>
   </POI>
   <POI>
-    <Number>3265</Number>
-    <Name>Luxembourg Gardens</Name>
-    <Latitude>48.8462217</Latitude>
-    <Longitude>2.3371605</Longitude>
-    <Longitude>2.3371605</Longitude>
+    <Number>14354</Number>
+    <Name>Clérigos Tower</Name>
+    <Latitude>41.1456753</Latitude>
+    <Longitude>-8.6145985</Longitude>
+    <Longitude>-8.6145985</Longitude>
   </POI>
 </POIs>

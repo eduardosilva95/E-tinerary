@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-      <meta charset="utf-8">
-      <meta name="description" content="Nome da aplicação">
-      <meta name="author" content="Eduardo Silva">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="description" content="Nome da aplicação">
+    <meta name="author" content="Eduardo Silva">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-      <title>Simple Map</title>
+    <title>e-tinerary</title>
+    <link rel="icon" href="img/logo-icon.ico">
   
     <!-- Custom styles -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
@@ -17,9 +18,9 @@
 
       
     <!-- Scripts -->
-    
-    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
+
     <!-- Popper.JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
 
@@ -80,9 +81,8 @@
                     </a>
                     <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
                     <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                    <a class="dropdown-item header" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                    <a class="dropdown-item header" href="./trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
                     <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
-                    <a class="dropdown-item header" href="./review-poi"><i class="fas fa-edit"></i><span style="padding-left: 10px;">Review POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
                     <div class="dropdown-divider"></div>
                     <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
                     </div>   
@@ -92,6 +92,7 @@
             </ul>
         </div>
     </nav>
+
 
     <div class="wrapper">
         <!-- Sidebar -->
@@ -112,10 +113,10 @@
                 <% } %>
                 <% day = days[day_no] %>
                 <div class="card card-body" style="height: 70px;">
-                    <div class="row" id="plan-day-<%= day_no %>">
+                    <div class="row" id="trip-day-<%= day_no %>">
                         <div class="col-md-2">
                             <div class="text-center">
-                                <button id="previous-day-btn" class="change-plan-day-btn" onclick="previousDay();"><i class="fas fa-arrow-alt-circle-left fa-lg"></i></button>
+                                <button id="previous-day-btn" class="change-trip-day-btn" onclick="previousDay();"><i class="fas fa-arrow-alt-circle-left fa-lg"></i></button>
                             </div>
                         </div>
                         <div class="col-md-8">
@@ -125,7 +126,7 @@
                         </div>
                         <div class="col-md-2">
                             <div class="text-center">
-                                <button id="next-day-btn" class="change-plan-day-btn" onclick="nextDay();"><i class="fas fa-arrow-alt-circle-right fa-lg"></i></button>
+                                <button id="next-day-btn" class="change-trip-day-btn" onclick="nextDay();"><i class="fas fa-arrow-alt-circle-right fa-lg"></i></button>
                             </div>
                         </div>
                     </div>
@@ -138,6 +139,7 @@
                 <div class="row" style="width: 98%; margin: auto auto auto auto;">
                     <div class="card card-body" style="height: 400px;">
                         <span><h3 style="font-weight: bold; color: black; text-align: center;"><%= name %></h3></span>
+                        <h3 class="text-center"><a href="/city?name=<%= city %>" style="font-style: italic; color: #ffc107;"><%= city %></a></h3>
                         <img style="width: 100%; height: 300px;" id="city-img">
                     </div>
                 </div>
@@ -149,6 +151,7 @@
                     <div class="card card-body">
                         <p><i class="fas fa-calendar-alt"></i><span style="font-weight: bold; padding-left: 10px;">Arrival: </span> <%= start_date %></p>
                         <p><i class="fas fa-calendar-alt"></i><span style="font-weight: bold; padding-left: 10px;">Departure: </span> <%= end_date %></p>
+                        <p><i class="fas fa-user"></i><span style="font-weight: bold; padding-left: 10px;">People: </span> <%= num_persons %></p> 
                     </div>
                 </div>
 
@@ -158,12 +161,12 @@
                             <div class="col-md-6 text-center">
                                 <button class="change-view" onclick="changeView('normal');"><img class="img-responsive change-view-img" src="img/view-normal.jpg" /></button>
                                 <br>
-                                <button class="change-view" onclick="changeView('normal');">Plan & Map view</button>
+                                <button class="change-view" onclick="changeView('normal');">E-tinerary view</button>
                             </div>
                             <div class="col-md-6 text-center">
                                 <button class="change-view" onclick="changeView('full');"><img class="img-responsive change-view-img" src="img/view-full.jpg" /></button>
                                 <br>
-                                <button class="change-view" onclick="changeView('full');">Plan view only</button>
+                                <button class="change-view" onclick="changeView('full');">Plan view</button>
                             </div>
                         </div>
                     </div>
@@ -182,8 +185,10 @@
 
                 
                 <div class="cont text-center form-group">
-                    <button class="btn btn-success" onclick="backToPlan();"><i class="fas fa-undo-alt"></i><span style="padding-left: 10px;">Back to plan</span></button>
-                    <button class="btn btn-danger" id="add-remove-visit-btn"></button>
+                    <button class="btn btn-success" onclick="backToPlan();"><i class="fas fa-undo-alt"></i><span style="padding-left: 10px;">Back to trip</span></button>
+                    <% if(isEditable) { %>
+                        <button class="btn btn-danger" id="add-remove-visit-btn"></button>
+                    <% } %>
                 </div>
 
 
@@ -220,59 +225,80 @@
 
     <!-- Login Modal -->
     <div class="modal fade" id="login-modal" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content" style="width: 400px;">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Login</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                      <img id="profile-img" class="profile-img-card" src="img/login.png" />
-                      <form class="form-signin">
-                        <span id="reauth-email"></span>
-                        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
-                        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-                        <div class="row">
-                            <div class="col-md-6">
-                              <div class="custom-control custom-checkbox" id="remember">
-                                  <input type="checkbox" class="custom-control-input" id="remember-me">
-                                  <label class="custom-control-label" for="remember-me">Remember me</label>
-                              </div>
-                            </div>
-                            <div class="col-md-6 text-right">
-                                <a href="/recover" class="forgot-password">
-                                    Forgot the password?
-                                </a>
+        <div class="modal-dialog">
+            <div class="modal-content" style="width: 400px;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="profile-img" class="profile-img-card" src="img/login.png" />
+                    <form class="form-signin">
+                    <span id="reauth-email"></span>
+                    <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="custom-control custom-checkbox" id="remember">
+                                <input type="checkbox" class="custom-control-input" id="remember-me">
+                                <label class="custom-control-label" for="remember-me">Remember me</label>
                             </div>
                         </div>
-                        <br>
-                        <button class="btn btn-success" type="button" onclick="login();"><i class="fas fa-sign-in-alt"></i><span style="padding-left: 10px">Sign in</span></button>
-                            <!--<button class="btn btn-primary" type="submit"><i class="fas fa-user-plus"></i><span style="padding-left: 10px">Register</span></button>-->
-                        <span>Don't have an account yet? <a href="/register" class="forgot-password">Register now</a></span>
+                        <div class="col-md-6 text-right">
+                            <a href="/recover" class="forgot-password">
+                                Forgot the password?
+                            </a>
+                        </div>
+                    </div>
+                    <br>
+                    <button class="btn btn-success" type="button" onclick="login();"><i class="fas fa-sign-in-alt"></i><span style="padding-left: 10px">Sign in</span></button>
+                        <!--<button class="btn btn-primary" type="submit"><i class="fas fa-user-plus"></i><span style="padding-left: 10px">Register</span></button>-->
+                    <span>Don't have an account yet? <a href="/register" class="forgot-password">Register now</a></span>
+                
+                    </form>
                     
-                      </form>
-                      
-  
-                      <div class="login-or">
-                        <hr class="hr-or">
-                        <span class="span-or">or</span>
-                      </div>
-  
-                      <button class="btn btn-primary btn-facebook" type="submit"><i class="fab fa-facebook-f fa-lg"></i><span style="padding-left: 10px">Log in using Facebook</span></button>
-                      <br><br>
-                                  
-                      <div id="customBtn">
-                          <button class="btn btn-google" type="submit" ><img id="google-signin-icon" src="img/google-icon.png"><span style="padding-left: 10px">Log in using Google</span></button>
-                      </div>
-  
+
+                    <div class="login-or">
+                    <hr class="hr-or">
+                    <span class="span-or">or</span>
                     </div>
-                    <div class="modal-footer">
+
+                    <button class="btn btn-primary btn-facebook" type="submit"><i class="fab fa-facebook-f fa-lg"></i><span style="padding-left: 10px">Log in using Facebook</span></button>
+                    <br><br>
+                                
+                    <div id="customBtn">
+                        <button class="btn btn-google" type="submit" ><img id="google-signin-icon" src="img/google-icon.png"><span style="padding-left: 10px">Log in using Google</span></button>
                     </div>
+
+                </div>
+                <div class="modal-footer">
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Remove Modal -->
+    <div class="modal fade" id="remove-modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Delete visit: <span id="modal-delete-visit-name-title" style="font-weight: bold;"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure that you want to delete <span id="modal-delete-visit-name" style="font-weight: bold;"></span> from the trip ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="confirm-remove-btn" data-dismiss="modal"><i class="fas fa-trash-alt"></i><span style="padding-left: 10px;">Yes</span></button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">No</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -299,12 +325,12 @@
     
     <script>startGoogleSignIn();</script>
     <script>
-        var plan = [];
+        var trip = [];
         var suggested_visits = [];
         var suggested_hotels = [];
         
-        '<% plan.forEach(function(visit) { %>'
-            plan.push('<%- JSON.stringify(visit) %>');
+        '<% trip.forEach(function(visit) { %>'
+            trip.push('<%- JSON.stringify(visit) %>');
         '<% }); %>'
 
         '<% suggested_visits.forEach(function(visit) { %>'
@@ -315,7 +341,7 @@
             suggested_hotels.push('<%- JSON.stringify(hotel) %>');
         '<% }); %>'
 
-        loadPlan(plan, '<%= days %>');
+        loadTrip(trip, '<%= days %>', '<%= days_shortname %>', '<%= travel_mode %>');
         loadSuggestions(suggested_visits);
         loadHotels(suggested_hotels);
     

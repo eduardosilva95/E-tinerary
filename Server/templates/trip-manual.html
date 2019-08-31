@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Nome da aplicação">
+    <meta name="author" content="Eduardo Silva">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>e-tinerary</title>
+    <link rel="icon" href="img/logo-icon.ico">
+
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/v4-shims.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+    
+    <script type="text/javascript" src="js/trip-manual.js"></script>
+    <script type="text/javascript" src="js/login.js"></script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
+    <script type="text/javascript" src="js/map-font-icons.js"></script>
+    <script src="https://apis.google.com/js/platform.js"></script>
+
+    
+  </head>
+  <body onload="loadNavbar();">
+        <!-- header navbar -->
+        <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
+            <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                    <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+                    </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
+                        <a class="dropdown-item header" href="./about-us">Aplicacao</a>
+                        <a class="dropdown-item header" href="./help">Help</a>
+                    </div>
+                </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                <li>
+                    <div id="login-user">
+                    <div id="login" style="display: none;">
+                        <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                    </div>
+                    <div id="profile" class="dropleft" style="display: none;">
+                        <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img id="user-profile-pic" class="rounded-circle border border-light">
+                        </a>
+                        <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
+                        <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                        <a class="dropdown-item header" href="./trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                        <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                        </div>   
+                    </div>        
+                    </div>
+                </li>
+                </ul>
+            </div>
+        </nav>
+
+
+
+        <div class="container-fluid" style="width: 80%;">
+            <div class="cont">
+                <div class="card card-body bg-light">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="text-left">
+                                <h3 id="place_name"><b><%= name %></b></h3>
+                                <p><h8><%= start_date %>  - <%= end_date %></h8></p>
+                                <p><i class="far fa-user"></i><span style="padding-left: 10px;"><%= num_persons %></span></p>                         
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <p><h8>You have <strong><%= total_time %></strong> to save your trip. After the trip is saved, you are still able to edit the itinerary. If you didn't save the trip, the trip will be deleted.</h8></p>
+                            <h8>Time left until the trip is deleted: </h8>
+                            <h3 id="trip-time-left"></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cont">
+                <div class="card card-body bg-light">
+                    <div class="row">
+                        <div class="col-md-3 col-12">
+                            <div class="dropdown" id="add-visit-div">
+                                <button class="btn btn-info dropdown-toggle" type="button" id="add-visit-dropdown-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 
+                                    <i class="fas fa-plus"></i><span style="padding-left: 10px;">Add visit</span>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <button class="dropdown-item" onclick="addVisit('<%= city %>');" style="cursor: pointer;">Add new visit or activity</button>
+                                    <a class="dropdown-item" href="/hotels?dest=<%= city %>">Book an hotel</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <p><h8>Step 2: <b>Choose your visits</b></h8></p>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="progress">
+                                <div id="visits-progress-bar" class="progress-bar progress-bar-striped" role="progressbar" style="width: 0%;" aria-valuenow="<%= num_visits %>" aria-valuemin="0" aria-valuemax="10"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+            
+            <div class="cont">
+                <div class="row">
+                    <div class="col-md-8" style="padding-top: 40px;">
+
+                        <% count = 0 %>
+                        <% trip.forEach(function(visit) { %>
+                            <div id="place-<%= count %>">
+                                <div class="card visit-loaded" style="height: 150px;">
+                                    <div class="row">
+                                        <div class="col-md-4 col-5">
+                                            <img id="place-<%= count %>-img" class="img-fluid visit-img" alt="">
+                                        </div>
+                                        <div class="col-md-8 col-7">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-7">
+                                                        <h6 id="place-<%= count %>-name" class="card-title trip-title" ><b></b></h6>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <div class="text-right">
+                                                            <button type="button" class="manual-remove-trip-icon btn-remove-modal" id="place-<%= count %>-remove" data-toggle="modal" data-target="#remove-modal"><i title="Remove visit" class="fas fa-trash-alt fa-lg" style="padding-left: 10px;"></i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+    
+                                                <div class="row">
+                                                    <div class="col-md-7">
+                                                        <div class="text-left">
+    
+                                                            <span id="place-<%= count %>-type" style="color: #767676;"></span>
+                                                            <p></p>
+    
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-5" style="position: relative;">
+
+                                                        <button type="button" class="manual-info-btn btn-info-modal" id="place-<%= count %>-info" data-toggle="modal" data-target="#info-modal"></button>
+                                                        
+                                                    </div>
+                                                </div>
+    
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                            </div>
+                            <% count = count + 1 %>
+                        <% }); %>
+                        
+                    </div>
+                    
+                    
+                    <!-- Sugestions div -->
+                    <div class="col-md-4" style="padding-top: 40px;">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title text-center"><b>Visit also in <%= city %></b></h5>
+                                <% count = 0 %>
+                                <% suggested_visits.forEach(function(visit) { %>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <% if(visit.photo != null) { %>
+                                                <a href="/place?id=<%= visit.id %>&trip=<%= trip_id %>" class="suggestions-title"><img id="suggested-visit-<%= count %>" class="card-img suggestions-img" src="<%= visit.photo %>"></a>
+                                            <% } else { %>
+                                                <a href="/place?id=<%= visit.id %>&trip=<%= trip_id %>" class="suggestions-title"><img id="suggested-visit-<%= count %>" class="card-img suggestions-img"></a>
+                                                <script>
+                                                    loadImage("<%= visit.place_id %>", "suggested-visit-<%= count %>");
+                                                </script>
+                                            <% } %>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <a href="/place?id=<%= visit.id %>&trip=<%= trip_id %>" class="suggestions-title"><%= visit.name %></a>
+                                            <br>
+                                            <span style="color: #767676;"><%= visit.poi_type %></span>
+                                        </div>
+                                    </div>
+                                    
+                                    
+
+                                    <br>
+
+                                    <hr class="hr-suggest">
+
+
+                                   
+
+                                    <% count = count + 1 %>
+                                <% }); %>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title text-center"><b>Hotels and accomodations in <%= city %></b></h5>
+                                <% count = 0 %>
+                                <% suggested_hotels.forEach(function(visit) { %>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <% if(visit.photo != null) { %>
+                                                <a href="/place?id=<%= visit.id %>&trip=<%= trip_id %>" class="suggestions-title"><img id="suggested-hotel-<%= count %>" class="card-img suggestions-img" src="<%= visit.photo %>"></a>
+                                            <% } else { %>
+                                                <a href="/place?id=<%= visit.id %>&trip=<%= trip_id %>" class="suggestions-title"><img id="suggested-hotel-<%= count %>" class="card-img suggestions-img"></a>
+                                                <script>
+                                                    loadImage("<%= visit.place_id %>", "suggested-hotel-<%= count %>");
+                                                </script>
+                                            <% } %>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <a href="/place?id=<%= visit.id %>&trip=<%= trip_id %>" class="suggestions-title"><%= visit.name %></a>
+                                            <br>
+                                            <span style="color: #767676;"><%= visit.poi_type %></span>
+                                        </div>
+                                    </div>
+
+                                    <br>
+
+
+                                    <hr class="hr-suggest">
+
+
+                                    <% count = count + 1 %>
+                                <% }); %>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <br><br>
+
+            <div class="card card-body bg-light">
+                <div class="row">
+                    <div class="col-md-6 col-12">
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <div class="form-group text-right">
+                            <button type="button" class="btn btn-danger btn-remove-trip-modal" data-toggle="modal" data-target="#remove-trip-modal" data-name="<%= name %>" data-id="<%= trip_id %>"><i title="Delete trip" class="fas fa-trash-alt fa-lg"></i><span style="padding-left: 10px;">Delete Trip</span></button>
+                            <button type="button" class="btn btn-success" onclick="saveTrip();"><i class="fas fa-save"></i><span style="padding-left: 10px;">Save Trip</span></button>                
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <br><br>
+        
+        </div>
+
+        <!-- Login Modal -->
+        <div class="modal fade" id="login-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content" style="width: 400px;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                      <img id="profile-img" class="profile-img-card" src="img/login.png" />
+                      <form class="form-signin">
+                        <span id="reauth-email"></span>
+                        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                              <div class="custom-control custom-checkbox" id="remember">
+                                  <input type="checkbox" class="custom-control-input" id="remember-me">
+                                  <label class="custom-control-label" for="remember-me">Remember me</label>
+                              </div>
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <a href="/recover" class="forgot-password">
+                                    Forgot the password?
+                                </a>
+                            </div>
+                        </div>
+                        <br>
+                        <button class="btn btn-success" type="button" onclick="login();"><i class="fas fa-sign-in-alt"></i><span style="padding-left: 10px">Sign in</span></button>
+                            <!--<button class="btn btn-primary" type="submit"><i class="fas fa-user-plus"></i><span style="padding-left: 10px">Register</span></button>-->
+                        <span>Don't have an account yet? <a href="/register" class="forgot-password">Register now</a></span>
+                    
+                      </form>
+                      
+  
+                      <div class="login-or">
+                        <hr class="hr-or">
+                        <span class="span-or">or</span>
+                      </div>
+  
+                      <button class="btn btn-primary btn-facebook" type="submit"><i class="fab fa-facebook-f fa-lg"></i><span style="padding-left: 10px">Log in using Facebook</span></button>
+                      <br><br>
+                                  
+                      <div id="customBtn">
+                          <button class="btn btn-google" type="submit" ><img id="google-signin-icon" src="img/google-icon.png"><span style="padding-left: 10px">Log in using Google</span></button>
+                      </div>
+  
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Info Modal -->
+        <div class="modal fade" id="info-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <img id="info-modal-img" height="200px;">
+                        </div>
+                        <br><br>
+
+                        <nav class="nav nav-pills flex-column flex-sm-row">
+                            <a class="flex-sm-fill text-sm-center nav-link tab active" id="pills-general-info-tab" data-toggle="pill" href="#place-info" role="tab" aria-controls="place-info" aria-selected="true">General Information</a>
+                            <a class="flex-sm-fill text-sm-center nav-link tab" id="pills-more-info-tab" data-toggle="pill" href="#place-more-info" role="tab" aria-controls="place-more-info" aria-selected="false">More info</a>
+                        </nav>
+
+                        <br>
+
+                        <div class="tab-content" id="pills-tabContent">
+                            <div class="tab-pane fade show active" id="place-info" role="tabpanel" aria-labelledby="pills-general-info-tab">
+                                <ul>
+                                    <li><strong><i class="fas fa-city"></i> City: </strong><p id="modal-info-city"></p></li>
+                                    <li><strong><i class="fas fa-map-marker-alt"></i> Address: </strong><p id="modal-info-addr"></p></li>
+                                    <li><strong><i class="fas fa-map-pin"></i> Coordinates: </strong><p id="modal-info-coord"></p></li>
+                                    <li><strong><i class="fas fa-phone"></i> Phone number: </strong><p id="modal-info-phone"></p></li>
+                                    <li><strong><i class="fas fa-globe-europe"></i> Website: </strong><br><a id="modal-info-website" target="_blank"></a></li>
+                                </ul>
+                            </div>
+
+                            <div class="tab-pane fade" id="place-more-info" role="tabpanel" aria-labelledby="pills-more-info-tab">
+                                <ul>
+                                    <li><strong><i class="fas fa-map-marked-alt"></i> Trips: </strong><p id="modal-info-number-trips"></p></li>
+                                    <li><strong>
+                                        <i class="fas fa-star"></i> Rating: </strong>
+                                        <div class="place-etinerary-div" id="place-rating">
+                                            
+                                        </div>
+                                    </li>
+                                    <li><strong>
+                                        <i class="fab fa-accessible-icon"></i> Accessibility: </strong>
+                                        <div class="place-etinerary-div" id="place-accessibility">
+                                        </div>
+                                    </li>
+                                    <li><strong>
+                                        <i class="fas fa-lock"></i> Security: </strong>
+                                        <div class="place-etinerary-div" id="place-security">
+                                        </div>
+                                    </li>
+                                    <li><strong><i class="far fa-clock"></i> Duration: </strong><p id="modal-info-duration"></p></li>
+                                    <li><strong><i class="fas fa-euro-sign"></i> Price: </strong><p id="modal-info-price"></p></li>                                   
+                                </ul>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button id="modal-find-more-btn" type="button" class="btn btn-warning" style="color: white;" data-dismiss="modal"><i class="fas fa-search"></i><span style="padding-left: 10px;">Find out more</span></button>
+                        <button id="add-visit-btn" type="button" class="btn btn-success" style="color: white; display: none;" data-dismiss="modal"><i class="fas fa-calendar-alt"></i><span style="padding-left: 10px;">Add to the trip</span></button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Close</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Remove Modal -->
+        <div class="modal fade" id="remove-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Delete visit</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure that you want to delete <span id="modal-delete-visit-name" style="font-weight: bold;"></span> from the trip ?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" id="confirm-remove-btn" data-dismiss="modal"><i class="fas fa-trash-alt"></i><span style="padding-left: 10px;">Yes</span></button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">No</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Remove Trip Modal -->
+        <div class="modal fade" id="remove-trip-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Delete trip: <span id="modal-delete-trip-title"><%= name %></span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure that you want to delete your trip <span id="modal-delete-trip-name" style="font-weight: bold;"><%= name %></span> ?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" onclick="deleteTrip();" id="confirm-remove-trip-btn"><i class="fas fa-trash-alt"></i><span style="padding-left: 10px;">Yes</span></button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">No</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
+
+        <!-- Footer -->
+        <footer class="footer">
+          <!-- Footer Elements -->
+
+          <div id="social">
+              <a class="facebookBtn smGlobalBtn" href="#" ></a>
+              <a class="twitterBtn smGlobalBtn" href="#" ></a>
+              <a class="googleplusBtn smGlobalBtn" href="#" ></a>
+              <a class="linkedinBtn smGlobalBtn" href="#" ></a>
+              <a class="instagramBtn smGlobalBtn" href="#" ></a>
+            </div>
+            <!-- Footer Elements -->
+        
+            <!-- Copyright -->
+            <div class="footer-copyright"> 2019 Copyright:
+              <a href="">&copy; Aplicacao, todos os direitos reservados</a>
+            </div>
+
+        </footer>
+        <!-- Footer -->
+
+    <!-- Scripts -->
+    <script>startGoogleSignIn();</script>
+    <script>
+        var trip = [];
+        var suggested_visits = [];
+        var suggested_hotels = [];
+        
+        '<% trip.forEach(function(visit) { %>'
+            trip.push('<%- JSON.stringify(visit) %>');
+        '<% }); %>'
+
+        '<% suggested_visits.forEach(function(visit) { %>'
+            suggested_visits.push('<%- JSON.stringify(visit) %>');
+        '<% }); %>'
+
+        '<% suggested_hotels.forEach(function(hotel) { %>'
+            suggested_hotels.push('<%- JSON.stringify(hotel) %>');
+        '<% }); %>'
+
+
+        loadTrip(trip, '<%= days %>', '<%= days_shortname %>', '<%= travel_mode %>');
+        loadSuggestions(suggested_visits);
+        loadHotels(suggested_hotels);
+    
+    </script>
+
+    <script>
+        loadProgressBar('<%= num_visits %>', 10);
+        setExperationTimeText('<%= expiration_time %>');
+    </script>
+
+  </body>
+</html>

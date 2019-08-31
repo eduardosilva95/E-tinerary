@@ -731,11 +731,11 @@ hr {
 }
 
 
-.input-poi-photo-container {
+.input-photo-container {
   width: 160px;
 } 
 
-.js .input-poi-photo-trigger {
+.js .input-photo-trigger {
   display: block;
   padding: 14px 15px;
   background: #34495E;
@@ -745,7 +745,7 @@ hr {
   cursor: pointer;
   border-radius: .25rem;
 }
-.js .input-poi-photo{
+.js .input-photo{
   position: absolute;
   top: 0; left: 0;
   width: 225px;
@@ -754,10 +754,10 @@ hr {
   cursor: pointer;
 }
 
-.js .input-poi-photo:hover + .input-poi-photo-trigger,
-.js .input-poi-photo:focus + .input-poi-photo-trigger,
-.js .input-poi-photo-trigger:hover,
-.js .input-poi-photo-trigger:focus {
+.js .input-photo:hover + .input-photo-trigger,
+.js .input-photo:focus + .input-photo-trigger,
+.js .input-photo-trigger:hover,
+.js .input-photo-trigger:focus {
   background: #ffc107;
   color: #34495E;
 }
@@ -971,7 +971,7 @@ hr {
 
 
 
-.change-plan-day-btn {
+.change-trip-day-btn {
   background-color: transparent; /* Blue background */
   border: none; /* Remove borders */
   color: #ffc107; /* White text */
@@ -980,11 +980,11 @@ hr {
 }
 
 /* Darker background on mouse-over */
-.change-plan-day-btn:hover {
+.change-trip-day-btn:hover {
   color: #f4a029;
 }
 
-.change-plan-day-btn:disabled{
+.change-trip-day-btn:disabled{
   color: #e5e2be;
   cursor: default;
 }
@@ -1020,13 +1020,13 @@ hr {
 	border: 3px solid #ffc107;
 }
 
-#plan-link-hotels {
+#trip-link-hotels {
   padding-left: 10px; 
   color: #767676; 
   font-size: 14px;
 }
 
-#plan-link-hotels:hover {
+#trip-link-hotels:hover {
   text-decoration: none;
   opacity: 0.7;
 }
@@ -1045,7 +1045,7 @@ hr {
 }
 
 .suggestions-img{
-  max-height: 300px;
+  max-height: 150px;
 }
 
 .suggestions-img:hover{
@@ -1126,7 +1126,7 @@ hr {
   opacity: 0.6;
 }
 
-.plan-title{
+.trip-title{
   display: -webkit-box; -webkit-line-clamp: 2; 
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -1136,11 +1136,42 @@ hr {
   line-height: 1.3em;
 }
 
+.trip-visits-count {
+  font-style: italic;
+  color: green;
+  font-size: 20px;
+}
 
 
 .visit-loaded {
   opacity: 0;
 }
+
+.manual-remove-trip-icon{
+  background-color: transparent;
+  color: #dc3545;
+  border: none;
+}
+
+.manual-remove-trip-icon:hover:enabled{
+  color: #bd2130;;
+}
+
+.manual-info-btn{
+  font-style: italic;
+  background-color: transparent;
+  color: #f4a029;
+  border: none;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+
+.manual-info-btn:hover {
+  color: #ffc107;
+}
+
 
 
 #sideb, #map {
@@ -1296,7 +1327,7 @@ table tr td a{
 /* ---------------------------------- DISCOVER ------------------------------ */
 
 .discover-search{
-  width: 60%;
+  width: 100%;
   margin: auto;
 }
 

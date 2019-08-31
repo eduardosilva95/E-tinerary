@@ -30,7 +30,7 @@
 
   
   </head>
-  <body onload="loadNavbar();" style="background-image: url('/img/home-image.jpg');">
+  <body onload="loadNavbar();" style="background-image: url('/img/home-image.jpg'); background-size: 100%; height: 1100px">
         <!-- header navbar -->
         <nav class="navbar sticky-top navbar-expand-lg navbar-dark navbar-transparent bg-dark justify-content-between">
             <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
@@ -97,12 +97,16 @@
                 <br>
 
                 <div class="text-center">
-                    <h2 style="color: #ffc107; font-weight: bold;">Create your plan</h2>
+                    <h2 style="color: #ffc107; font-weight: bold;">Create your trip</h2>
                 </div>
 
-                <br><br>
+                <br>
+                
+                <p><h8 style="color: #ffc107; padding-left: 15px;">Step 1: <b>Select a destination, dates, number of persons and travel mode</b></h8></p>
 
-                <form autocomplete="off" id="search-form" method="POST" action="/create-plan-m">
+                <br>
+
+                <form autocomplete="off" id="search-form" method="POST" action="/create-trip-m">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group autocomplete fg">
@@ -123,7 +127,7 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <label class="mr-2" for="select-adults" style="color: #ffc107; font-weight: bold;">Adults</label>
-                                        <select class="custom-select mr-sm-2" id="select-adults">
+                                        <select class="custom-select mr-sm-2" id="select-adults" name="adults">
                                             <option selected value="1">1</option>
                                             <option value="2">2</option>
                                             <option value="3">3</option>
@@ -136,7 +140,7 @@
                                     </div>
                                     <div class="col-sm-6">
                                         <label class="my-1 mr-2" for="select-children" style="color:#ffc107; font-weight: bold;">Children <sup id="input-info-popover"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Children to 12 years old"></i></sup></label>
-                                        <select class="custom-select mr-sm-2" id="select-children">
+                                        <select class="custom-select mr-sm-2" id="select-children" name="children">
                                             <option selected value="0">0</optsion>
                                             <option value="1">1</option>
                                             <option value="2">2</option>
@@ -187,26 +191,26 @@
 
                         </div>
                     </div>
-
+                    
                     <div class="form-group fg">
                         <legend style="color: #ffc107; font-size: 1rem; font-weight: bold;">How to move: </legend>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="check-move-car" name="travel_mode">
+                            <input type="radio" class="custom-control-input" id="check-move-car" name="travel_mode" value="driving" checked>
                             <label class="custom-control-label" for="check-move-car" style="color: white; font-size: 1rem;"><i class="fas fa-car"></i><span style="padding-left: 10px;">Car</span></label>
                         </div>
     
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="check-move-foot" name="travel_mode">
+                            <input type="radio" class="custom-control-input" id="check-move-foot" name="travel_mode" value="walking">
                             <label class="custom-control-label" for="check-move-foot" style="color: white; font-size: 1rem;"><i class="fas fa-walking"></i><span style="padding-left: 10px;">On foot</span></label>
                         </div>
     
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="check-move-public" name="travel_mode">
+                            <input type="radio" class="custom-control-input" id="check-move-public" name="travel_mode" value="transit">
                             <label class="custom-control-label" for="check-move-public" style="color: white; font-size: 1rem;"><i class="fas fa-bus"></i><span style="padding-left: 10px;">Public Transportations</span></label>
                         </div>
     
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="check-move-bike" name="travel_mode">
+                            <input type="radio" class="custom-control-input" id="check-move-bike" name="travel_mode" value="bicycling">
                             <label class="custom-control-label" for="check-move-bike" style="color: white; font-size: 1rem;"><i class="fas fa-bicycle"></i><span style="padding-left: 10px;">Bicycle</span></label>
                         </div>
                     </div>
