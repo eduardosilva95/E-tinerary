@@ -6,7 +6,8 @@
     <meta name="author" content="Eduardo Silva">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Simple Map</title>
+    <title>e-tinerary</title>
+    <link rel="icon" href="img/logo-icon.ico">
 
     <!-- Custom styles -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
@@ -21,7 +22,9 @@
 
     <script type="text/javascript" src="js/login.js"></script> 
     <script type="text/javascript" src="js/search.js"></script>    
+
     <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
     
 
   
@@ -31,19 +34,19 @@
       <nav class="navbar sticky-top navbar-expand-lg navbar-dark navbar-transparent bg-dark justify-content-between">
         <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ml-auto">
-              <li class="nav-item">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
                 <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
-              </li>
+                </li>
             
             <li class="nav-item">
-              <a class="nav-link header active" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+                <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
@@ -53,31 +56,32 @@
                     <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
                 </a>
                 <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
-                  <a class="dropdown-item" href="./about-us">Aplicacao</a>
-                  <a class="dropdown-item" href="./help">Help</a>
+                    <a class="dropdown-item header" href="./about-us">Aplicacao</a>
+                    <a class="dropdown-item header" href="./help">Help</a>
                 </div>
             </li>
-          </ul>
-          <ul class="navbar-nav ml-auto">
+            </ul>
+            <ul class="navbar-nav ml-auto">
             <li>
-              <div id="login-user">
+                <div id="login-user">
                 <div id="login" style="display: none;">
-                  <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                    <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
                 </div>
                 <div id="profile" class="dropleft" style="display: none;">
-                  <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <img id="user-profile-pic" class="rounded-circle border border-light">
-                  </a>
-                  <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
-                    <a class="dropdown-item" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                    <a class="dropdown-item" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                    <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img id="user-profile-pic" class="rounded-circle border border-light">
+                    </a>
+                    <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
+                    <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                    <a class="dropdown-item header" href="./trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                    <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
                     <div class="dropdown-divider"></div>
-                    <button class="dropdown-item" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
-                  </div>   
+                    <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                    </div>   
                 </div>        
-              </div>
+                </div>
             </li>
-          </ul>
+            </ul>
         </div>
       </nav>
 
@@ -123,25 +127,34 @@
 
           <div class="row">
             <div class="col-md-1 col-sm-1"></div>
-            <div class="col-md-10 col-sm-10">
+            <div class="col-md-10 col-sm-10" >
                 <br>
                 <div class="row">
+                    <% count = 0 %>
                     <% top_dest.forEach(function(dest) { %>
                       <a href="/city?name=<%= dest.name %>" class="card-home-link">
-                      <div class="col-md col-sm-12 cont">
+                      <div class="col-md-3 col-sm-12 cont">
                           <div class="card card-home" style="width: 18rem;">
-                            <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
+                            <% if(dest.photo == null) { %>
+                              <img class="card-img-top cities-imgs" id="top-city-img-<%= count %>">
+                            <% } else { %>
+                                <img class="card-img-top cities-imgs" id="top-city-img-<%= count %>" src="<%= dest.photo %>">
+                            <% } %>
                             <div class="card-body">
                               <h5 class="card-title"><b><%= dest.name %></b></h5>
-                              <% if(dest.plans == 1) { %>
-                                <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trip planned for <%= dest.name %></p>
+                              <% if(dest.trips == 1) { %>
+                                <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trip planned for <%= dest.name %></p>
                               <% } else { %>
-                                <p class="card-text" style="padding-top: 10px;"><%= dest.plans %> trips planned for <%= dest.name %></p>
+                                <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trips planned for <%= dest.name %></p>
                               <% } %>
                             </div>
                           </div>
                       </div>
                       </a>
+                      <script>
+                          loadPlaceImage("top-city-img-<%= count %>", '<%= dest.place_id %>');
+                      </script> 
+                      <% count = count + 1 %>
                     <% }); %>
                 </div>
             </div>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<Hotels>
+  <Hotel>
+    <Number>6434</Number>
+    <Name>Sheraton Lisboa Hotel &amp; Spa</Name>
+    <Latitude>38.731753</Latitude>
+    <Longitude>-9.1469952</Longitude>
+  </Hotel>
+  <Hotel>
+    <Number>6424</Number>
+    <Name>Tivoli Avenida Liberdade Lisboa</Name>
+    <Latitude>38.7209997</Latitude>
+    <Longitude>-9.1469657</Longitude>
+  </Hotel>
+  <Hotel>
+    <Number>6431</Number>
+    <Name>Hotel ibis Lisboa Centro Saldanha</Name>
+    <Latitude>38.73183</Latitude>
+    <Longitude>-9.141921</Longitude>
+  </Hotel>
+</Hotels>

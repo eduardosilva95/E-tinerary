@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<Hotels>
+  <Hotel>
+    <Number>4760</Number>
+    <Name>QUINTA DAS LÁGRIMAS</Name>
+    <Latitude>40.197625</Latitude>
+    <Longitude>-8.432693</Longitude>
+  </Hotel>
+  <Hotel>
+    <Number>4763</Number>
+    <Name>Hotel Ibis Coimbra Centro</Name>
+    <Latitude>40.2052767</Latitude>
+    <Longitude>-8.4267832</Longitude>
+  </Hotel>
+  <Hotel>
+    <Number>4765</Number>
+    <Name>Hotel Dona Inês</Name>
+    <Latitude>40.2145905</Latitude>
+    <Longitude>-8.4361936</Longitude>
+  </Hotel>
+</Hotels>

@@ -117,8 +117,8 @@ function readURL(input) {
     }
 }
 
-var fileInput = document.querySelector( ".input-poi-photo" );  
-var button  = document.querySelector( ".input-poi-photo-trigger");
+var fileInput = document.querySelector( ".input-photo" );  
+var button  = document.querySelector( ".input-photo-trigger");
 var the_return = document.querySelector(".file-return");
 
 button.addEventListener("keydown", function( event ) {  
@@ -154,43 +154,7 @@ function loadCities(cities){
 
 $(function () {
     $('#input-google-place-id').focusout(function() {
-
-        var request = {
-            placeId: $('#input-google-place-id').val(),
-            fields: ["formatted_address", "formatted_phone_number", "website", "rating", "user_ratings_total", "geometry"]
-        };
-      
-      
-        var service = new google.maps.places.PlacesService(document.createElement('places-map'));
-    
-        service.getDetails(request, function(place, status) {
-            if (status === google.maps.places.PlacesServiceStatus.OK) {
-        
-                if(place.formatted_address != null)
-                    $('#input-poi-address').val(place.formatted_address);
-
-                if(place.website != null)
-                    $('#input-poi-website').val(place.website);
-
-                if(place.formatted_phone_number != null)
-                    $('#input-poi-phone').val(place.formatted_phone_number);
-
-                if(place.rating != null)
-                    $('#input-google-rating').val(place.rating);
-
-                if(place.user_ratings_total != null)
-                    $('#input-google-reviews').val(place.user_ratings_total);
-
-                if(place.geometry.location != null){
-                    $('#input-poi-latitude').val(place.geometry.location.lat);
-                    $('#input-poi-longitude').val(place.geometry.location.lng);
-                    marker.setPosition(new google.maps.LatLng($('#input-poi-latitude').val(), $('#input-poi-longitude').val()));
-                    map.setCenter(new google.maps.LatLng($('#input-poi-latitude').val(), $('#input-poi-longitude').val()));
-                }
-
-
-            }
-        });
+        autoCompleteData();
     });
 
     $('#input-poi-latitude').focusout(function() {
@@ -206,10 +170,131 @@ $(function () {
 
 });
 
+function autoCompleteData(){
+    var request = {
+        placeId: $('#input-google-place-id').val(),
+        fields: ["formatted_address", "formatted_phone_number", "website", "rating", "user_ratings_total", "geometry", "name"]
+    };
+  
+  
+    var service = new google.maps.places.PlacesService(document.createElement('places-map'));
+
+    service.getDetails(request, function(place, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+    
+            if(place.formatted_address != null)
+                $('#input-poi-address').val(place.formatted_address);
+            else
+                $('#input-poi-address').val('');
+
+            if(place.website != null)
+                $('#input-poi-website').val(place.website);
+            else
+                $('#input-poi-website').val('');
+
+            if(place.formatted_phone_number != null)
+                $('#input-poi-phone').val(place.formatted_phone_number);
+            else
+                $('#input-poi-phone').val('');
+
+            if(place.rating != null)
+                $('#input-google-rating').val(place.rating);
+            else
+                $('#input-google-rating').val('');
+
+            if(place.user_ratings_total != null)
+                $('#input-google-reviews').val(place.user_ratings_total);
+            else
+                $('#input-google-reviews').val('');
+
+            if(place.geometry.location != null){
+                $('#input-poi-latitude').val(place.geometry.location.lat);
+                $('#input-poi-longitude').val(place.geometry.location.lng);
+                marker.setPosition(new google.maps.LatLng($('#input-poi-latitude').val(), $('#input-poi-longitude').val()));
+                map.setCenter(new google.maps.LatLng($('#input-poi-latitude').val(), $('#input-poi-longitude').val()));
+            }
+
+            if(place.name != null){
+                $('#input-poi-title').val(place.name);
+            }
+
+
+        }
+    });
+}
+
+
+function searchID(){
+    var poi_name = $("#input-poi-title-for-id-search").val();
+
+    if(poi_name != ''){
+        var request = {
+            query: poi_name
+        };
+    
+        var service = new google.maps.places.PlacesService(document.createElement('places-map'));
+    
+        service.textSearch(request, function(results, status) {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                if(results.length > 0 && results[0].place_id != null){
+                    $("#input-google-place-id").val(results[0].place_id);
+                    autoCompleteData();
+                }
+
+                else{
+                    $("#input-google-place-id").val('None');
+                }
+            }
+
+            else{
+                $("#input-google-place-id").val('None');
+            }
+
+        });
+    }
+
+    else{
+        $("#input-google-place-id").val('None');
+    }
+}
+
+$(function () {
+    $('#input-poi-type').on('change', function() {
+        if(this.value == 'Other'){
+            $("#div-other-type").css("display", "block");
+        }
+        else{
+            $("#div-other-type").css("display", "none");
+        }
+    });
+});
+
+
+
+
 
 function verify(){
+    var poi_type = $("#input-poi-type").val();
+    var city = $("#input-poi-city").val();
+
+    if(poi_type == 'Select a category' || poi_type == '' || poi_type == undefined){
+        alert("Must specify a category");
+        return false;
+    }
+
+    else if(poi_type == 'Other'){
+        var other_poi_type = $("#input-other-poi-type").val();
+        if(other_poi_type == ''){
+            alert("Must specify an other category");
+            return false;
+        }
+    }
 
 
+    if(city == 'Select a city' || city == '' || city == undefined){
+        alert("Must specify a city");
+        return false;
+    }
 
     return true;
 }

@@ -393,6 +393,8 @@ function queryPlace(){
 
   var href = new URL(window.location.href);
   href.searchParams.set('query', query);
+
+  href.searchParams.delete('page');
   
   window.location.href = href;
 
@@ -642,6 +644,12 @@ function loadSortOption(){
     
   }
 
+  else if(href.searchParams.get('sort') == "reviews"){
+    $("#sort-reviews-btn").addClass("active");
+    $("#sort-reviews-btn").prop("disabled",true);
+    
+  }
+
   else{
     $("#sort-num-reviews-btn").addClass("active");
     $("#sort-num-reviews-btn").prop("disabled",true);
@@ -651,7 +659,7 @@ function loadSortOption(){
 
 
 $( function() {
-  $( "#slider-range" ).slider({
+  $( "#slider-rating-range" ).slider({
     range: true,
     min: 1.0,
     max: 5.0,
@@ -662,9 +670,10 @@ $( function() {
     }
   });
   
-  $("#rating-range").val($("#slider-range").slider("values", 0).toFixed(1) +
-    " - " + $("#slider-range").slider("values", 1).toFixed(1));
+  $("#rating-range").val($("#slider-rating-range").slider("values", 0).toFixed(1) +
+    " - " + $("#slider-rating-range").slider("values", 1).toFixed(1));
 } );
+
 
 $(function () {
   $("#places-filter-btn" ).click(function() {
@@ -700,6 +709,8 @@ $(function () {
       document.cookie = "others_filter=" + false;
 
     document.cookie = "rating_range_filter=" + $("#rating-range").val();
+
+    document.cookie = "reviews_range_filter=" + $("#reviews-range").val()
   
 
     window.location.reload();
@@ -769,19 +780,47 @@ function loadFilters(){
 
   var rating_range_filter = loadFilterCookie("rating_range_filter");
 
-
   if(rating_range_filter != null){
     $("#rating-range").val(rating_range_filter);
 
-    $( "#slider-range" ).slider({
+    $( "#slider-rating-range" ).slider({
       values: [rating_range_filter.split('-')[0], rating_range_filter.split('-')[1]]
     });
   }
 
   document.cookie = "rating_range_filter=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
+  var reviews_range_filter = loadFilterCookie("reviews_range_filter");
+
+  if(reviews_range_filter != null){
+    $("#reviews-range").val(reviews_range_filter);
+
+    $( "#slider-reviews-range" ).slider({
+      values: [reviews_range_filter.split('-')[0], reviews_range_filter.split('-')[1]]
+    });
+  }
+
+  document.cookie = "reviews_range_filter=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
 }
 
 $(function () {
   $('[data-toggle="popover"]').popover()
 })
+
+
+function loadNumMaxReviews(num_max_reviews){
+  $( "#slider-reviews-range" ).slider({
+    range: true,
+    min: 0,
+    max: num_max_reviews,
+    step: 1,
+    values: [0, num_max_reviews],
+    slide: function( event, ui ) {
+      $("#reviews-range").val(ui.values[0] + " - " + ui.values[1]);
+    } 
+  });
+
+  $("#reviews-range").val($("#slider-reviews-range").slider("values", 0) +
+    " - " + $("#slider-reviews-range").slider("values", 1));
+}

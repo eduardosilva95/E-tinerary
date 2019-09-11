@@ -6,7 +6,8 @@
     <meta name="author" content="Eduardo Silva">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Simple Map</title>
+    <title>e-tinerary</title>
+    <link rel="icon" href="img/logo-icon.ico">
 
     <!-- Custom styles -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
@@ -23,6 +24,7 @@
     <script type="text/javascript" src="js/login.js"></script>
     
     <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
     
   </head>
   <body onload="loadNavbar();">
@@ -35,7 +37,7 @@
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                  <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+                  <a class="nav-link header active" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
                 </li>
               
               <li class="nav-item">
@@ -87,15 +89,16 @@
                 <br><br>
                 
                 <div class="text-center">
-                    <img src="/img/success.jpg" title="success" />
-                    <br><br>
-                    <h3><span>Your plan was successfully created.</span></h3>
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-user-slash fa-10x"></i>
+                        <br><br><br>
+                        <h2>Login is required to see this page. </h2>
+                    </div>
                     <br>
-                    <a href="/plan?id=<%= plan %>"><button class="btn btn-success" >See plan</button></a>
                     
                 </div>
 
-                <br><br><br><br><br><br><br>
+                <br><br><br><br><br>
 
         </div>
 

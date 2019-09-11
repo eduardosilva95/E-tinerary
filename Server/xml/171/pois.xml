@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<POIs>
+  <POI>
+    <Number>4798</Number>
+    <Name>Mata Nacional do Choupal</Name>
+    <Latitude>40.2222536</Latitude>
+    <Longitude>-8.4438944</Longitude>
+    <Longitude>-8.4438944</Longitude>
+  </POI>
+  <POI>
+    <Number>4854</Number>
+    <Name>Igreja de Santa Cruz</Name>
+    <Latitude>40.2109418</Latitude>
+    <Longitude>-8.4287188</Longitude>
+    <Longitude>-8.4287188</Longitude>
+  </POI>
+  <POI>
+    <Number>4793</Number>
+    <Name>Mondego Green Park</Name>
+    <Latitude>40.2018274</Latitude>
+    <Longitude>-8.4256883</Longitude>
+    <Longitude>-8.4256883</Longitude>
+  </POI>
+  <POI>
+    <Number>4873</Number>
+    <Name>National Museum Machado de Castro</Name>
+    <Latitude>40.208962</Latitude>
+    <Longitude>-8.4255117</Longitude>
+    <Longitude>-8.4255117</Longitude>
+  </POI>
+  <POI>
+    <Number>4794</Number>
+    <Name>Quinta da Paiva</Name>
+    <Latitude>40.0821292</Latitude>
+    <Longitude>-8.3330465</Longitude>
+    <Longitude>-8.3330465</Longitude>
+  </POI>
+  <POI>
+    <Number>4832</Number>
+    <Name>University of Coimbra</Name>
+    <Latitude>40.2089072</Latitude>
+    <Longitude>-8.4241509</Longitude>
+    <Longitude>-8.4241509</Longitude>
+  </POI>
+  <POI>
+    <Number>4886</Number>
+    <Name>Exploratory - Coimbra Live Science Center</Name>
+    <Latitude>40.19696</Latitude>
+    <Longitude>-8.42936</Longitude>
+    <Longitude>-8.42936</Longitude>
+  </POI>
+</POIs>

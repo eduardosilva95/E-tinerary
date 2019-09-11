@@ -96,7 +96,7 @@
                 <br>
                 <h3 align="center" style="color: white;"><b>Let us plan your trip</b></h3>
                 <br><br>
-                <form autocomplete="off" action="/create-plan" method="POST">
+                <form autocomplete="off" action="/create-trip" method="POST" onsubmit="return verify();">
                     <div class="form-group autocomplete">
                       <input type="text" class="form-control" id="inputDestination" name="destination" placeholder="Enter your destination" required>
                     </div>
@@ -293,11 +293,16 @@
               <div class="col-md-10 col-10">
                   <br>
                   <div class="row">
+                      <% count = 0 %>
                       <% recommended_dest.forEach(function(dest) { %>
                         <a href="/city?name=<%= dest.name %>" class="card-home-link">
                         <div class="col-md col-12 cont">
                             <div class="card card-home" style="width: 18rem;">
-                              <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
+                              <% if(dest.photo == null) { %>
+                                <img class="card-img-top cities-imgs" id="recommended-city-img-<%= count %>">
+                              <% } else { %>
+                                <img class="card-img-top cities-imgs" id="recommended-city-img-<%= count %>" src="<%= dest.photo %>">
+                              <% } %>
                               <div class="card-body">
                                 <h5 class="card-title"><b><%= dest.name %></b></h5>
                                 <% if(dest.trips == 1) { %>
@@ -309,6 +314,10 @@
                             </div>
                         </div>
                         </a>
+                        <script>
+                            loadPlaceImage("recommended-city-img-<%= count %>", '<%= dest.place_id %>');
+                        </script> 
+                        <% count = count + 1 %>
                       <% }); %>
                   </div>
               </div>
@@ -331,11 +340,16 @@
               <div class="col-md-10 col-10">
                   <br>
                   <div class="row">
+                      <% count = 0 %>
                       <% top_dest.forEach(function(dest) { %>
                         <a href="/city?name=<%= dest.name %>" class="card-home-link">
                         <div class="col-md col-12 cont">
                             <div class="card card-home" style="width: 18rem;">
-                              <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
+                              <% if(dest.photo == null) { %>
+                                <img class="card-img-top cities-imgs" id="top-city-img-<%= count %>">
+                              <% } else { %>
+                                <img class="card-img-top cities-imgs" id="top-city-img-<%= count %>" src="<%= dest.photo %>">
+                              <% } %>
                               <div class="card-body">
                                 <h5 class="card-title"><b><%= dest.name %></b></h5>
                                 <% if(dest.trips == 1) { %>
@@ -347,6 +361,10 @@
                             </div>
                         </div>
                         </a>
+                        <script>
+                            loadPlaceImage("top-city-img-<%= count %>", '<%= dest.place_id %>');
+                        </script> 
+                        <% count = count + 1 %>
                       <% }); %>
                   </div>
               </div>
@@ -375,7 +393,11 @@
                       <a href="/place?id=<%= place.id %>" class="card-home-link">
                       <div class="col-md col-12 cont">
                           <div class="card card-home" style="width: 18rem; height: 360px;">
-                            <img class="card-img-top cities-imgs" id="top-places-img-<%= count %>">
+                            <% if(place.photo == null) { %>
+                              <img class="card-img-top cities-imgs" id="top-places-img-<%= count %>">
+                            <% } else { %>
+                              <img class="card-img-top cities-imgs" id="top-places-img-<%= count %>" src="<%= place.photo %>">
+                            <% } %>
                             <div class="card-body">
                               <h5 class="card-title"><b><%= place.name %></b></h5>
                               <span style="color: #767676;"><%= place.city %></span>
@@ -414,11 +436,14 @@
                       </button>
                   </div>
                   <div class="modal-body">
-                      
+                    <div class="alert alert-danger" id="need-login-error" role="alert" style="display: none;">
+                      <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">You need to be logged in to do this action.</span>
+                    </div>
 
                     <img id="profile-img" class="profile-img-card" src="img/login.png" />
                     <form class="form-signin">
                       <span id="reauth-email"></span>
+
                       <div class="alert alert-danger" id="login-error" role="alert" style="display: none;">
                           <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">The email or password is incorrect</span>
                       </div>

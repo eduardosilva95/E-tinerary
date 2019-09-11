@@ -89,7 +89,7 @@ function login(type=null) {
       
       else{
         setUserCookie(result.user_id, result.picture);
-        window.location.reload();
+        window.location.href = '/';
       }
 
     });

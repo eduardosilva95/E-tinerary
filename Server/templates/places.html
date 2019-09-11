@@ -220,7 +220,7 @@
                                             </div>
                                             <div class="col-md text-right">
                                                 <div id="places-poi-<%= count %>-price">
-                                                    <span style="padding-right: 5px; color: #ffc107; font-style: italic;" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Price Level">Visits around <%= place.price %>€</span>
+                                                    <span style="padding-right: 5px; color: #ffc107; font-style: italic;" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Price">Visits around <%= place.price %>€</span>
                                                 </div>
                                                 <script>
                                                     loadPriceRating("<%= place.price_level %>", "places-poi-<%= count %>-price");
@@ -321,7 +321,17 @@
                                     <label for="rating-range"><b>Rating range:</b></label>
                                     <input type="text" id="rating-range" readonly style="border:0; color:#f6931f; font-weight:bold;">
                                 </p>
-                                <div id="slider-range"></div>
+                                <div id="slider-rating-range"></div>
+                            </div>
+
+                            <br>
+
+                            <div id="reviews-filter">
+                                <p>
+                                    <label for="reviews-range"><b>Number of reviews range:</b></label>
+                                    <input type="text" id="reviews-range" readonly style="border:0; color:#f6931f; font-weight:bold;">
+                                </p>
+                                <div id="slider-reviews-range"></div>
                             </div>
 
                             <br>
@@ -548,12 +558,14 @@
   
     <!-- Scripts -->
     <script>
-        var fromTrip = '<%= (fromTrip) %>';
+        var fromTrip = '<%= fromTrip %>';
 
         if(fromTrip == "true"){
             var openslots = '<%- JSON.stringify(openslots) %>';
             loadOpenSlots(openslots);
         }
+
+        loadNumMaxReviews('<%= num_max_reviews %>');
             
     </script>
 

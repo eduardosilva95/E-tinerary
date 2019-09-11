@@ -418,6 +418,8 @@ function loadImage(place_id, dest){
 
 function viewPOI(place_dict){
 
+    console.log(place_dict);
+
     $("#poi-info-table").children().remove();
 
     document.getElementById("sidebar-1").style.display = "none";
@@ -440,6 +442,8 @@ function viewPOI(place_dict){
     }
 
     document.getElementById('poi-name').innerHTML = place_dict['name'];
+
+    document.getElementById('visit-schedule').innerHTML = '<i class="fas fa-check-circle"></i>' + '<span style="padding-left: 5px;"> Scheduled for ' + place_dict['day'] + ' from ' + place_dict['start_time'] + ' to ' + place_dict['end_time'] + '</span>';
 
     document.getElementById("poi-info").style.visibility = 'visible';
     document.getElementById("poi-opening-hours").style.visibility = 'visible';

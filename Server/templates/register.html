@@ -117,7 +117,7 @@
                                     <input type="text" class="form-control input-sm" id="bday" name="birthday" placeholder="Birthday">
                                 </div>
                                 <div class="form-group">
-                                    Gender: 
+                                    Gender<sup aria-describedby="mandatoryHelp">*</sup>: 
                                     <div class="custom-control custom-radio custom-control-inline">
                                         <input type="radio" id="gender-male" name="gender" class="custom-control-input" value="M">
                                         <label class="custom-control-label" for="gender-male">Male</label>
@@ -132,6 +132,7 @@
                                 </div>
                                 <div class="form-group">
                                     <select class="custom-select" name="country">
+                                        <option value="null">Select a country</option>
                                         <option value="Afghanistan">Afghanistan</option>
                                         <option value="Åland Islands">Åland Islands</option>
                                         <option value="Albania">Albania</option>
@@ -395,6 +396,7 @@
                                     <label for="type-use">Type of use <sup aria-describedby="mandatoryHelp">*</sup></label>
                                     <select class="custom-select" name="type_use" id="type-use">
                                         <option selected value="Free">Personal use (Free)</option>
+                                        <option value="Premium">Professional use (Premium)</option>
                                     </select>
                                 </div>
                                 <div class="form-group" name="profile_pic">

@@ -3,13 +3,12 @@ function getCityImage(city, dest, image){
 
     /* if there are images stored in the server, use them */
     if(image != undefined && image != ""){
-        console.log()
         if(image.includes("img/city")){
             document.getElementById(dest).src = image;
         }
 
         else{
-            document.getElementById(dest).src = "/img/plans/" + image;
+            document.getElementById(dest).src = "/img/trips/" + image;
         }
     }
     
@@ -85,7 +84,7 @@ $(function () {
             $("#are-you-sure-share-msg").css("display", "block");
 
 
-       // document.getElementById('confirm-public-btn').setAttribute( "onClick", "javascript: makePublic("+$(this).data('id')+");");
+        //document.getElementById('submit-share-trip-btn').setAttribute( "onClick", "javascript: shareTrip("+$(this).data('id')+");");
 
     });
 });
@@ -223,6 +222,21 @@ $(function (){
         else{
             $('#development-trips').show();
             $('#development-trips').removeClass('out').addClass('active');
+        }
+    });
+
+    $('#interested-trips-checkbox').on('change', function () {
+        if (!this.checked) {
+            $('#interested-trips').removeClass('active').addClass('out');
+
+			setTimeout(function(){
+				$('#interested-trips').hide() 
+            }, 300); //Same time as animation
+            
+        }
+        else{
+            $('#interested-trips').show();
+            $('#interested-trips').removeClass('out').addClass('active');
         }
     });
 });

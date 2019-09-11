@@ -116,15 +116,15 @@ function autocomplete(inp, arr) {
 
     service.getDetails(request, function(place, status) {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
-
-            if(place.photos != undefined)
-            document.getElementById(dest).src = place.photos[0].getUrl();
-            else
-            document.getElementById(dest).src = "";
-
+            if(place.photos != undefined && $('#' + dest).attr('src') == null)
+              document.getElementById(dest).src = place.photos[Math.floor(Math.random() * place.photos.length)].getUrl();
+            else if($('#' + dest).attr('src') == null)
+              document.getElementById(dest).src = "img/no-photo-found.png";
         }
-    });
 
+        else if($('#' + dest).attr('src') == null)
+          document.getElementById(dest).src = "img/no-photo-found.png";
+    });
   }
 
 
@@ -132,3 +132,16 @@ function autocomplete(inp, arr) {
     $('[data-toggle="popover"]').popover()
   })
 
+
+
+  function verify(){
+    var user_id = getUserCookie();
+
+    if(user_id == null){
+      $("#need-login-error").css("display", "block");
+      $("#login-modal").modal();
+      return false;
+    }
+
+    return true;
+  }

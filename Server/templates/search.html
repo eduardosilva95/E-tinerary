@@ -26,6 +26,7 @@
     <link href="https://unpkg.com/gijgo@1.9.11/css/gijgo.min.css" rel="stylesheet" type="text/css" />
     
     <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw&libraries=places"></script>
     
 
   
@@ -102,12 +103,12 @@
 
             <br><br>
 
-            <form autocomplete="off" id="search-form" action="/create-plan" method="POST">
+            <form autocomplete="off" id="search-form" action="/create-trip" method="POST" onsubmit="return verify();">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group autocomplete fg">
                             <label class="mr-2" for="inputDestination" style="color: #ffc107; font-weight: bold;">Destination</label>
-                            <input type="text" class="form-control" id="inputDestination" name="destination" placeholder="Enter your destination">
+                            <input type="text" class="form-control" id="inputDestination" name="destination" placeholder="Enter your destination" required>
                         </div>
                         <script>
                             var cities = "<%= cities %>";
@@ -303,18 +304,27 @@
                 <div class="col-md-10 col-sm-10">
                     <br>
                     <div class="row">
+                        <% count = 0 %>
                         <% recommended_dest.forEach(function(dest) { %>
                         <a href="/places?dest=<%= dest.name %>" class="card-home-link">
                         <div class="col-md col-sm-12 cont">
                             <div class="card card-home" style="width: 18rem;">
-                                <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
+                                <% if(dest.photo == null) { %>
+                                    <img class="card-img-top cities-imgs" id="recommended-city-img-<%= count %>">
+                                <% } else { %>
+                                    <img class="card-img-top cities-imgs" id="recommended-city-img-<%= count %>" src="<%= dest.photo %>">
+                                <% } %>
                                 <div class="card-body">
                                 <h5 class="card-title"><b><%= dest.name %></b></h5>
-                                <p class="card-text"><%= dest.plans %> trips planned for <%= dest.name %></p>
+                                <p class="card-text"><%= dest.trips %> trips planned for <%= dest.name %></p>
                                 </div>
                             </div>
                         </div>
                         </a>
+                        <script>
+                            loadPlaceImage("recommended-city-img-<%= count %>", '<%= dest.place_id %>');
+                        </script> 
+                        <% count = count + 1 %>
                         <% }); %>
                     </div>
                 </div>
@@ -337,18 +347,27 @@
                 <div class="col-md-10 col-sm-10">
                     <br>
                     <div class="row">
+                        <% count = 0 %>
                         <% top_dest.forEach(function(dest) { %>
                         <a href="/places?dest=<%= dest.name %>" class="card-home-link">
                         <div class="col-md col-sm-12 cont">
                             <div class="card card-home" style="width: 18rem;">
-                                <img class="card-img-top cities-imgs" src="/img/cities/<%= dest.name.toLowerCase() %>.jpg">
+                                <% if(dest.photo == null) { %>
+                                    <img class="card-img-top cities-imgs" id="top-city-img-<%= count %>">
+                                <% } else { %>
+                                    <img class="card-img-top cities-imgs" id="top-city-img-<%= count %>" src="<%= dest.photo %>">
+                                <% } %>
                                 <div class="card-body">
                                 <h5 class="card-title"><b><%= dest.name %></b></h5>
-                                <p class="card-text"><%= dest.plans %> trips planned for <%= dest.name %></p>
+                                <p class="card-text"><%= dest.trips %> trips planned for <%= dest.name %></p>
                                 </div>
                             </div>
                         </div>
                         </a>
+                        <script>
+                            loadPlaceImage("top-city-img-<%= count %>", '<%= dest.place_id %>');
+                        </script> 
+                        <% count = count + 1 %>
                         <% }); %>
                     </div>
                 </div>
@@ -362,59 +381,68 @@
 
         <!-- Login Modal -->
         <div class="modal fade" id="login-modal" role="dialog">
-                <div class="modal-dialog">
-                    <div class="modal-content" style="width: 400px;">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Login</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+            <div class="modal-dialog">
+                <div class="modal-content" style="width: 400px;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="alert alert-danger" id="need-login-error" role="alert" style="display: none;">
+                        <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">You need to be logged in to do this action.</span>
+                      </div>
+  
+                      <img id="profile-img" class="profile-img-card" src="img/login.png" />
+                      <form class="form-signin">
+                        <span id="reauth-email"></span>
+  
+                        <div class="alert alert-danger" id="login-error" role="alert" style="display: none;">
+                            <i class="fas fa-times-circle"></i><span style="padding-left: 10px;">The email or password is incorrect</span>
                         </div>
-                        <div class="modal-body">
-                          <img id="profile-img" class="profile-img-card" src="img/login.png" />
-                          <form class="form-signin">
-                            <span id="reauth-email"></span>
-                            <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
-                            <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-                            <div class="row">
-                                <div class="col-md-6">
-                                  <div class="custom-control custom-checkbox" id="remember">
-                                      <input type="checkbox" class="custom-control-input" id="remember-me">
-                                      <label class="custom-control-label" for="remember-me">Remember me</label>
-                                  </div>
-                                </div>
-                                <div class="col-md-6 text-right">
-                                    <a href="/recover" class="forgot-password">
-                                        Forgot the password?
-                                    </a>
-                                </div>
+                        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                              <div class="custom-control custom-checkbox" id="remember">
+                                  <input type="checkbox" class="custom-control-input" id="remember-me">
+                                  <label class="custom-control-label" for="remember-me">Remember me</label>
+                              </div>
                             </div>
-                            <br>
-                            <button class="btn btn-success" type="button" onclick="login();"><i class="fas fa-sign-in-alt"></i><span style="padding-left: 10px">Sign in</span></button>
-                                <!--<button class="btn btn-primary" type="submit"><i class="fas fa-user-plus"></i><span style="padding-left: 10px">Register</span></button>-->
-                            <span>Don't have an account yet? <a href="/register" class="forgot-password">Register now</a></span>
-                        
-                          </form>
-                          
-      
-                          <div class="login-or">
-                            <hr class="hr-or">
-                            <span class="span-or">or</span>
-                          </div>
-      
-                          <button class="btn btn-primary btn-facebook" type="submit"><i class="fab fa-facebook-f fa-lg"></i><span style="padding-left: 10px">Log in using Facebook</span></button>
-                          <br><br>
-                                      
-                          <div id="customBtn">
-                              <button class="btn btn-google" type="submit" ><img id="google-signin-icon" src="img/google-icon.png"><span style="padding-left: 10px">Log in using Google</span></button>
-                          </div>
-      
+                            <div class="col-md-6 text-right">
+                                <a href="/recover" class="forgot-password">
+                                    Forgot the password?
+                                </a>
+                            </div>
                         </div>
-                        <div class="modal-footer">
-                        </div>
+                        <br>
+                        <button class="btn btn-success" type="button" onclick="login();"><i class="fas fa-sign-in-alt"></i><span style="padding-left: 10px">Sign in</span></button>
+                            <!--<button class="btn btn-primary" type="submit"><i class="fas fa-user-plus"></i><span style="padding-left: 10px">Register</span></button>-->
+                        <span>Don't have an account yet? <a href="/register" class="forgot-password">Register now</a></span>
+                    
+                      </form>
+                      
+  
+                      <div class="login-or">
+                        <hr class="hr-or">
+                        <span class="span-or">or</span>
+                      </div>
+  
+                      <div class="fb-login-button" data-width="366" data-size="large" data-button-type="login_with" data-auto-logout-link="false" data-use-continue-as="false"></div>
+                      <!--<button class="btn btn-primary btn-facebook" type="submit"><i class="fab fa-facebook-f fa-lg"></i><span style="padding-left: 10px">Log in using Facebook</span></button>-->
+                      <br><br>
+                                  
+                      <div id="customBtn">
+                          <button class="btn btn-google" type="submit" ><img id="google-signin-icon" src="img/google-icon.png"><span style="padding-left: 10px">Log in using Google</span></button>
+                      </div>
+  
+                    </div>
+                    <div class="modal-footer">
                     </div>
                 </div>
             </div>
+        </div>
 
         <!-- Footer -->
         <footer class="footer">

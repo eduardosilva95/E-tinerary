@@ -1515,6 +1515,11 @@ table tr td a{
   color: #ffc107;
  }
  
+ #city-description p{
+  color: #80868b;
+  text-align: justify;
+  text-justify: newspaper;
+}
 
 
 

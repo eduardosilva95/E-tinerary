@@ -328,7 +328,7 @@
                                         <td><span id="place-coordinates"><%= lat %>, <%= lon %></span></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><i class="far fa-money-bill-alt" style="color: #1a73e8"></i></th>
+                                        <th scope="row"><a class="btn-update-price-modal" data-toggle="modal" data-target="#update-price-modal" data-title="<%= place %>" style="cursor: pointer"><i class="far fa-money-bill-alt" style="color: #1a73e8"></i></a></th>
                                         <td><span id="place-price"><strong>Adults:</strong> <%= price %></span><span style="padding-left: 10px;"><strong>Children:</strong> <%= price_children %></span></td>
                                     </tr>
                                 </tbody>
@@ -374,8 +374,7 @@
                             </script>
                             
                              <p class="card-text"><i class="far fa-clock"></i><strong style="padding-left: 10px;">Estimated visit duration: </strong><span id="" style="padding-left: 10px;"></span><%= duration %></p>
-                            <p class="card-text"><i class="fas fa-euro-sign"></i><a class="btn-update-price-modal" data-toggle="modal" data-target="#update-price-modal" data-title="<%= place %>" style="cursor: pointer"><strong style="padding-left: 10px;">Price: </strong></a><span id="" style="padding-left: 10px;"></span><%= rating_price %></p>
-                        
+                            
                         </div>
                     </div>
 

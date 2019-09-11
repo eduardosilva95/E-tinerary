@@ -8,6 +8,13 @@
     <Longitude>-8.6094485</Longitude>
   </POI>
   <POI>
+    <Number>14763</Number>
+    <Name>Livraria Lello</Name>
+    <Latitude>41.1469055</Latitude>
+    <Longitude>-8.6147746</Longitude>
+    <Longitude>-8.6147746</Longitude>
+  </POI>
+  <POI>
     <Number>14336</Number>
     <Name>Jardins do Palácio de Cristal</Name>
     <Latitude>41.1483446</Latitude>
@@ -29,24 +36,17 @@
     <Longitude>-8.2903191</Longitude>
   </POI>
   <POI>
+    <Number>14762</Number>
+    <Name>Sé do Porto</Name>
+    <Latitude>41.142826</Latitude>
+    <Longitude>-8.6111836</Longitude>
+    <Longitude>-8.6111836</Longitude>
+  </POI>
+  <POI>
     <Number>14433</Number>
     <Name>Casa da Música</Name>
     <Latitude>41.158881</Latitude>
     <Longitude>-8.630696</Longitude>
     <Longitude>-8.630696</Longitude>
-  </POI>
-  <POI>
-    <Number>14438</Number>
-    <Name>Mercado do Bolhão</Name>
-    <Latitude>41.1487167</Latitude>
-    <Longitude>-8.6074698</Longitude>
-    <Longitude>-8.6074698</Longitude>
-  </POI>
-  <POI>
-    <Number>14354</Number>
-    <Name>Clérigos Tower</Name>
-    <Latitude>41.1456753</Latitude>
-    <Longitude>-8.6145985</Longitude>
-    <Longitude>-8.6145985</Longitude>
   </POI>
 </POIs>

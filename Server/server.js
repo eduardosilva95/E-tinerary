@@ -18,18 +18,18 @@ var distance = require('google-distance-matrix');
 var builder = require('xmlbuilder');
 var edge = require('edge-js');
 
-var GOOGLE_API_KEY = 'AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw';
-var OPEN_WEATHER_API_KEY = '8271fd206ceeef12df4e7bb6063241c3';
+const GOOGLE_API_KEY = 'AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw';
+const OPEN_WEATHER_API_KEY = '8271fd206ceeef12df4e7bb6063241c3';
 
 distance.key(GOOGLE_API_KEY);
 
-var RELIGION_TYPES = ['CHURCH', 'PLACE OF WORSHIP'];
-var HISTORIC_TYPES = ['CHURCH', 'CASTLE', 'MUSEUM'];
-var RECREATION_TYPES = ['AMUSEUMENT PARK', 'AQUARIUM', 'ZOO'];
-var NATURE_TYPES = ['PARK', 'NATURAL FEATURE'];
-var CULTURE_TYPES = ['THEATER', 'THEATRE', 'MUSEUM'];
+const RELIGION_TYPES = ['CHURCH', 'PLACE OF WORSHIP'];
+const HISTORIC_TYPES = ['CHURCH', 'CASTLE', 'MUSEUM', 'PALACE'];
+const RECREATION_TYPES = ['AMUSEUMENT PARK', 'AQUARIUM', 'ZOO'];
+const NATURE_TYPES = ['PARK', 'NATURAL FEATURE'];
+const CULTURE_TYPES = ['THEATER', 'THEATRE', 'MUSEUM'];
 
-var MANUAL_TRIP_TOTAL_TIME = "2 hours";
+const MANUAL_TRIP_TOTAL_TIME = "2 hours";
 
 /* store images of users */
 var storage = multer.diskStorage({
@@ -111,6 +111,7 @@ app.use(express.static(path.join(__dirname, 'dist')));
 app.use(cookieParser());
 
 
+// make a connection with the Database
 con.connect(function(err) {
    if (err) throw err;
    console.log("Connected with the DB");
@@ -146,6 +147,8 @@ app.get('/', function(req, res){
         	for(var i=0; i<result.length;i++){
         		var dest = new Object();
         		dest.name = result[i].name;
+        		dest.place_id = result[i].place_id;
+        		dest.photo = result[i].photo;
         		dest.trips = result[i].trips;
         		top_dest.push(dest);
         	}
@@ -161,6 +164,7 @@ app.get('/', function(req, res){
 	        		place.id = result[i].id;
 	        		place.place_id = result[i].place_id;
 	        		place.name = result[i].name;
+        			place.photo = result[i].photo;
 	        		place.city = result[i].city;
 	        		place.trips = result[i].trips;
 	        		top_places.push(place);
@@ -175,6 +179,8 @@ app.get('/', function(req, res){
 		        	for(var i=0; i<result.length;i++){
 		        		var dest = new Object();
 		        		dest.name = result[i].name;
+        				dest.place_id = result[i].place_id;
+        				dest.photo = result[i].photo;
 		        		dest.trips = result[i].trips;
 		        		recommended_dest.push(dest);
 		        	}
@@ -207,7 +213,7 @@ app.get('/search', function(req,res){
         	list_cities.push(result[i].name);
         }
     	
-    	// get the top N cities with the most plans made
+    	// get the top N cities with the most trips made
         con.query("call getTopCities(?)", number_results, function (err, result, fields) {
         	if (err) throw err;
 
@@ -216,7 +222,9 @@ app.get('/search', function(req,res){
         	for(var i=0; i<result.length;i++){
         		var dest = new Object();
         		dest.name = result[i].name;
-        		dest.plans = result[i].plans;
+				dest.place_id = result[i].place_id;
+        		dest.photo = result[i].photo;
+        		dest.trips = result[i].trips;
         		top_dest.push(dest);
         	}
 
@@ -228,8 +236,10 @@ app.get('/search', function(req,res){
 
 	        	for(var i=0; i<result.length;i++){
 	        		var dest = new Object();
-	        		dest.name = result[i].name;
-	        		dest.plans = result[i].plans;
+        			dest.name = result[i].name;
+    				dest.place_id = result[i].place_id;
+        			dest.photo = result[i].photo;
+	        		dest.trips = result[i].trips;
 	        		recommended_dest.push(dest);
 	        	}
 
@@ -264,7 +274,9 @@ app.get('/search-places',function(req,res){
         	for(var i=0; i<result.length;i++){
         		var dest = new Object();
         		dest.name = result[i].name;
-        		dest.plans = result[i].plans;
+				dest.place_id = result[i].place_id;
+        		dest.photo = result[i].photo;
+        		dest.trips = result[i].trips;
         		top_dest.push(dest);
         	}
 
@@ -313,7 +325,7 @@ app.get('/city', function(req, res){
 	    	var places = [];
 
 	    	var i = 0;
-	    	while(places.length < 8){
+	    	while(places.length < 8 && i < result.length){
 	    		if(result[i].poi_type.toUpperCase() != 'Hotel'.toUpperCase() && result[i].poi_type.toUpperCase() != 'Restaurant'.toUpperCase()){
 	    			var place = new Object();
 		    		place["id"] = result[i].id;
@@ -426,8 +438,35 @@ app.get('/city', function(req, res){
 				    				isUserRegistered = true;
 
 
-			    				res.render(path.join(__dirname+'/templates/city.html'), {id: city_id, city: city, place_id: place_id, coordinates: coordinates, description: description, address: address, photos: photos, places: places, hotels: hotels, trips: trips, num_pois: num_pois, num_hotels: num_hotels, num_trips: num_trips, isUserRegistered: isUserRegistered, isUserPremium: isUserPremium});
+				    			var temperature;
+				    			var weather;
+				    			var icon;
 
+
+				    			var url = "https://api.openweathermap.org/data/2.5/weather?lat=" + parseFloat(coordinates.split(',')[0]) + "&lon=" + parseFloat(coordinates.split(',')[1]) + "&appid=" + OPEN_WEATHER_API_KEY + "&units=metric";
+
+								https.get(url, (res) => {
+								  	var body ='';
+									res.on('data', function(chunk) {
+								  		body += chunk;
+									});
+
+									res.on('end', function() {
+										body = JSON.parse(body);
+										
+										temperature = Math.round(body.main.temp) + " ºC";
+										weather = body.weather[0].main;
+										icon = "http://openweathermap.org/img/w/" + body.weather[0].icon + ".png";
+									});
+								}).on('error', (e) => {
+								  console.error(e);
+								});
+
+							 	sleep(500).then(() => {
+
+			    					res.render(path.join(__dirname+'/templates/city.html'), {id: city_id, city: city, place_id: place_id, coordinates: coordinates, description: description, address: address, photos: photos, places: places, hotels: hotels, trips: trips, num_pois: num_pois, num_hotels: num_hotels, num_trips: num_trips, isUserRegistered: isUserRegistered, isUserPremium: isUserPremium, temperature: temperature, weather: weather, icon: icon});
+
+		    					});
 		    				});
 			    		});
 		    		});
@@ -464,6 +503,9 @@ app.get('/places', function (req, res){
 
 	var ratingMin = 1.0;
 	var ratingMax = 5.0;
+
+	var reviewsMin = 1;
+	var reviewsMax = 500000;
 
 
 	if(req.query['query'] != undefined)
@@ -515,6 +557,11 @@ app.get('/places', function (req, res){
 		ratingMax = parseFloat(req.cookies['rating_range_filter'].split('-')[1]);
 	}
 
+	if(req.cookies['reviews_range_filter'] != undefined){
+		reviewsMin = parseFloat(req.cookies['reviews_range_filter'].split('-')[0]);
+		reviewsMax = parseFloat(req.cookies['reviews_range_filter'].split('-')[1]);
+	}
+
 	if(tripID != -1)
 		hotelsFilter = false;
 
@@ -532,6 +579,7 @@ app.get('/places', function (req, res){
 	var list_places = [];
 	var number_results = 0;
 	var list_places_names = [];
+	var num_max_reviews = 0;
 
 
 	con.query("call tripExists(?)", tripID, function (err, result, fields) {
@@ -575,14 +623,24 @@ app.get('/places', function (req, res){
 	        	city = result[0].city;
 	        	country = result[0].country;
 
+	        	for(var i = 0 ; i < result.length ; i++){
+	        		if(result[i].num_reviews != null && result[i].num_reviews > num_max_reviews)
+	        			num_max_reviews = result[i].num_reviews;
+	        	}
+
+
 		        for(var i = 0 ; i < result.length ; i++){
 
 		        	var poi_type = result[i].poi_type.charAt(0).toUpperCase() + result[i].poi_type.slice(1);
 
 		        	var poi_google_rating = null;
+		        	var poi_num_reviews = null;
 
 		        	if(result[i].rating != null)
 		        		poi_google_rating = result[i].rating.toFixed(1);
+
+		        	if(result[i].num_reviews != null)
+		        		poi_num_reviews = result[i].num_reviews;
 
 		        	if(!hotelsFilter && poi_type == "Hotel"){}
 
@@ -599,6 +657,8 @@ app.get('/places', function (req, res){
 		        	else if(!othersFilter && !default_poi_types.includes(poi_type)){}
 
 	        		else if(poi_google_rating == null || poi_google_rating < ratingMin || poi_google_rating > ratingMax){}
+
+        			else if(poi_num_reviews == null || poi_num_reviews < reviewsMin || poi_num_reviews > reviewsMax){}
 
 	        		else if(i >= limit_inf && list_places.length < total_results){
 
@@ -734,7 +794,7 @@ app.get('/places', function (req, res){
 
 				        var openslots = getAllOpenSlotsAvailable(trip);
 
-			        	res.render(path.join(__dirname+'/templates/places.html'), {places: list_places, list_places_names: list_places_names, city: city, country: country, number_results: number_results, fromTrip: true, isManual: isManual, visits: list_places_trip, days: days, openslots: openslots});
+			        	res.render(path.join(__dirname+'/templates/places.html'), {places: list_places, list_places_names: list_places_names, city: city, country: country, number_results: number_results, fromTrip: true, isManual: isManual, visits: list_places_trip, days: days, openslots: openslots, num_max_reviews: num_max_reviews});
 
 			        	return 1;
 
@@ -794,14 +854,14 @@ app.get('/places', function (req, res){
 
 				    }
 				    
-				    res.render(path.join(__dirname+'/templates/places.html'), {places: list_places, list_places_names: list_places_names, city: city, country: country, number_results: number_results, fromTrip: true, isManual: isManual, visits: [], days: days, openslots: openslots});
+				    res.render(path.join(__dirname+'/templates/places.html'), {places: list_places, list_places_names: list_places_names, city: city, country: country, number_results: number_results, fromTrip: true, isManual: isManual, visits: [], days: days, openslots: openslots, num_max_reviews: num_max_reviews});
 
 				});	        		
 	    	}
 
 
 	    	else {
-				res.render(path.join(__dirname+'/templates/places.html'), {places: list_places, list_places_names: list_places_names, city: city, country: country, number_results: number_results, fromTrip: false, openslots: []});
+				res.render(path.join(__dirname+'/templates/places.html'), {places: list_places, list_places_names: list_places_names, city: city, country: country, number_results: number_results, fromTrip: false, openslots: [], num_max_reviews: num_max_reviews});
 			}
 		});
 
@@ -930,12 +990,12 @@ app.get('/place', function(req,res){
 			else
 				security = parseFloat(security).toFixed(1) + " / 5.0";
 
-			var rating_price = result[0].price;
+			var rating_price = result[0].rating_price;
 
-			if(price == null)
+			if(rating_price == null)
 				rating_price = "No information available";
 			else
-				rating_price = parseFloat(price).toFixed(2);
+				rating_price = parseFloat(rating_price).toFixed(2);
 
 			var duration = result[0].duration;
 
@@ -1178,7 +1238,9 @@ app.get('/search-hotels',function(req,res){
 	    	for(var i=0; i<result.length;i++){
 	    		var dest = new Object();
 	    		dest.name = result[i].name;
-	    		dest.plans = result[i].plans;
+				dest.place_id = result[i].place_id;
+        		dest.photo = result[i].photo;
+	    		dest.trips = result[i].trips;
 	    		top_dest.push(dest);
 	    	}
 
@@ -1304,125 +1366,8 @@ app.get('/create-plan', function(req, res){
 });
 
 
-app.post('/create-plan-old', function(req, res){
-	var connection;
 
-	var user_id = parseInt(req.cookies['user']);
-
-	if(isNaN(user_id)){
-		// send error message
-		return;
-	}
-
-	var destination = req.body.destination;
-
-	if(destination == null)
-		return; // send error message
-
-	var arrival = req.body.arrival;
-
-	if(arrival == null)
-		return; // send error message
-
-	var departure = req.body.departure;
-
-	if(departure == null)
-		return; // send error message
-
-	var num_adults = req.body.adults;
-	var num_children = req.body.children;
-	var hasBudgetConstraint = req.body.has_budget;
-	var budget = req.body.budget;
-	var travel_mode = req.body.travel_mode;
-
-    promise.createConnection({
-	    host: 'localhost',
-	    user: 'root',
-	    password: 'password',
-	    database: 'placesdb'
-
-	}).then(function(conn){
-		connection = conn;
-
-		var values = [destination,
-	    	arrival.split('/')[2] + "-" + (arrival.split('/')[1]<10?'0':'') + arrival.split('/')[1] + "-" + (arrival.split('/')[0]<10?'0':'') + arrival.split('/')[0], 
-	    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0],
-	    	user_id];
-
-	    var result = connection.query("call createTrip(?, ?, ?, ?)", values);
-
-	    return result;
-
-	}).then(function(result){
-		plan_id = parseInt(result[0][0].planID);
-
-		var num_days = diffBetweenDays(arrival, departure);
-
-		arrival = arrival.split('/')[0] + "-" + arrival.split('/')[1] + "-" + arrival.split('/')[2];
-
-  		var days = getTripDays(arrival, parseInt(num_days), false);
-
-  		var start_hours = ["10:00", "13:00", "15:00", "16:15", "18:00"];
-  		var end_hours = ["12:00", "14:30", "16:00", "18:00", "20:00"];
-
-  		var start_time_list = [];
-  		var end_time_list = [];
-
-  		for(var i=0 ; i < days.length ; i++){
-  			day = days[i].split('-')[2] + "-" + (days[i].split('-')[1]<10?'0':'') + days[i].split('-')[1] + "-" + (days[i].split('-')[0]<10?'0':'') + days[i].split('-')[0]
-  			for(var j=0 ; j < start_hours.length; j++){
-  				start_time_list.push(day + " " + start_hours[j]);
-  				end_time_list.push(day + " " + end_hours[j]);
-  			}
-  		}
-
-  		var i=0;
-
-  		con.query("call getPOIsIDFromCity(?)", destination, function (err, result, fields) {
-	        if (err) throw err;
-
-	        result = result[0];
-
-	        var list_pois_in_plan = [];
-
-	        while(i < start_time_list.length){
-
-	        	if(result.length == list_pois_in_plan.length){
-        			break;
-        		}
-	        	
-	        	var poiIsValid = false;
-
-	        	while(!poiIsValid){
-	        		var poi = result[parseInt(Math.floor((Math.random() * result.length-1) + 1))].poi;
-
-	        		if(!list_pois_in_plan.includes(poi)){
-	        			list_pois_in_plan.push(poi);
-	        			poiIsValid = true;
-	        		}
-	        	}
-
-			  	con.query("call addVisitToTrip(?, ?, ?, ?, ?)", [plan_id, poi, start_time_list[i], end_time_list[i], 0], function (err, result) {
-			    	if (err) throw err;
-
-			  	});
-
-			  	i++;	
-	  		}
-	    });
-
-	    connection.end();
-
-
-    	console.log("PLAN CREATED: ", plan_id);
-
-    	res.render(path.join(__dirname+'/templates/see-trip.html'), {plan: plan_id});
-	});
-
-});
-
-
-app.post('/create-plan', function(req, res){
+app.post('/create-trip', function(req, res){
 	var connection;
 
 	var user_id = parseInt(req.cookies['user']);
@@ -1452,7 +1397,10 @@ app.post('/create-plan', function(req, res){
 	var hasBudgetConstraint = req.body.has_budget;
 	var budget = req.body.budget;
 
-	var travel_mode = req.body.travel_mode.toUpperCase();
+	var travel_mode = 'DRIVING';
+
+	if(req.body.travel_mode != null)
+		travel_mode = travel_mode.toUpperCase();
 
 
 	var isReligionSitesInterestChecked = false;
@@ -1595,163 +1543,176 @@ app.post('/create-plan', function(req, res){
         	
         }
 
-        /* Generate XML and write to a file */
-        xml = poi_root.end({ pretty: true});
-		fs.writeFile('xml/pois.xml', xml, function(err, data) {
-	   		if (err) console.log(err);
+		
+		promise.createConnection({
+		    host: 'localhost',
+		    user: 'root',
+		    password: 'password',
+		    database: 'placesdb'
 
-     	 	console.log('XML for POIs Generated');
-	  	});
+		}).then(function(conn){
+			connection = conn;
 
+			// ADD TRIP WITH ITS VALUES TO THE DB
+			var values = [destination,
+		    	arrival.split('/')[2] + "-" + (arrival.split('/')[1]<10?'0':'') + arrival.split('/')[1] + "-" + (arrival.split('/')[0]<10?'0':'') + arrival.split('/')[0], 
+		    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0],
+		    	user_id, num_adults, num_children, category, travel_mode];
 
-		/* Generate XML and write to a file */
-		xml = hotels_root.end({ pretty: true});
-		fs.writeFile('xml/hotels.xml', xml, function(err, data) {
-	   		if (err) console.log(err);
+		    var result = connection.query("call createTrip(?, ?, ?, ?, ?, ?, ?, ?)", values);
 
-     	 	console.log('XML for Hotels Generated');
-	  	});
+		    return result;
 
-
-		var item = graphs_root.ele('Graph');
-		item.ele('Number', 1);
-		item.ele('Name', 'Distance Matrix');
-		item.ele('Complete', 'True');
-		item.ele('Directed', 'True');
-
-		distance.mode(travel_mode.toLowerCase());
-
-		distance.matrix(coordinates, coordinates, function (err, distances) {
-		    if (err) {
-		        return console.log(err);
-		    }
-
-		    if (distances.status == 'OK') {
-		    	for (var i=0; i < coordinates.length; i++) {
-		    		var arc = item.ele('Arcs');
-
-		    		if(places[i].type == 'Hotel')
-		    			arc.ele("SrcObject", "H");
-		    		else
-		    			arc.ele("SrcObject", "P");
-
-		    		arc.ele("SrcNumber", places[i].id);
+		}).then(function(result){
+			trip_id = parseInt(result[0][0].tripID);
 
 
-		    		for (var j=0; j < coordinates.length; j++) {
+			/* Generate XML and write to a file */
+	        xml = poi_root.end({pretty: true});
 
-		    			// only add if there is a distance between the two places and if it's not the same place
-		    			if(j != i && distances.rows[0].elements[j].status == 'OK'){
-			    			var des = arc.ele('Des');
+	        var dir = 'xml/' + trip_id;
+	        try {
+			  if (!fs.existsSync(dir)){
+			    fs.mkdirSync(dir)
+			  }
+			} catch (err) {
+			  console.error(err)
+			}
 
-			    			if(places[j].type == 'Hotel')
-				    			des.ele("Obj", "H");
-				    		else
-				    			des.ele("Obj", "P");
-
-			    			des.ele('Num', places[j].id);
-			    			des.ele('Len', {'units': 'meters'}, distances.rows[i].elements[j].distance.value);
-			    			des.ele('Time', {'units': 'seconds'}, distances.rows[i].elements[j].duration.value);
-			    		}
-		    		}
-		    	}
-	    	}
-
-	    	xml = graphs_root.end({ pretty: true});
-
-
-	    	/* Generate XML and write to a file */
-			fs.writeFile('xml/graphs.xml', xml, function(err, data) {
+			fs.writeFile('xml/' + trip_id + '/pois.xml', xml, function(err, data) {
 		   		if (err) console.log(err);
 
-     	 		console.log('XML for Distances Generated');
+	     	 	console.log('XML for POIs Generated');
 		  	});
 
 
-			/* REPLACE WITH THE RESULTS FROM THE ALGORITHMS */
+			/* Generate XML and write to a file */
+			xml = hotels_root.end({ pretty: true});
+			fs.writeFile('xml/' + trip_id + '/hotels.xml', xml, function(err, data) {
+		   		if (err) console.log(err);
+
+	     	 	console.log('XML for Hotels Generated');
+		  	});
+
+
+			var item = graphs_root.ele('Graph');
+			item.ele('Number', 1);
+			item.ele('Name', 'Distance Matrix');
+			item.ele('Complete', 'True');
+			item.ele('Directed', 'True');
+
+			distance.mode(travel_mode.toLowerCase());
+
+			distance.matrix(coordinates, coordinates, function (err, distances) {
+			    if (err) {
+			        return console.log(err);
+			    }
+
+			    if (distances.status == 'OK') {
+			    	for (var i=0; i < coordinates.length; i++) {
+			    		var arc = item.ele('Arcs');
+
+			    		if(places[i].type == 'Hotel')
+			    			arc.ele("SrcObject", "H");
+			    		else
+			    			arc.ele("SrcObject", "P");
+
+			    		arc.ele("SrcNumber", places[i].id);
+
+
+			    		for (var j=0; j < coordinates.length; j++) {
+
+			    			// only add if there is a distance between the two places and if it's not the same place
+			    			if(j != i && distances.rows[0].elements[j].status == 'OK'){
+				    			var des = arc.ele('Des');
+
+				    			if(places[j].type == 'Hotel')
+					    			des.ele("Obj", "H");
+					    		else
+					    			des.ele("Obj", "P");
+
+				    			des.ele('Num', places[j].id);
+				    			des.ele('Len', {'units': 'meters'}, distances.rows[i].elements[j].distance.value);
+				    			des.ele('Time', {'units': 'seconds'}, distances.rows[i].elements[j].duration.value);
+				    		}
+			    		}
+			    	}
+		    	}
+
+		    	xml = graphs_root.end({ pretty: true});
+
+
+		    	/* Generate XML and write to a file */
+				fs.writeFile('xml/' + trip_id + '/graphs.xml', xml, function(err, data) {
+			   		if (err) console.log(err);
+
+	     	 		console.log('XML for Distances Generated');
+			  	});
+
+			});
+
 			
-			promise.createConnection({
-			    host: 'localhost',
-			    user: 'root',
-			    password: 'password',
-			    database: 'placesdb'
+			/* REPLACE WITH THE RESULTS FROM THE ALGORITHMS */
 
-			}).then(function(conn){
-				connection = conn;
+			var num_days = diffBetweenDays(arrival, departure);
 
-				var values = [destination,
-			    	arrival.split('/')[2] + "-" + (arrival.split('/')[1]<10?'0':'') + arrival.split('/')[1] + "-" + (arrival.split('/')[0]<10?'0':'') + arrival.split('/')[0], 
-			    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0],
-			    	user_id, num_adults, num_children, category, travel_mode];
+			arrival = arrival.split('/')[0] + "-" + arrival.split('/')[1] + "-" + arrival.split('/')[2];
 
-			    var result = connection.query("call createTrip(?, ?, ?, ?, ?, ?, ?, ?)", values);
+	  		var days = getTripDays(arrival, parseInt(num_days), false);
 
-			    return result;
+	  		var start_hours = ["10:00", "13:00", "15:00", "16:15", "18:00"];
+	  		var end_hours = ["12:00", "14:30", "16:00", "18:00", "20:00"];
 
-			}).then(function(result){
-				plan_id = parseInt(result[0][0].tripID);
+	  		var start_time_list = [];
+	  		var end_time_list = [];
 
-				var num_days = diffBetweenDays(arrival, departure);
+	  		for(var i=0 ; i < days.length ; i++){
+	  			day = days[i].split('-')[2] + "-" + (days[i].split('-')[1]<10?'0':'') + days[i].split('-')[1] + "-" + (days[i].split('-')[0]<10?'0':'') + days[i].split('-')[0]
+	  			for(var j=0 ; j < start_hours.length; j++){
+	  				start_time_list.push(day + " " + start_hours[j]);
+	  				end_time_list.push(day + " " + end_hours[j]);
+	  			}
+	  		}
 
-				arrival = arrival.split('/')[0] + "-" + arrival.split('/')[1] + "-" + arrival.split('/')[2];
+	  		var i=0;
 
-		  		var days = getTripDays(arrival, parseInt(num_days), false);
+	        var list_pois_in_plan = [];
 
-		  		var start_hours = ["10:00", "13:00", "15:00", "16:15", "18:00"];
-		  		var end_hours = ["12:00", "14:30", "16:00", "18:00", "20:00"];
+	        while(i < start_time_list.length){
 
-		  		var start_time_list = [];
-		  		var end_time_list = [];
+	        	if(pois.length == list_pois_in_plan.length){
+        			break;
+        		}
+	        	
+	        	var poiIsValid = false;
 
-		  		for(var i=0 ; i < days.length ; i++){
-		  			day = days[i].split('-')[2] + "-" + (days[i].split('-')[1]<10?'0':'') + days[i].split('-')[1] + "-" + (days[i].split('-')[0]<10?'0':'') + days[i].split('-')[0]
-		  			for(var j=0 ; j < start_hours.length; j++){
-		  				start_time_list.push(day + " " + start_hours[j]);
-		  				end_time_list.push(day + " " + end_hours[j]);
-		  			}
-		  		}
+	        	while(!poiIsValid){
+	        		var poi = pois[i].id;
 
-		  		var i=0;
-
-		        var list_pois_in_plan = [];
-
-		        while(i < start_time_list.length){
-
-		        	if(pois.length == list_pois_in_plan.length){
-	        			break;
+	        		if(!list_pois_in_plan.includes(poi)){
+	        			list_pois_in_plan.push(poi);
+	        			poiIsValid = true;
 	        		}
-		        	
-		        	var poiIsValid = false;
+	        	}
 
-		        	while(!poiIsValid){
-		        		var poi = pois[i].id;
+			  	con.query("call addVisitToTrip(?, ?, ?, ?, ?)", [trip_id, poi, start_time_list[i], end_time_list[i], 0], function (err, result) {
+			    	if (err) throw err;
 
-		        		if(!list_pois_in_plan.includes(poi)){
-		        			list_pois_in_plan.push(poi);
-		        			poiIsValid = true;
-		        		}
-		        	}
+			  	});
 
-				  	con.query("call addVisitToTrip(?, ?, ?, ?, ?)", [plan_id, poi, start_time_list[i], end_time_list[i], 0], function (err, result) {
-				    	if (err) throw err;
-
-				  	});
-
-				  	i++;	
-		  		}
+			  	i++;	
+	  		}
 
 
-			    connection.end();
+		    connection.end();
 
 
-		    	console.log("TRIP CREATED: ", plan_id);
+	    	console.log("TRIP CREATED: ", trip_id);
 
-		    	res.render(path.join(__dirname+'/templates/see-trip.html'), {plan: plan_id});
+	    	res.render(path.join(__dirname+'/templates/see-trip.html'), {trip: trip_id});
 
-	    	});
 	    });
    	});
-
 });
 
 
@@ -1789,7 +1750,10 @@ app.post('/create-trip-m', function(req, res){
 	var hasBudgetConstraint = req.body.has_budget;
 	var budget = req.body.budget;
 	
-	var travel_mode = req.body.travel_mode.toUpperCase();
+	var travel_mode = 'DRIVING';
+
+	if(req.body.travel_mode != null)
+		travel_mode = travel_mode.toUpperCase();
 
     promise.createConnection({
 	    host: 'localhost',
@@ -1821,34 +1785,41 @@ app.post('/create-trip-m', function(req, res){
 
 });
 
-// create a plan from a already created plans
-app.post('/create-child-plan', function(req, res){
+// create a trip from a already created trip
+app.post('/create-child-trip', function(req, res){
 	var connection;
 
 	var user_id = parseInt(req.cookies['user']);
 
 	if(isNaN(user_id)){
-		// send error message
+		res.contentType('json');
+		res.send({result: 'error', msg: "You need to be logged in to do this action."});
 		return;
 	}
 
-	var plan_id = req.body.plan;
+	var trip_id = req.body.trip;
 
-	if(isNaN(plan_id)){
-		// send error message
+	if(isNaN(trip_id)){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The plan is not valid."});
 		return;
 	}
 
 	var start_date = req.body.start_date;
 
-	if(start_date == null)
-		return; // send error message
+	if(start_date == null){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The start date is invalid."});
+		return;
+	}
 
 	var end_date = req.body.end_date;
 
-	if(end_date == null)
-		return; // send error message
-
+	if(end_date == null){
+		res.contentType('json');
+		res.send({result: 'error', msg: "The end date is invalid."});
+		return;
+	}
 
 	var start_time_list = [];
 	var end_time_list = [];
@@ -1862,7 +1833,7 @@ app.post('/create-child-plan', function(req, res){
 	}).then(function(conn){
 		connection = conn;
 
-	    var result = connection.query("call getInfoTrip(?)", [plan_id]);
+	    var result = connection.query("call getInfoTrip(?)", [trip_id]);
 
     	return result;
 
@@ -1901,28 +1872,39 @@ app.post('/create-child-plan', function(req, res){
 
 		}
 
-		con.query("call createChildTrip(?,?,?,?,?)", [start_date, end_date, user_id, city, plan_id], function(err, result) {
-			if (err) throw err;
+		con.query("call createChildTrip(?,?,?,?,?)", [start_date, end_date, user_id, city, trip_id], function(err, result) {
+			if (err){
+				throw err;
+				res.contentType('json');
+				res.send({result: 'error', msg: 'Error generating the trip. Try again.'});
+				return;
+			}
 
 			result = result[0];
 
-			var child_plan = result[0].tripID;
+			var child_trip = result[0].tripID;
 
 			var i = 0;
 
 			while(i < start_time_list.length){
 
-				con.query("call addVisitToTrip(?,?,?,?, ?);", [child_plan, visits[i].poi_id, start_time_list[i], end_time_list[i], 0], function (err, result) {
+				con.query("call addVisitToTrip(?,?,?,?, ?);", [child_trip, visits[i].poi_id, start_time_list[i], end_time_list[i], 0], function (err, result) {
 			    	if (err) throw err;
 			  	});
 
 		  		i++;
 			}
 
-			console.log("TRIP CREATED: ", child_plan)
+
+			con.query("call unsetUserInterested(?,?)", [user_id, trip_id], function(err, result){
+				if (err) throw err;
+
+			});
+
+			console.log("TRIP CREATED: ", child_trip)
 
 			res.contentType('json');
-			res.send({result: 'success', plan: child_plan});
+			res.send({result: 'success', trip: child_trip});
 
 		});
 	});
@@ -1997,7 +1979,7 @@ app.post('/rename-trip', function(req, res){
 
 
 
-app.post('/share-trip', upload_trip.single('picture'), function (req, res, next){
+app.post('/share-trip', upload_trip.single('photo'), function (req, res, next){
 
 	var user_id = parseInt(req.cookies['user']);
 
@@ -2015,23 +1997,72 @@ app.post('/share-trip', upload_trip.single('picture'), function (req, res, next)
 		return;
 	}
 
-	var filename = req.file.filename;
-	var description = req.body.description;
-	var rating = req.body.rating;	
 
-
-	con.query("call shareTrip(?,?,?,?,?)", [trip_id, user_id, description, filename, rating], function (err, result, fields) {
+	con.query("call tripExists(?)", trip_id, function (err, result, fields) {
 		if (err) throw err;
 
-    	res.redirect('http://localhost:8080/trips');
+		result = result[0];
 
+		if(result[0].trip_exists == 0){
+			res.contentType('json');
+			res.send({result: 'error', msg: "The trip is not valid."});
+			return;
+		}
+
+		var filename = req.file.filename;
+		var description = req.body.description;
+		var rating = req.body.rating;	
+		var accessibility = req.body.accessibility;	
+		var security = req.body.security;	
+		var price_rating = req.body.price_rating;	
+
+		if(accessibility == "")
+			accessibility = null;
+
+		else{
+			accessibility = parseInt(accessibility);
+
+			if(accessibility < 1 || accessibility > 5){
+				accessibility = null;
+			}
+		}
+
+		if(security == "")
+			security = null;
+
+		else{
+			security = parseInt(security);
+
+			if(security < 1 || security > 5){
+				security = null;
+			}
+		}
+
+		if(price_rating == "")
+			price_rating = null;
+
+		else{
+			price_rating = parseInt(price_rating);
+
+			if(price_rating < 1 || price_rating > 5){
+				price_rating = null;
+			}
+		}
+
+
+		con.query("call shareTrip(?,?,?,?,?,?,?,?)", [trip_id, user_id, description, filename, rating, accessibility, security, price_rating], function (err, result, fields) {
+			if (err) throw err;
+
+	    	res.redirect('http://localhost:8080/trips');
+
+		});
 	});
 
 });
 
 
 
-app.post('/review-plan', function(req, res){
+app.post('/review-trip', function(req, res){
 
 	var user_id = parseInt(req.cookies['user']);
 
@@ -2041,33 +2072,97 @@ app.post('/review-plan', function(req, res){
 		return;
 	}
 
-	var plan_id = req.body.plan;
+	var trip_id = req.body.trip;
 
-	if(isNaN(plan_id)){
+	if(isNaN(trip_id)){
 		res.contentType('json');
-		res.send({result: 'error', msg: "The plan is not valid."});
+		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
 
-	var review = null;
-
-	if(req.body.review != undefined)
-		review = req.body.review;
-
-	var rating = parseInt(req.body.rating);	
-
-	if(isNaN(rating)){
-		res.contentType('json');
-		res.send({result: 'error', msg: "The rating is not valid."});
-		return;
-	}
-
-	con.query("call reviewTrip(?,?,?,?)", [plan_id, user_id, rating, review], function (err, result, fields) {
+	con.query("call tripExists(?)", trip_id, function (err, result, fields) {
 		if (err) throw err;
 
-		res.contentType('json');
-		res.send({result: 'success'});
+		result = result[0];
 
+		if(result[0].trip_exists == 0){
+			res.contentType('json');
+			res.send({result: 'error', msg: "The trip is not valid."});
+			return;
+		}
+
+		var review = null;
+
+		if(req.body.review != undefined)
+			review = req.body.review;
+
+		var review_rating = req.body.rating;	
+		var review_accessibility = req.body.rating_access;
+		var review_security = req.body.rating_security;
+		var review_price = req.body.rating_price;
+
+		if(review_rating == "" || review_rating == undefined){
+			res.contentType('json');
+			res.send({result: 'error', msg: "You must specify the rating."});
+			return;
+		}
+
+		else{
+			review_rating = parseInt(review_rating);
+
+			if(review_rating < 1 || review_rating > 5){
+				res.contentType('json');
+				res.send({result: 'error', msg: "The rating of the trip is not valid."});
+				return;
+			}
+		}
+
+		if(review_accessibility == "" || review_accessibility == undefined)
+			review_accessibility = null;
+
+		else{
+			review_accessibility = parseInt(review_accessibility);
+
+			if(review_accessibility < 1 || review_accessibility > 5){
+				review_accessibility = null;
+			}
+		}
+
+		if(review_security == "" || review_security == undefined)
+			review_security = null;
+
+		else{
+			review_security = parseInt(review_security);
+
+			if(review_security < 1 || review_rating > 5){
+				review_security = null;
+			}
+		}
+
+		if(review_price == "" || review_price == undefined)
+			review_price = null;
+
+		else{
+			review_price = parseInt(review_price);
+
+			if(review_price < 1 || review_price > 5){
+				review_price = null;
+			}
+		}
+
+
+		con.query("call reviewTrip(?,?,?,?,?,?,?)", [trip_id, user_id, review_rating, review, review_accessibility, review_security, review_price], function (err, result, fields) {
+			if (err){
+				throw err;
+				res.contentType('json');
+				res.send({result: 'error', msg: "Error making the review. Try again !"});
+				return;
+			} 
+
+			res.contentType('json');
+			res.send({result: 'success'});
+
+		});
 	});
 });
 
@@ -2228,15 +2323,15 @@ app.post('/user-interested', function(req, res){
 		return;
 	}
 
-	var plan_id = req.body.plan;
+	var trip_id = req.body.trip;
 
-	if(isNaN(plan_id)){
+	if(isNaN(trip_id)){
 		res.contentType('json');
-		res.send({result: 'error', msg: "The plan is not valid."});
+		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
 
-	con.query("call setUserInterested(?,?)", [user_id, plan_id], function (err, result, fields) {
+	con.query("call setUserInterested(?,?)", [user_id, trip_id], function (err, result, fields) {
     	if (err){
     		throw err;
     		res.send(JSON.stringify('error'));
@@ -2260,15 +2355,15 @@ app.post('/user-not-interested', function(req, res){
 		return;
 	}
 
-	var plan_id = req.body.plan;
+	var trip_id = req.body.trip;
 
-	if(isNaN(plan_id)){
+	if(isNaN(trip_id)){
 		res.contentType('json');
-		res.send({result: 'error', msg: "The plan is not valid."});
+		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
 
-	con.query("call unsetUserInterested(?,?)", [user_id, plan_id], function (err, result, fields) {
+	con.query("call unsetUserInterested(?,?)", [user_id, trip_id], function (err, result, fields) {
     	if (err){
     		throw err;
     		res.send(JSON.stringify('error'));
@@ -2528,9 +2623,8 @@ app.get('/trip', function(req, res){
 	var user_id = parseInt(req.cookies['user']);
 
 	if(isNaN(user_id)){
-		res.contentType('json');
-		res.send({result: 'error', msg: "You need to be logged in to do this action."});
-		return;
+		res.render(path.join(__dirname+'/templates/need-login.html'));
+		return;	
 	}
 
 	var trip_id = parseInt(req.query['id']);
@@ -2539,7 +2633,7 @@ app.get('/trip', function(req, res){
 		res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
 	}
 
-	var view_method = req.query['v']; // method chose by the user to see his trip
+	var view_method = req.query['v']; // method chose by the user to see his/her trip
 
 	/* variables to store the information from the trip */
 	var start_date = "n/a";
@@ -2550,7 +2644,9 @@ app.get('/trip', function(req, res){
     var isPublic = 0;
     var source;
     var num_viewers = 0;
+    var openslots = {};
 
+    /* check if the trip with that ID exists */
     con.query("call tripExists(?)", trip_id, function (err, result, fields) {
 		if (err) throw err;
 
@@ -2561,7 +2657,8 @@ app.get('/trip', function(req, res){
 			return;
 		}
 
-		con.query("call getVisitsFromTrip(?, ?)", [user_id, trip_id], function (err, result, fields) {
+
+		con.query("call getVisitsFromTrip(?,?)", [user_id, trip_id], function (err, result, fields) {
 			if (err) throw err;
 
 			result = result[0];
@@ -2593,6 +2690,43 @@ app.get('/trip', function(req, res){
 	        	for(var i=0; i < days.length; i++){
 	        		days_shortname.push(convertToDateFormat(days[i].split(', ')[1]));
 	        	}
+
+
+	        	/* get the open slots of the trip that can have a new visit or move a visit to */
+	        	var list_places_trip = [];
+    			var trip = {};
+
+    			for(var i=0 ; i < days.length; i++){
+    				var d = new Date(days[i]);
+    				d = d.getFullYear() + "-" + (d.getMonth()<10?'0':'') + (d.getMonth() + 1)  + "-" + (d.getDate()<10?'0':'') + d.getDate();
+    				trip[d] = [];
+    			}
+
+    			for(var i =0 ; i < result.length; i++){
+		        	list_places_trip.push(result[i].poi_id);
+
+					var visit = new Object();
+
+		        	var start_time = new Date(result[i].start_time);
+					var end_time = new Date(result[i].end_time);
+
+					var day = start_time.getFullYear() + "-" + (start_time.getMonth()<10?'0':'') + (start_time.getMonth() + 1)  + "-" + (start_time.getDate()<10?'0':'') + start_time.getDate();
+
+		        	visit["start_time"] = start_time.getHours() + ":" + (start_time.getMinutes()<10?'0':'') + start_time.getMinutes();
+		        	visit["end_time"] = end_time.getHours() + ":" + (end_time.getMinutes()<10?'0':'') + end_time.getMinutes();
+
+		        	if(trip[day] != undefined){
+		        		trip[day].push(visit);
+		        	}
+
+		        	else{
+		        		trip[day] = [];
+		        		trip[day].push(visit);
+		        	}
+		        }
+
+		        openslots = getAllOpenSlotsAvailable(trip);
+
 
 	        	/* if the user didn't give a name to his trip, use the default 'Your visit to <name of the city>' */
 	        	if(result[0].trip_name != null && result[0].trip_name.length > 0)
@@ -2816,7 +2950,11 @@ app.get('/trip', function(req, res){
 				        	visit["name"] = result[i].name;
 				        	visit["place_id"] = result[i].place_id;
 				        	visit["poi_type"] = result[i].poi_type;
-				        	visit["photo"] = result[i].photo;
+
+				        	if(result[i].photo != null)
+				        		visit["photo"] = result[i].photo.replace(/\\/g,"/");
+				        	else
+				        		visit["photo"] = null;
 
 				        	if(result[i].poi_type.toUpperCase() == 'HOTEL' && suggested_hotels.length < Math.floor(size / 2))
 				        		suggested_hotels.push(visit);
@@ -2850,64 +2988,72 @@ app.get('/trip', function(req, res){
 				        		result = result[0];
 
 				        		var rating = "0.0";
+				        		var accessibility_rating = "No information available";
+				        		var security_rating = "No information available";
+				        		var price_rating = "No information available";
 				        		var num_reviews = 0;
+				        		var num_trips = 0;
+				        		var num_interests = 0;
+
 
 				        		if(result.length > 0){
 				        			num_reviews = result[0].num_reviews;
+				        			num_trips = result[0].num_trips;
+				        			num_interests = result[0].num_interests;
 				        			if(result[0].rating != null)
 				        				rating = result[0].rating.toFixed(1);
+				        			if(result[0].accessibilityRating != null)
+				        				accessibility_rating = result[0].accessibilityRating.toFixed(1);
+				        			if(result[0].securityRating != null)
+				        				security_rating = result[0].securityRating.toFixed(1);
+				        			if(result[0].priceRating != null)
+				        				price_rating = result[0].priceRating.toFixed(1);
+
+				        		}
+					        		
+
+				        		if(source != "author"){
+				        			if(isPublic == "1"){
+					        			con.query("call isUserInterested (?, ?)", [user_id, trip_id], function (err, result, fields) {
+					        				if (err) throw err;
+
+					        				result = result[0];
+
+					        				var isInterested = result[0].isInterested;
+
+					        				data = {trip_id: trip_id, name: name, trip: trip, start_date: start_date, end_date: end_date, city: city, city_latitude: city_latitude, city_longitude: city_longitude, days: days, days_shortname: days_shortname, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, accessibility_rating: accessibility_rating, security_rating: security_rating, price_rating: price_rating, num_reviews: num_reviews, num_trips: num_trips, num_interests: num_interests, isInterested: isInterested, isEditable: 0, travel_mode: travel_mode, num_persons: num_persons, openslots: openslots};
+
+					        				if(view_method == "full")
+					        					res.render(path.join(__dirname+'/templates/full-trip.html'), data);
+					        				else if(view_method == "map")
+					        					res.render(path.join(__dirname+'/templates/map.html'), data);
+					        				else
+					        					res.render(path.join(__dirname+'/templates/trip.html'), data);
+
+					        			});
+				        			}
+						        		
+					        		else
+						        		res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
 				        		}
 
-						        con.query("call getSharedTripsFromTrip(?)", trip_id, function (err, result, fields) {
-					        		if (err) throw err;
+				        		else{
 
-					        		result = result[0];
+				        			isEditable = 1;
 
-					        		var num_trips = 0;
+				        			if(isPublic == "1" || new Date(start_date) <= new Date())
+				        				isEditable = 0;
 
-					        		if(result.length > 0)
-					        			num_trips = result[0].num_trips;
+				        			data = {trip_id: trip_id, name: name, trip: trip, start_date: start_date, end_date: end_date, city: city, city_latitude: city_latitude, city_longitude: city_longitude, days: days, days_shortname: days_shortname, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, accessibility_rating: accessibility_rating, security_rating: security_rating, price_rating: price_rating, num_reviews: num_reviews, num_trips: num_trips, num_interests: num_interests, isInterested: 0, isEditable: isEditable, travel_mode: travel_mode, num_persons: num_persons, openslots: openslots};
 
-					        		if(source != "author"){
-					        			if(isPublic == "1"){
-						        			con.query("call isUserInterested (?, ?)", [user_id, trip_id], function (err, result, fields) {
-						        				if (err) throw err;
-
-						        				data = {trip_id: trip_id, name: name, trip: trip, start_date: start_date, end_date: end_date, city: city, city_latitude: city_latitude, city_longitude: city_longitude, days: days, days_shortname: days_shortname, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, num_reviews: num_reviews, num_trips: num_trips, isInterested: isInterested, isEditable: 0, travel_mode: travel_mode, num_persons: num_persons};
-
-						        				if(view_method == "full")
-						        					res.render(path.join(__dirname+'/templates/full-trip.html'), data);
-						        				else if(view_method == "map")
-						        					res.render(path.join(__dirname+'/templates/map.html'), data);
-						        				else
-						        					res.render(path.join(__dirname+'/templates/trip.html'), data);
-
-						        			});
-					        			}
-							        		
-						        		else
-							        		res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
-					        		}
-
-					        		else{
-
-					        			isEditable = 1;
-
-					        			if(isPublic == "1" || new Date(start_date) <= new Date())
-					        				isEditable = 0;
-
-					        			data = {trip_id: trip_id, name: name, trip: trip, start_date: start_date, end_date: end_date, city: city, city_latitude: city_latitude, city_longitude: city_longitude, days: days, days_shortname: days_shortname, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, num_reviews: num_reviews, num_trips: num_trips, isInterested: 0, isEditable: isEditable, travel_mode: travel_mode, num_persons: num_persons};
-
-					        			if(view_method == "full")
-				        					res.render(path.join(__dirname+'/templates/full-trip.html'), data);
-				        				else if(view_method == "map")
-				        					res.render(path.join(__dirname+'/templates/map.html'), data);
-				        				else
-				        					res.render(path.join(__dirname+'/templates/trip.html'), data);
-						        		
-					        		}
-
-				        		});
+				        			if(view_method == "full")
+			        					res.render(path.join(__dirname+'/templates/full-trip.html'), data);
+			        				else if(view_method == "map")
+			        					res.render(path.join(__dirname+'/templates/map.html'), data);
+			        				else
+			        					res.render(path.join(__dirname+'/templates/trip.html'), data);
+					        		
+				        		}
 			        		});
 		        		});
 	        		});
@@ -2937,8 +3083,7 @@ app.get('/trip-m', function(req,res){
 	}
 
 	if(isNaN(user_id)){
-		res.contentType('json');
-		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		res.render(path.join(__dirname+'/templates/need-login.html'));
 		return;
 	}
 
@@ -3247,10 +3392,13 @@ app.get('/trip-m', function(req,res){
 
 
 
+/* view calendar to be implemented in the future
 
 app.get('/calendar', function(req, res){
 	res.render(path.join(__dirname+'/templates/calendar.html'),);
 });
+
+*/
 
 
 
@@ -3273,6 +3421,7 @@ app.get('/trips', function(req, res){
 	        var scheduled_trips = [];
 	        var past_trips = [];
 	        var development_trips = [];
+	        var interested_trips = [];
 
 	        for(var i=0 ; i < result.length; i++){
 
@@ -3320,7 +3469,46 @@ app.get('/trips', function(req, res){
 	        sortTrips(scheduled_trips,"cresc");
 	        sortTrips(past_trips,"desc");
 
-			res.render(path.join(__dirname+'/templates/trips.html'),  {past_trips: past_trips, scheduled_trips: scheduled_trips, development_trips: development_trips});
+	        con.query("call getInterestedTripsByUser(?)", user_id, function (err, result, fields) {
+	        	if (err) throw err;
+
+	        	result = result[0];
+
+	        	for(var i=0 ; i < result.length; i++){
+	        		var trip = new Object();
+	        		trip["id"] = result[i].trip_id;
+
+		        	if(result[i].name != null && result[i].name.length > 0)
+		        		trip["name"] = result[i].name;
+		        	else
+		        		trip["name"] = 'Visit to ' + result[i].city;
+
+		        	trip["city"] = result[i].city;
+
+		        	trip["author"] = result[i].author;
+		        	trip["creation_date"] = result[i].creation_date.toJSON().slice(0,10);;
+
+		        	if(result[i].type_use == "Premium")
+						trip["isPremium"] = 1;
+
+		        	if(result[i].photo != undefined)
+		        		trip["photo"] = result[i].photo;
+
+		        	else if(result[i].city_photo != undefined)
+		        		trip["photo"] = result[i].city_photo.replace(/\\/g,"/");
+
+		        	start_date = new Date(result[i].start);
+		        	end_date = new Date(result[i].end);
+		        	
+		        	trip["start"] = start_date.getDate() + " " + convertToTextMonth(start_date.getMonth()) + " " + start_date.getFullYear();
+    				trip["end"] = end_date.getDate() + " " + convertToTextMonth(end_date.getMonth()) + " " + end_date.getFullYear();
+
+    				interested_trips.push(trip)
+
+	        	}
+
+				res.render(path.join(__dirname+'/templates/trips.html'),  {past_trips: past_trips, scheduled_trips: scheduled_trips, development_trips: development_trips, interested_trips: interested_trips});
+			});
 	    });
 	}
 
@@ -3335,7 +3523,7 @@ app.get('/trips', function(req, res){
 });
 
 
-// login usando o GOOGLE
+// login using GOOGLE
 app.post('/login-g', function(req, res){
 
 	var googleID = req.body.google_id;
@@ -3365,7 +3553,7 @@ app.post('/login-g', function(req, res){
 
 
 
-
+// login using user account
 app.post('/login-e', function(req, res){
 	var username = req.body.email;
 	var password = md5(req.body.password);
@@ -3428,18 +3616,27 @@ app.post('/register', upload.single('photo'), function (req, res, next){
 
 	var birthday = req.body.birthday;
 
-	if(birthday != null)
+	console.log(birthday);
+
+	if(birthday != '' && birthday != null)
 		birthday = birthday.split('/')[2] + "-" + birthday.split('/')[1] + "-" + birthday.split('/')[0];
+	else
+		birthday = null;
 
 	var gender = req.body.gender;
 
 	if(gender != 'M' || gender != 'F')
 		gender = null;
 
+	var type_use = req.body.type_use;
+
+	if(type_use != 'Free' && type_use != 'Premium')
+		type_use = 'Free';
+
 
 	var password = md5(req.body.password);
 
-	con.query("call register(?,?,?,?,?,?,?,?)", [username, name, picture, birthday, gender, country, phone_number, password], function (err, result, fields) {
+	con.query("call register(?,?,?,?,?,?,?,?,?)", [username, name, picture, birthday, gender, country, phone_number, type_use, password], function (err, result, fields) {
     	if (err) throw err;
 
     	result = result[0];
@@ -3471,8 +3668,7 @@ app.get('/profile', function(req, res){
 	var user_id = req.cookies['user'];
 
 	if(isNaN(user_id)){
-		res.contentType('json');
-		res.send({result: 'error', msg: "You need to be logged in to do this action."});
+		res.render(path.join(__dirname+'/templates/need-login.html'));
 		return;
 	}
 
@@ -3519,13 +3715,15 @@ app.get('/profile', function(req, res){
 	        var num_trips_used = 0;
 	        var num_reviews = 0;
 	        var num_photos = 0;
+	        var num_pois = 0;
 
 	        num_trips = result.num_trips;
 	        num_trips_used = result.num_trips_used;
 	        num_reviews = result.num_reviews;
 	        num_photos = result.num_photos;
+	        num_pois = result.num_pois;
 
-        	res.render(path.join(__dirname+'/templates/profile.html'), {name: name, picture: picture, birthday: birthday, address: address, phone_number: phone_number, gender: gender, country: country, username: username, num_trips: num_trips, num_trips_used: num_trips_used, num_reviews: num_reviews, num_photos: num_photos});
+        	res.render(path.join(__dirname+'/templates/profile.html'), {name: name, picture: picture, birthday: birthday, address: address, phone_number: phone_number, gender: gender, country: country, username: username, num_trips: num_trips, num_trips_used: num_trips_used, num_reviews: num_reviews, num_photos: num_photos, num_pois: num_pois});
 	
         });
 	});
@@ -3653,24 +3851,38 @@ app.post('/edit-profile-picture', upload.single('photo'), function (req, res, ne
 
 app.get('/request-poi', function(req, res){
 
-	con.query("call getCities();", function (err, result, fields) {
-    	if (err) throw err;
+	con.query("call getUserType(?)", user_id, function (err, result, fields){
+		if (err) throw err;
 
-    	result = result[0];
+		result = result[0];
 
-    	cities = [];
+		var isUserPremium = false;
 
-    	for(var i=0; i < result.length; i++){
-    		cities.push(result[i].name);
-    	}
+		if(result.length == 0 || result[0].type_use != 'Premium'){
+			res.render(path.join(__dirname+'/templates/404page.html'));
+			return;
+		}
+
+		con.query("call getCities();", function (err, result, fields) {
+			if (err) throw err;
+
+			result = result[0];
+
+			cities = [];
+
+			for(var i=0; i < result.length; i++){
+				cities.push(result[i].name);
+			}
 
 
-    	res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: cities, wasSubmitedWithSuccess: -1});
+			res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: cities, wasSubmitedWithSuccess: -1});
 
-    });
+		});
+	});
 
 });
 
+/* feature that allows users to submit new POI to the DB */
 app.post('/request-poi', upload_poi.single('photo'), function(req, res){
 
 	var user_id = req.cookies['user'];
@@ -3679,97 +3891,117 @@ app.post('/request-poi', upload_poi.single('photo'), function(req, res){
 
 	// verificar se o utilizador pode submeter
 
-	var poi_name = req.body.title;
-	var poi_description = req.body.description;
-	var poi_latitude = parseFloat(req.body.latitude);
-	var poi_longitude = parseFloat(req.body.longitude);
-	var poi_address = req.body.address;
-	var poi_type = req.body.poi_type;
-	var poi_website = req.body.website;
-	var poi_phone_number = req.body.phone_number;
-	var poi_photo = req.file.path;
-	var poi_city = req.body.city;
+	con.query("call getUserType(?)", user_id, function (err, result, fields){
+		if (err) throw err;
 
-	var google_place_id = req.body.google_place_id;
-	var google_rating = parseFloat(req.body.google_rating).toFixed(1);
-	var google_num_reviews = parseInt(req.body.google_reviews);
+		result = result[0];
 
-	if(google_place_id == "None")
-		google_place_id = null;
+		var isUserPremium = false;
 
-	if(isNaN(google_rating)){
-		res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
-		return;
-	}
-
-	if(isNaN(google_num_reviews)){
-		res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
-		return;
-	}
-
-	if(isNaN(poi_latitude)){
-		res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
-		return;
-	}
-
-	if(isNaN(poi_longitude)){
-		res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
-		return;
-	}
-
-	if(poi_description == "")
-		poi_description = null;
-
-	if(poi_website == "")
-		poi_website = null;
-
-	if(poi_phone_number == "")
-		poi_phone_number = null;
-	else if(isNaN(parseInt(poi_phone_number))){
-		res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
-		return;
-	}
-
-
-	var sql = "call submitPOI(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-	var values = [poi_name, poi_description, poi_latitude, poi_longitude, poi_address, poi_type, poi_website, poi_phone_number, poi_city, user_id, google_place_id, google_rating, google_num_reviews];
-
-	con.query(sql, values, function (err, result, fields) {
-		if (err){
-			throw err;
-			res.send(JSON.stringify('error'));
+		if(result.length == 0 || result[0].type_use != 'Premium'){
+			res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
+			return;
 		}
 
-		else{
-			poi_id = result[0][0].poiID;
 
-			var newPath = path.join(__dirname, 'dist/img/poi/' + poi_id + "/" + Date.now() + Math.random().toString(36).substring(2) + path.extname(poi_photo));
-			var newPath_rel = newPath.split('dist')[1];
+		var poi_name = req.body.title;
+		var poi_description = req.body.description;
+		var poi_latitude = parseFloat(req.body.latitude);
+		var poi_longitude = parseFloat(req.body.longitude);
+		var poi_address = req.body.address;
+		var poi_type = req.body.poi_type;
+		var poi_website = req.body.website;
+		var poi_phone_number = req.body.phone_number;
+		var poi_photo = req.file.path;
+		var poi_city = req.body.city;
 
-			mkdirp(path.join(__dirname, 'dist/img/poi/' + poi_id), function(err) {
-				if (err) throw err;
+		var google_place_id = req.body.google_place_id;
+		var google_rating = parseFloat(req.body.google_rating).toFixed(1);
+		var google_num_reviews = parseInt(req.body.google_reviews);
 
-			});
+		if(google_place_id == "None")
+			google_place_id = null;
 
-			fs.rename(poi_photo, newPath, function (err) {
-			  if (err) throw err;
-			});
-
-
-			sql = "call uploadPOIPhoto(?, ?, ?);";
-			values = [poi_id, user_id, newPath_rel];
-
-			con.query(sql, values, function (err, result, fields) {
-		    	if (err) throw err;
-
-		    	res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: 1});
-
-		    });
+		if(isNaN(google_rating)){
+			res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
+			return;
 		}
+
+		if(isNaN(google_num_reviews)){
+			res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
+			return;
+		}
+
+		if(isNaN(poi_latitude)){
+			res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
+			return;
+		}
+
+		if(isNaN(poi_longitude)){
+			res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
+			return;
+		}
+
+		if(poi_description == "" || poi_description == undefined)
+			poi_description = null;
+
+		if(poi_website == "" || poi_website == undefined)
+			poi_website = null;
+
+		if(poi_phone_number == "" || poi_phone_number == undefined)
+			poi_phone_number = null;
+		else if(isNaN(parseInt(poi_phone_number))){
+			res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
+			return;
+		}
+
+		if(poi_type == 'Other'){
+			poi_type = req.body.other_poi_type;
+		}
+
+
+		var sql = "call submitPOI(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		var values = [poi_name, poi_description, poi_latitude, poi_longitude, poi_address, poi_type, poi_website, poi_phone_number, poi_city, user_id, google_place_id, google_rating, google_num_reviews];
+
+		con.query(sql, values, function (err, result, fields) {
+			if (err){
+				throw err;
+				res.send(JSON.stringify('error'));
+			}
+
+			else{
+				poi_id = result[0][0].poiID;
+
+				var newPath = path.join(__dirname, 'dist/img/poi/' + poi_id + "/" + Date.now() + Math.random().toString(36).substring(2) + path.extname(poi_photo));
+				var newPath_rel = newPath.split('dist')[1];
+
+				mkdirp(path.join(__dirname, 'dist/img/poi/' + poi_id), function(err) {
+					if (err) throw err;
+
+				});
+
+				fs.rename(poi_photo, newPath, function (err) {
+				  if (err) throw err;
+				});
+
+
+				sql = "call uploadPOIPhoto(?, ?, ?);";
+				values = [poi_id, user_id, newPath_rel];
+
+				con.query(sql, values, function (err, result, fields) {
+			    	if (err) throw err;
+
+			    	res.redirect('http://localhost:8080/place?id=' + poi_id);
+	    			console.log("POI: ", poi_id, ' ADDED WITH SUCCESS');
+			    });
+			}
+		});
 	});
-
 });
 
+
+/* let users review requests of POIs from other users 
+   feature implemented but removed because its too complex -> requests of POIs are automatically added to the DB
 
 app.get('/review-poi', function(req, res){
 
@@ -3920,6 +4152,8 @@ app.post('/reject-poi', function(req, res){
     });
 
 });
+
+*/
 
 
 
@@ -4133,6 +4367,29 @@ app.post('/upload-city-photo', upload_city.single('photo'), function(req, res){
 
     });
 
+});
+
+
+// update place_id of a city when its null
+app.post('/update-city-place-id', function(req, res){
+
+	var city = req.body['city'];
+
+	if(city == null || city == '')
+		return;
+
+	var place_id = req.body.place_id;
+
+	if(place_id == null || place_id == '')
+		return;
+
+	con.query("call updateCityPlaceID(?,?)", [city, place_id], function (err, result, fields) {
+    	if (err) throw err;
+
+    	res.contentType('json');
+		res.send({result: 'success'});
+
+	});
 });
 
 

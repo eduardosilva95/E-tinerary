@@ -206,6 +206,63 @@
                         <% }); %> 
                     </div>
 
+
+                    <div class="trips-div" id="interested-trips">
+
+                        <div class="cont">
+                            <div class="card card-body">
+                                <h5 style="font-weight: bold;">Trips that I'm interested in</h5>
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <% count = 0 %>
+                        <% interested_trips.forEach(function(trip) { %>
+
+                        <div class="card" style="height: 150px;">
+                            <div class="row">
+                                <div class="col-md-3 col-5">
+                                    <img id="interested-trip-<%= count %>-img" class="img-fluid card-img" alt="" style="height: 148px; width: 100%;">
+                                </div>
+                                <div class="col-md-9 col-7">
+                                    <div class="card-body row">
+                                        <div class="col-md-8 col-12">
+                                            <div class="text-left">
+                                                <a href="/trip?id=<%= trip.id %>" class="trip-link"><span class="card-title"><b><%= trip.name %></b></span></a>
+                                                <% if(trip.isPremium == 1) { %>
+                                                    <p class="card-text" style="overflow:unset"><i style="color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
+                                                <% } else { %>
+                                                    <p class="card-text" style="overflow:unset"><small class="text-muted" style="font-weight: 0.6;">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
+                                                <% } %>
+                                                <br>
+                                                <span class="text-bottom"><%= trip.start %> - <%= trip.end %></span> 
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4" id="favorite-trip-div">
+
+                                            <div class="plan-table-icons text-right"> 
+                                                <a class="plan-table-btn-icons" href="/trip?id=<%= trip.id %>"><i title="See trip" class="fas fa-search-location"></i></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <br>
+
+                        <script>
+                            var city = "<%= trip.city %>";
+                            getCityImage(city, "interested-trip-<%= count %>-img" , "<%= trip.photo %>");
+                        </script>
+
+                        <% count = count + 1 %>
+                        
+                        <% }); %> 
+    
+                    </div>
+
                     <div class="trips-div" id="past-trips">
 
                         <div class="cont">
@@ -292,6 +349,10 @@
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" class="custom-control-input" value="Scheduled Trips" id="scheduled-trips-checkbox" checked>
                                         <label class="custom-control-label" for="scheduled-trips-checkbox">Scheduled Trips</label>                    
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" value="Trips that I'm interested in" id="interested-trips-checkbox" checked>
+                                        <label class="custom-control-label" for="interested-trips-checkbox">Trips that I'm interested in</label>                    
                                     </div>
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" class="custom-control-input" value="Past Trips" id="past-trips-checkbox" checked>

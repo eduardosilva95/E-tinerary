@@ -22,6 +22,8 @@ DROP PROCEDURE getUserStats;
 DROP PROCEDURE setUserInterested;
 DROP PROCEDURE unsetUserInterested;
 DROP PROCEDURE isUserInterested;
+DROP PROCEDURE numUsersInterestedInTrip;
+DROP PROCEDURE getInterestedTripsByUser;
 DROP PROCEDURE setFavoriteTrip;
 DROP PROCEDURE unfavoriteTrip;
 DROP PROCEDURE reviewPOI;
@@ -72,6 +74,8 @@ DROP PROCEDURE getCityTrips;
 DROP PROCEDURE getCityStats;
 DROP PROCEDURE discover;
 DROP PROCEDURE tripExists;
+DROP PROCEDURE updateCityPlaceID;
+
 
 DELIMITER //
 
@@ -84,8 +88,8 @@ END //
 # obter as N cidades com mais itinerarios criados
 CREATE PROCEDURE getTopCities (num_results INT)
 BEGIN
-	select name, count(name) as trips from 
-	(select city.name from trip join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on trip.id = visit.trip_id where trip.isActive = 1 group by trip.id) t 
+	select name, place_id, photo, count(name) as trips from 
+	(select city.name, city.place_id, photo_city_tmp.photo_url as photo from trip join (visit join (poi join (city left join (SELECT ph1.* FROM photo_city as ph1 LEFT JOIN photo_city as ph2 ON ph1.city_id = ph2.city_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.city_id IS NULL) as photo_city_tmp on city.id = photo_city_tmp.city_id) on poi.city = city.id) on visit.poi_id = poi.id) on trip.id = visit.trip_id where trip.isActive = 1 group by trip.id) t 
     group by name order by trips desc limit num_results;
 END //
 
@@ -98,16 +102,16 @@ END //
 # obter os N POIs com mais itinerarios criados
 CREATE PROCEDURE getTopPOIs (num_results INT)
 BEGIN
-	select id, name, place_id, city, count(name) as trips from 
-    (select distinct poi.id, poi.name, poi.place_id, city.name as city, trip.id as trip from trip join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on trip.id = visit.trip_id where trip.isActive = 1 and poi.isAproved = 1) t 
+	select id, name, place_id, photo, city, count(name) as trips from 
+    (select distinct poi.id, poi.name, poi.place_id, photo_poi_tmp.photo_url as photo, city.name as city, trip.id as trip from trip join (visit join ((poi left join (SELECT ph1.* FROM photo_poi as ph1 LEFT JOIN photo_poi as ph2 ON ph1.poi_id = ph2.poi_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.poi_id IS NULL) as photo_poi_tmp on poi.id = photo_poi_tmp.poi_id) join city on poi.city = city.id) on visit.poi_id = poi.id) on trip.id = visit.trip_id where trip.isActive = 1 and poi.isAproved = 1) t 
     group by name order by trips desc limit num_results;
 END //
 
 # obter N cidades random
 CREATE PROCEDURE getRandomCities (num_results INT)
 BEGIN
-	select name, count(name) as trips from 
-    (select city.name from trip join (visit join (poi join city on poi.city = city.id) on visit.poi_id = poi.id) on trip.id = visit.trip_id where trip.isActive = 1 group by trip.id) t 
+	select name, place_id, photo, count(name) as trips from 
+    (select city.name, city.place_id, photo_city_tmp.photo_url as photo from trip join (visit join (poi join (city left join (SELECT ph1.* FROM photo_city as ph1 LEFT JOIN photo_city as ph2 ON ph1.city_id = ph2.city_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.city_id IS NULL) as photo_city_tmp on city.id = photo_city_tmp.city_id) on poi.city = city.id) on visit.poi_id = poi.id) on trip.id = visit.trip_id where trip.isActive = 1 group by trip.id) t 
     group by name order by rand() limit num_results;
 END //
 
@@ -255,7 +259,7 @@ BEGIN
 		SELECT count(*) into num_visits FROM poi join (visit join trip on visit.trip_id = trip.id) on poi.id = visit.poi_id where poi.id = poiID AND trip.id = tripID;
 		
         IF num_visits > 0 THEN
-			SELECT id, place_id, name as name, description as description, address, latitude, longitude, google_rating, phone_number, website, poi_type, opening_hours, start_time as start_time, end_time as end_time, no_trips, rating, accessibility, security, rating_price, duration FROM
+			SELECT id, place_id, name as name, description as description, address, latitude, longitude, google_rating, phone_number, website, price, price_children, poi_type, opening_hours, start_time as start_time, end_time as end_time, no_trips, rating, accessibility, security, rating_price, duration FROM
 			(SELECT poi.id as id, place_id, poi.name as name, poi.description as description, address, latitude, longitude, google_rating, phone_number, website, poi_type, opening_hours, visit.start_time as start_time, visit.end_time as end_time FROM poi join (visit join trip on visit.trip_id = trip.id) on poi.id = visit.poi_id where poi.id = poiID AND trip.id = tripID) AS A 
 			LEFT JOIN
 			(SELECT count(*) as no_trips, poi.id as id2 from trip join visit join poi on visit.poi_id = poi.id on trip.id = visit.trip_id where poi.id = poiID) AS B
@@ -264,7 +268,7 @@ BEGIN
 			(SELECT avg(review_rating) as rating, avg(review_rating_accessibility) as accessibility, avg(review_rating_security) as security, avg(review_rating_price) as rating_price, avg(review_rating_duration) as duration, poi_id as id3 from review_poi where poi_id = poiID) AS D
 			ON A.id = D.id3;
 		ELSE
-			SELECT id, place_id, name, description, address, latitude, longitude, google_rating, phone_number, website, poi_type FROM poi where poi.id = poiID;
+			SELECT id, place_id, name, description, address, latitude, longitude, google_rating, phone_number, website, price, price_children, poi_type FROM poi where poi.id = poiID;
         END IF;
 	END IF;
 END //
@@ -320,17 +324,19 @@ BEGIN
 	DECLARE num_trips_used INT;
 	DECLARE num_reviews INT;
 	DECLARE num_photos INT;
+	DECLARE num_pois INT;
 
 	SELECT count(*) INTO num_trips FROM trip WHERE user = userID;
 	SELECT count(*) INTO num_trips_used FROM trip as t1 JOIN trip as t2 on t1.id = t2.parent_trip WHERE t1.user = userID;
 	SELECT count(*) INTO num_reviews FROM review WHERE user_id = userID;
 	SELECT count(*) INTO num_photos FROM photo_poi WHERE user_id = userID;
+	SELECT count(*) INTO num_pois FROM poi WHERE submitionUser = userID;
 
-	SELECT num_trips, num_trips_used, num_reviews, num_photos;
+	SELECT num_trips, num_trips_used, num_reviews, num_photos, num_pois;
     
 END //
 
-# utilizador está interessado num itinerario
+# utilizador está interessado numa viagem
 CREATE PROCEDURE setUserInterested (userID INT, tripID INT)
 BEGIN
 	DECLARE existsColumn INT;
@@ -345,7 +351,7 @@ BEGIN
 END //
 
 
-# utilizador não está interessado num itinerario
+# utilizador não está interessado numa viagem
 CREATE PROCEDURE unsetUserInterested (userID INT, tripID INT)
 BEGIN
 	DECLARE existsColumn INT;
@@ -358,7 +364,7 @@ BEGIN
 END //
 
 
-# verificar se o utilizador está interessado num itinerario
+# verificar se o utilizador está interessado numa viagem
 CREATE PROCEDURE isUserInterested (userID INT, tripID INT)
 BEGIN
 	DECLARE existsColumn INT;
@@ -376,6 +382,21 @@ BEGIN
 		SELECT 0 AS isInterested;
 	END IF;
 END //
+
+
+# obter o numero de utilizadores interessados numa viagem
+CREATE PROCEDURE numUsersInterestedInTrip (tripID INT)
+BEGIN
+	SELECT COUNT(*) AS num_interests FROM user_isinterested_trip WHERE trip_id = tripID and user_isinterested_trip.isInterested = 1;
+END //
+
+
+# obter a lista de viagens que o utilizador está interessado
+CREATE PROCEDURE getInterestedTripsByUser (userID INT)
+BEGIN
+	SELECT DISTINCT trip.name as name, city.name as city, trip.start_date as start, trip.end_date as end, trip.id as trip_id, trip.isPublic as isPublic, trip.photo as photo, trip.trip_timestamp as creation_date, user.name as author, user.type_use, photo_city_tmp.photo_url as city_photo from ((trip join (city left join (SELECT ph1.* FROM photo_city as ph1 LEFT JOIN photo_city as ph2 ON ph1.city_id = ph2.city_id AND ph1.photo_timestamp > ph2.photo_timestamp WHERE ph2.city_id IS NULL) as photo_city_tmp on city.id = photo_city_tmp.city_id) on trip.city = city.id) left join visit on trip.id = visit.trip_id) join user_isinterested_trip on trip.id = user_isinterested_trip.trip_id join user on trip.user = user.id where user_isinterested_trip.user_id = userID and user_isinterested_trip.isInterested = 1;
+END //
+
 
 
 # tornar itinerario favorito
@@ -601,7 +622,24 @@ END //
 # obter as estatísticas de um determinado itinerario
 CREATE PROCEDURE getTripStats (tripID INT)
 BEGIN
-    select avg(review_rating) as rating, count(*) as num_reviews from review_trip where trip_id = tripID;
+	DECLARE rating decimal(2,1);
+	DECLARE accessibilityRating decimal(2,1);
+	DECLARE securityRating decimal(2,1);
+	DECLARE priceRating decimal(2,1);
+	DECLARE num_reviews INT;
+	DECLARE num_trips INT;
+	DECLARE num_interests INT;
+	
+    select avg(review_rating) into rating from review_trip where trip_id = tripID;
+    select avg(review_rating_accessibility) into accessibilityRating from review_trip where trip_id = tripID;
+    select avg(review_rating_security) into securityRating from review_trip where trip_id = tripID;
+    select avg(review_rating_price) into priceRating from review_trip where trip_id = tripID;
+    select count(*) into num_reviews from review_trip where trip_id = tripID;
+    select count(*) into num_trips from trip where parent_trip = tripID;
+    SELECT COUNT(*) into num_interests FROM user_isinterested_trip WHERE trip_id = tripID;
+
+    SELECT rating, accessibilityRating, securityRating, priceRating, num_reviews, num_trips, num_interests;
+
 END //
 
 # obter as estatísticas de um determinado itinerario
@@ -704,7 +742,7 @@ BEGIN
 END //
 
 # partilhar o itinerario (tornar o itinerario publico)
-CREATE PROCEDURE shareTrip (tripID INT, userID INT, tripDescription VARCHAR(255), tripPhotoURL VARCHAR(255), tripRating INT)
+CREATE PROCEDURE shareTrip (tripID INT, userID INT, tripDescription VARCHAR(255), tripPhotoURL VARCHAR(255), tripRating INT, ratingAccessibility INT, ratingSecurity INT, ratingPrice INT)
 BEGIN 
 	DECLARE reviewID INT;
     
@@ -714,11 +752,24 @@ BEGIN
 	SET reviewID = LAST_INSERT_ID();
     
     INSERT INTO review_trip(review_id, trip_id, review_text, review_rating) values (reviewID, tripID, tripDescription, tripRating);
+
+    IF ratingAccessibility is not null THEN
+		UPDATE review_trip SET review_rating_accessibility = ratingAccessibility WHERE review_id = reviewID;
+	END IF;
+    
+ 	IF ratingSecurity is not null THEN
+		UPDATE review_trip SET review_rating_security = ratingSecurity WHERE review_id = reviewID;
+	END IF;
+    
+     IF ratingPrice is not null THEN
+		UPDATE review_trip SET review_rating_price = ratingPrice WHERE review_id = reviewID;
+	END IF;
+
 END //	
 
 
 # fazer uma review a um itinerario
-CREATE PROCEDURE reviewTrip (tripID INT, userID INT, reviewRating INT, reviewText TEXT)
+CREATE PROCEDURE reviewTrip (tripID INT, userID INT, reviewRating INT, reviewText TEXT, ratingAccessibility INT, ratingSecurity INT, ratingPrice INT)
 BEGIN 
 	DECLARE reviewID INT;
     
@@ -730,6 +781,19 @@ BEGIN
     ELSE
 		INSERT INTO review_trip (review_id, trip_id, review_rating) values (reviewID, tripID, reviewRating);
     END IF;
+
+    IF ratingAccessibility is not null THEN
+		UPDATE review_trip SET review_rating_accessibility = ratingAccessibility WHERE review_id = reviewID;
+	END IF;
+    
+ 	IF ratingSecurity is not null THEN
+		UPDATE review_trip SET review_rating_security = ratingSecurity WHERE review_id = reviewID;
+	END IF;
+    
+     IF ratingPrice is not null THEN
+		UPDATE review_trip SET review_rating_price = ratingPrice WHERE review_id = reviewID;
+	END IF;
+
 
 END //	
 
@@ -797,7 +861,7 @@ END //
 
 
 # registar um utilizador
-CREATE PROCEDURE register (userName VARCHAR(255), user_Name VARCHAR(255), userPhoto VARCHAR(255), userBirthday DATE, userGender CHAR, userCountry VARCHAR(255), userPhone INT, userPassword BINARY(128))
+CREATE PROCEDURE register (userName VARCHAR(255), user_Name VARCHAR(255), userPhoto VARCHAR(255), userBirthday DATE, userGender CHAR, userCountry VARCHAR(255), userPhone INT, typeUser VARCHAR(255), userPassword BINARY(128))
 BEGIN
 	DECLARE hasAccount INT;
     DECLARE userID INT;
@@ -810,10 +874,10 @@ BEGIN
 		START TRANSACTION;
 			BEGIN
 				IF userPhoto is not null THEN
-					INSERT INTO user (username, name, picture) values (userName, user_Name, userPhoto);
+					INSERT INTO user (username, name, picture, type_use) values (userName, user_Name, userPhoto, typeUser);
 					SET userID = LAST_INSERT_ID();
 				ELSE
-					INSERT INTO user (username, name) values (userName, user_Name);
+					INSERT INTO user (username, name, type_use) values (userName, user_Name, typeUser);
 					SET userID = LAST_INSERT_ID();
 				END IF;
                     
@@ -843,9 +907,9 @@ BEGIN
 END //
 
 # login
-CREATE PROCEDURE login (userName VARCHAR(255))
+CREATE PROCEDURE login (userUsername VARCHAR(255))
 BEGIN
-	select id, picture, CAST(password AS CHAR(32) CHARACTER SET utf8) as password from user_e join user on user_e.user_id = user.id where username = userName;
+	select id, picture, CAST(password AS CHAR(32) CHARACTER SET utf8) as password from user_e join user on user_e.user_id = user.id where username = userUsername;
 END //
 
 # editar a descrição de um POI
@@ -996,5 +1060,11 @@ BEGIN
 	SELECT count(*) as trip_exists from trip where id = tripID; 
 END //
  
+# atualizar o place id de uma cidade
+CREATE PROCEDURE updateCityPlaceID (cityName VARCHAR(255), placeID VARCHAR(255))
+BEGIN
+	UPDATE city SET place_id = placeID WHERE name LIKE cityName;
+END //
+
 
 DELIMITER ;

@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<POIs>
+  <POI>
+    <Number>14766</Number>
+    <Name>Praça do Comércio</Name>
+    <Latitude>38.707532</Latitude>
+    <Longitude>-9.1364489</Longitude>
+    <Longitude>-9.1364489</Longitude>
+  </POI>
+  <POI>
+    <Number>6500</Number>
+    <Name>Castelo de S. Jorge</Name>
+    <Latitude>38.7139092</Latitude>
+    <Longitude>-9.1334762</Longitude>
+    <Longitude>-9.1334762</Longitude>
+  </POI>
+  <POI>
+    <Number>12321</Number>
+    <Name>Oceanário de Lisboa</Name>
+    <Latitude>38.7635435</Latitude>
+    <Longitude>-9.0937415</Longitude>
+    <Longitude>-9.0937415</Longitude>
+  </POI>
+  <POI>
+    <Number>6480</Number>
+    <Name>Belém Tower</Name>
+    <Latitude>38.6915837</Latitude>
+    <Longitude>-9.2159773</Longitude>
+    <Longitude>-9.2159773</Longitude>
+  </POI>
+  <POI>
+    <Number>6519</Number>
+    <Name>Park and National Palace of Pena</Name>
+    <Latitude>38.7875851</Latitude>
+    <Longitude>-9.3906089</Longitude>
+    <Longitude>-9.3906089</Longitude>
+  </POI>
+  <POI>
+    <Number>12598</Number>
+    <Name>Padrão dos Descobrimentos</Name>
+    <Latitude>38.6935973</Latitude>
+    <Longitude>-9.2057115</Longitude>
+    <Longitude>-9.2057115</Longitude>
+  </POI>
+  <POI>
+    <Number>12295</Number>
+    <Name>Santa Justa Lift</Name>
+    <Latitude>38.7121301</Latitude>
+    <Longitude>-9.1394297</Longitude>
+    <Longitude>-9.1394297</Longitude>
+  </POI>
+</POIs>

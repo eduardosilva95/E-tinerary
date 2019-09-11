@@ -7,7 +7,8 @@
     <meta name="author" content="Eduardo Silva">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Simple Map</title>
+    <title>e-tinerary</title>
+    <link rel="icon" href="img/logo-icon.ico">
 
     <!-- Custom styles -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
@@ -151,10 +152,10 @@
                       <% trips.forEach(function(trip) { %> 
                         <% if(trip.isPremium == 1) { %>
 
-                          <a href="/plan?id=<%= trip.id %>" class="card-home-link">
+                          <a href="/trip?id=<%= trip.id %>" class="card-home-link">
                           <div class="col-md-3 col-sm-12 cont">
                               <div class="card card-home" style="width: 18rem; height: 400px;">
-                                <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
+                                <img class="card-img-top cities-imgs" src="img/trips/<%= trip.photo %>">
                                 <% if(trip.isPremium == 1) { %>
                                   <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
                                 <% } else { %>
@@ -207,10 +208,10 @@
 
                       <% trips.forEach(function(trip) { %> 
 
-                        <a href="/plan?id=<%= trip.id %>" class="card-home-link">
+                        <a href="/trip?id=<%= trip.id %>" class="card-home-link">
                         <div class="col-md-3 col-sm-12 cont">
                             <div class="card card-home" style="width: 18rem; height: 400px;">
-                              <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
+                              <img class="card-img-top cities-imgs" src="img/trips/<%= trip.photo %>">
                               <% if(trip.isPremium == 1) { %>
                                 <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
                               <% } else { %>
@@ -268,10 +269,10 @@
                         <% trips.forEach(function(trip) { %> 
                           <% if(trip.category == 'NATURE') { %>
   
-                            <a href="/plan?id=<%= trip.id %>" class="card-home-link">
+                            <a href="/trip?id=<%= trip.id %>" class="card-home-link">
                             <div class="col-md-3 col-sm-12 cont">
                                 <div class="card card-home" style="width: 18rem; height: 400px;">
-                                  <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
+                                  <img class="card-img-top cities-imgs" src="img/trips/<%= trip.photo %>">
                                   <% if(trip.isPremium == 1) { %>
                                     <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
                                   <% } else { %>
@@ -318,10 +319,10 @@
                         <% trips.forEach(function(trip) { %> 
                           <% if(trip.category == 'HISTORY') { %>
   
-                            <a href="/plan?id=<%= trip.id %>" class="card-home-link">
+                            <a href="/trip?id=<%= trip.id %>" class="card-home-link">
                             <div class="col-md-3 col-sm-12 cont">
                                 <div class="card card-home" style="width: 18rem; height: 400px;">
-                                  <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
+                                  <img class="card-img-top cities-imgs" src="img/trips/<%= trip.photo %>">
                                   <% if(trip.isPremium == 1) { %>
                                     <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
                                   <% } else { %>
@@ -367,10 +368,10 @@
 
                         <% trips.forEach(function(trip) { %> 
                           <% if(trip.category == 'CULTURE') { %>
-                            <a href="/plan?id=<%= trip.id %>" class="card-home-link">
+                            <a href="/trip?id=<%= trip.id %>" class="card-home-link">
                             <div class="col-md-3 col-sm-12 cont">
                                 <div class="card card-home" style="width: 18rem; height: 400px;">
-                                  <img class="card-img-top cities-imgs" src="img/plans/<%= trip.photo %>">
+                                  <img class="card-img-top cities-imgs" src="img/trips/<%= trip.photo %>">
                                   <% if(trip.isPremium == 1) { %>
                                     <p class="card-text" style="overflow:unset"><i style="padding-left: 0.75rem; color: #ffd700" class="fas fa-star"></i><small class="text-muted" style="font-weight: 0.6; padding-left: 5px">Created by <b><%= trip.author %></b> on <%= trip.creation_date %></small></p>
                                   <% } else { %>

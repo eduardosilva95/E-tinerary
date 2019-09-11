@@ -7,7 +7,8 @@
     <meta name="author" content="Eduardo Silva">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Simple Map</title>
+    <title>e-tinerary</title>
+    <link rel="icon" href="img/logo-icon.ico">
 
     <!-- Custom styles -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
@@ -29,61 +30,60 @@
   
   </head>
   <body>
-   
-        <!-- header navbar -->
-        <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
-            <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-              <ul class="navbar-nav ml-auto">
-                  <li class="nav-item">
-                    <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
-                  </li>
-                
+      <!-- header navbar -->
+      <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
+        <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                  <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
+            
+            <li class="nav-item">
+                <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
+                </a>
+                <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
+                    <a class="dropdown-item header" href="./about-us">Aplicacao</a>
+                    <a class="dropdown-item header" href="./help">Help</a>
+                </div>
+            </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+            <li>
+                <div id="login-user">
+                <div id="login" style="display: none;">
+                    <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                </div>
+                <div id="profile" class="dropleft" style="display: none;">
+                    <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img id="user-profile-pic" class="rounded-circle border border-light">
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
-                      <a class="dropdown-item header" href="./about-us">Aplicacao</a>
-                      <a class="dropdown-item header" href="./help">Help</a>
-                    </div>
-                </li>
-              </ul>
-              <ul class="navbar-nav ml-auto">
-                <li>
-                  <div id="login-user">
-                    <div id="login" style="display: none;">
-                      <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
-                    </div>
-                    <div id="profile" class="dropleft" style="display: none;">
-                      <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <img id="user-profile-pic" class="rounded-circle border border-light">
-                      </a>
-                      <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
-                        <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                        <a class="dropdown-item header" id="profile-trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
-                        <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
-                      </div>   
-                    </div>        
-                  </div>
-                </li>
-              </ul>
-            </div>
-        </nav>
+                    <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
+                    <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                    <a class="dropdown-item header" href="./trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                    <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                    </div>   
+                </div>        
+                </div>
+            </li>
+            </ul>
+        </div>
+      </nav>
 
 
         <div class="container-fluid cont" style="min-height: 100%;">
@@ -116,9 +116,9 @@
                                         <p class="file-return"></p>
                                     </div>
                                     <div class="col-md-3">
-                                        <div class="input-poi-photo-container">  
-                                            <input class="input-poi-photo" id="my-file" type="file" accept="image/*" name="photo" >
-                                            <label tabindex="0" for="my-file" class="input-poi-photo-trigger"><i class="fas fa-camera"></i><span style="padding-left: 10px;">Upload photo</span></span></label>
+                                        <div class="input-photo-container">  
+                                            <input class="input-photo" id="my-file" type="file" accept="image/*" name="photo" >
+                                            <label tabindex="0" for="my-file" class="input-photo-trigger"><i class="fas fa-camera"></i><span style="padding-left: 10px;">Upload photo</span></span></label>
                                         </div>
                                     </div>
                                 </div>
@@ -145,15 +145,16 @@
                             <br>
 
                             <div class="form-group">
-                              <label for="input-poi-title"><h5>Title <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
-                              <input type="text" class="form-control" id="input-poi-title" name="title" placeholder="Enter a title for the POI" required>
+                              <label for="input-google-place-id"><h5>Google Place ID <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
+                              <input type="text" class="form-control" id="input-google-place-id" name="google_place_id" placeholder="Google Place ID" required>
+                              <span>Don't know ? <a data-toggle="modal" data-target="#search-id-modal" class="forgot-password" style="cursor: pointer">Search here</a></span>
                             </div>
 
                             <div class="form-group">
-                              <label for="input-google-place-id"><h5>Google Place ID <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
-                              <input type="text" class="form-control" id="input-google-place-id" name="google_place_id" placeholder="Google Place ID (None if it's unknown)" required>
+                              <label for="input-poi-title"><h5>Name <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
+                              <input type="text" class="form-control" id="input-poi-title" name="title" placeholder="Enter the name of the POI" required>
                             </div>
-                            
+                           
 
                             <div class="form-group">
                               <label for="input-poi-address"><h5>Address <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
@@ -161,24 +162,34 @@
                             </div>
 
                             <div class="form-group">
-                              <label for="input-poi-type"><h5>Type <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
+                              <label for="input-poi-type"><h5>Category <sup aria-describedby="mandatoryHelp">*</sup></h5></label>
                               <select class="form-control" id="input-poi-type" name="poi_type" required>
-                                <option>Select a type</option>
-                                <option>Museum</option>
-                                <option>Park</option>
-                                <option>Hotel</option>
-                                <option>Restaurant</option>
-                                <option>Tower</option>
-                                <option>Castle</option>
-                                <option>Church</option>
-                                <option>Amusement Park</option>
-                                <option>Natural Feature</option>
-                                <option>Zoo</option>
-                                <option>Sports Venue</option>
-                                <option>Aquarium</option>
-                                <option>Point of Interest</option>
-                                <option>Shopping</option>
+                                <option>Select a category</option>
+                                <option value="Museum">Museum</option>
+                                <option value="Park">Park</option>
+                                <option value="Hotel">Hotel</option>
+                                <option value="Restaurant">Restaurant</option>
+                                <option value="Tower">Tower</option>
+                                <option value="Castle">Castle</option>
+                                <option value="Church">Church</option>
+                                <option value="Amusement Park">Amusement Park</option>
+                                <option value="Natural Feature">Natural Feature</option>
+                                <option value="Zoo">Zoo</option>
+                                <option value="Sports Venue">Sports Venue</option>
+                                <option value="Aquarium">Aquarium</option>
+                                <option value="Point of Interest">Point of Interest</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Palace">Palace</option>
+                                <option value="Square">Square</option>
+                                <option value="Other">Other</option>
                               </select>
+
+                              <div id="div-other-type" style="display: none;">
+                                  <br>
+                                  <input type="text" class="form-control" id="input-poi-other-type" name="other_poi_type" placeholder="Enter a category for the POI">
+                              </div>
+                              
+                              
                             </div>
 
                             <div class="form-group">
@@ -320,6 +331,33 @@
 
                   </div>
                   <div class="modal-footer">
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Search Place ID Modal -->
+      <div class="modal fade" id="search-id-modal" role="dialog">
+          <div class="modal-dialog">
+              <div class="modal-content" style="width: 400px;">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Search Google Place ID</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      <div class="form-group">
+                        <label for="input-poi-title"><h5>Name of the POI</h5></label>
+                        <input type="text" class="form-control" id="input-poi-title-for-id-search" name="title" placeholder="Enter a name for the POI" required>
+                      </div>
+
+                    
+
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-success" style="color: white;" onclick="searchID()" data-dismiss="modal"><i class="fas fa-search"></i><span style="padding-left: 10px;">Search</span></button>
+                      <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Close</span></button>
                   </div>
               </div>
           </div>

@@ -27,18 +27,20 @@ var reviewPhotoInput = document.querySelector( "#review-photo-name" );
 var reviewPhotoBtn  = document.querySelector( ".input-photo-trigger");
 var reviewPhotoFilename = document.querySelector(".review-photo-filename");
 
-reviewPhotoBtn.addEventListener("keydown", function( event ) {  
-    if ( event.keyCode == 13 || event.keyCode == 32 ) {  
-        fileInput.focus();  
-    }  
-});
+if(reviewPhotoInput != null){
+    reviewPhotoBtn.addEventListener("keydown", function( event ) {  
+        if ( event.keyCode == 13 || event.keyCode == 32 ) {  
+            fileInput.focus();  
+        }  
+    });
 
-reviewPhotoBtn.addEventListener( "click", function( event ) {
-   fileInput.focus();
-   return false;
-});  
+    reviewPhotoBtn.addEventListener( "click", function( event ) {
+    fileInput.focus();
+    return false;
+    });  
 
-reviewPhotoInput.addEventListener( "change", function( event ) {  
-    reviewPhotoFilename.innerHTML = event.srcElement.files[0].name;  
-    reviewPhotoFilename.title = event.srcElement.files[0].name;
-});  
+    reviewPhotoInput.addEventListener( "change", function( event ) {  
+        reviewPhotoFilename.innerHTML = event.srcElement.files[0].name;  
+        reviewPhotoFilename.title = event.srcElement.files[0].name;
+    });  
+}

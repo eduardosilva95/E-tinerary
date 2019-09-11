@@ -17,6 +17,7 @@ var place_info = [];
 var places = {}; // dictionary with all visits
 var suggested_places = {}; // dictionary with all suggested places
 var hotels = {}; // dictionary with all suggested hotels
+var open_slots = {}; // dictionary with all open slots for a new trip or an edition of a existing one
 
 /* variables to store map markers and markers cluster */
 var markers = [];
@@ -289,7 +290,7 @@ function calcRoute(start, end, waypts) {
 }  
 
 
-function loadTrip(trip_array, days, days_shortname, travel_mode){
+function loadTrip(trip_array, days, days_shortname, travel_mode, openslots){
     TRAVEL_MODE = travel_mode;
     trip = trip_array;
     day = 0;
@@ -314,7 +315,7 @@ function loadTrip(trip_array, days, days_shortname, travel_mode){
     for(var i=0; i < days_shortname.length ; i++){
         shortdays.push(days_shortname[i]);
     }
-
+    
     loadVisits();
 
     document.getElementById('previous-day-btn').disabled = true;
@@ -329,6 +330,17 @@ function loadTrip(trip_array, days, days_shortname, travel_mode){
         directionsService = new google.maps.DirectionsService();
         loadItinerary();
     }
+
+    openslots = JSON.parse(openslots);
+  
+    for(d in openslots){
+      var list = [];
+      for(var i=0; i < openslots[d].length ; i++){
+        list.push(openslots[d][i]);
+      }
+      open_slots[d] = list;
+    }
+
 }
 
 
@@ -472,6 +484,7 @@ function loadVisits(){
     document.getElementById('visit-day-mobile').innerText = shortdays[day];
 
     var count = 0;
+
     for(var key in places){
         if(places[key].day.replace(/\s/g, '') == trip_days[day].replace(/\s/g, '')){
             document.getElementById('place-' + count + '-name').innerText = places[key].name;
@@ -644,6 +657,10 @@ $(function () {
 
         $('#modal-title').text(place_info[id]['name']);
 
+        console.log(place_info[id]);
+
+        
+
     });
 });
 
@@ -777,6 +794,8 @@ function useTrip(){
     $.post("/create-child-trip", {trip: trip_id, start_date: start_date, end_date: end_date}, function(result){
     
         if(result.result == 'error'){
+            $("#use-trip-error").css("display", "block");
+            $("#use-trip-error").text(result.msg);
         }
         
         else{
@@ -787,18 +806,18 @@ function useTrip(){
 }
 
 
-function getRatingValue(){
+function getRatingValue(element){
     var value = 0;
   
-    if(document.getElementById('star5').checked)
+    if(document.getElementById(element + "-star5").checked)
       value = 5;
-    else if(document.getElementById('star4').checked)
+    else if(document.getElementById(element + "-star4").checked)
       value = 4;
-    else if(document.getElementById('star3').checked)
+    else if(document.getElementById(element + "-star3").checked)
       value = 3;
-    else if(document.getElementById('star2').checked)
+    else if(document.getElementById(element + "-star2").checked)
       value = 2;
-    else if(document.getElementById('star1').checked)
+    else if(document.getElementById(element + "-star1").checked)
       value = 1;
   
     return value;
@@ -811,15 +830,26 @@ function submitReview(){
 
     var review = document.getElementById("review-text").value;
 
-    var rating = parseInt(getRatingValue());
+    var rating = parseInt(getRatingValue('review-rating'));
+
+    var rating_access = parseInt(getRatingValue('review-rating-access'));
+    var rating_security = parseInt(getRatingValue('review-rating-security'));
+    var rating_price = parseInt(getRatingValue('review-rating-price'));
 
     if(rating < 1 || rating > 5){
         alert("Please submit a valid rating  !!");
         return;
     }
 
-    $.post("/review-trip", {trip: trip_id, review: review, rating: rating}, function(result){
-        window.location.reload();
+    $.post("/review-trip", {trip: trip_id, review: review, rating: rating, rating_access: rating_access, rating_security: rating_security, rating_price: rating_price}, function(result){
+        if(result.result == 'error'){
+            $("#review-error").css("display", "block");
+            $("#review-error").text(result.msg);
+        }
+        
+        else{
+            window.location.reload();
+        }
     });
 }
 
@@ -842,36 +872,36 @@ function loadReviewRating(rating, review){
 
 $(function () {
     $('#submit-review-btn').attr('disabled','disabled');
-    $('#star1').change(function(){
-        var rating = parseInt(getRatingValue());
+    $('#review-rating-star1').change(function(){
+        var rating = parseInt(getRatingValue("review-rating"));
         if(rating > 0 && rating < 6){
             $('#submit-review-btn').removeAttr('disabled');
         }
     });
 
-    $('#star2').change(function(){
-        var rating = parseInt(getRatingValue());
+    $('#review-rating-star2').change(function(){
+        var rating = parseInt(getRatingValue("review-rating"));
         if(rating > 0 && rating < 6){
             $('#submit-review-btn').removeAttr('disabled');
         }
     });
 
-    $('#star3').change(function(){
-        var rating = parseInt(getRatingValue());
+    $('#review-rating-star3').change(function(){
+        var rating = parseInt(getRatingValue("review-rating"));
         if(rating > 0 && rating < 6){
             $('#submit-review-btn').removeAttr('disabled');
         }
     });
 
-    $('#star4').change(function(){
-        var rating = parseInt(getRatingValue());
+    $('#review-rating-star4').change(function(){
+        var rating = parseInt(getRatingValue("review-rating"));
         if(rating > 0 && rating < 6){
             $('#submit-review-btn').removeAttr('disabled');
         }
     });
 
-    $('#star5').change(function(){
-        var rating = parseInt(getRatingValue());
+    $('#review-rating-star5').change(function(){
+        var rating = parseInt(getRatingValue("review-rating"));
         if(rating > 0 && rating < 6){
             $('#submit-review-btn').removeAttr('disabled');
         }
@@ -983,58 +1013,108 @@ function loadRating(rating, dest){
 
     var count = 0;
 
-    document.getElementById(dest).innerHTML = '<p></p>';
+    var data = '<p>';
 
     while(count < Math.floor(rating)){
-      document.getElementById(dest).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #ffc107;"></i>';
+      data += '<i class="fas fa-star" aria-hidden="true" style="color: #ffc107;"></i>';
       count = count + 1;
     }
 
     if(rating-count >= 0.5){
-      document.getElementById(dest).innerHTML += '<i class="fas fa-star-half-alt" aria-hidden="true" style="color: #ffc107;"></i>';
+        data += '<i class="fas fa-star-half-alt" aria-hidden="true" style="color: #ffc107;"></i>';
       count = count + 1;
     }
 
     while(count < 5){
-      document.getElementById(dest).innerHTML += '<i class="fas fa-star" aria-hidden="true" style="color: #d0cfd1;"></i>';
+        data += '<i class="fas fa-star" aria-hidden="true" style="color: #d0cfd1;"></i>';
       count = count + 1;
     }
+
+    data += '</p>'
+
+    document.getElementById(dest).innerHTML = data;
 
   }
 
 
-function changeReviewPage(){
+function changeSharePage(){
     $('#share-modal-general-info').removeClass('active');
-    $('#pills-general-info-tab').removeClass('active');
+    $('#pills-share-general-info-tab').removeClass('active');
 
     $('#share-modal-more-info').tab('show');
-    $('#pills-more-info-tab').addClass('active');
+    $('#pills-share-more-info-tab').addClass('active');
+
+    $('#change-share-page-btn').css("display", "none");
+    $('#submit-share-trip-btn').css("display", "block");
+    $('#return-share-page-btn').css("display", "block");
+
+}
+
+$(function () {
+    $('#pills-share-general-info-tab').click(
+      function(){ returnSharePage(); return false;})
+});
+
+function returnSharePage(){
+    $('#share-modal-general-info').tab('show');
+    $('#pills-share-general-info-tab').addClass('active');
+
+    $('#share-modal-more-info').removeClass('active');
+    $('#pills-share-more-info-tab').removeClass('active');
+
+    $('#change-share-page-btn').css("display", "block");
+    $('#submit-share-trip-btn').css("display", "none");
+    $('#return-share-page-btn').css("display", "none");
+
+}
+
+$(function () {
+    $('#pills-share-more-info-tab').click(
+      function(){ changeSharePage(); return false;})
+});
+
+
+
+function changeReviewPage(){
+    $('#review-modal-general-info').removeClass('active');
+    $('#pills-review-general-info-tab').removeClass('active');
+
+    $('#review-modal-more-info').tab('show');
+    $('#pills-review-more-info-tab').addClass('active');
 
     $('#change-review-page-btn').css("display", "none");
-    $('#submit-share-trip-btn').css("display", "block");
+    $('#submit-review-btn').css("display", "block");
     $('#return-review-page-btn').css("display", "block");
 
 }
 
 $(function () {
-    $('#pills-general-info-tab').click(
+    $('#pills-review-general-info-tab').click(
       function(){ returnReviewPage(); return false;})
 });
 
 function returnReviewPage(){
-    $('#share-modal-general-info').tab('show');
-    $('#pills-general-info-tab').addClass('active');
+    $('#review-modal-general-info').tab('show');
+    $('#pills-review-general-info-tab').addClass('active');
 
-    $('#share-modal-more-info').removeClass('active');
-    $('#pills-more-info-tab').removeClass('active');
+    $('#review-modal-more-info').removeClass('active');
+    $('#pills-review-more-info-tab').removeClass('active');
 
     $('#change-review-page-btn').css("display", "block");
-    $('#submit-share-trip-btn').css("display", "none");
+    $('#submit-review-btn').css("display", "none");
     $('#return-review-page-btn').css("display", "none");
 
 }
 
 $(function () {
-    $('#pills-more-info-tab').click(
+    $('#pills-review-more-info-tab').click(
       function(){ changeReviewPage(); return false;})
 });
+
+
+function loadStatsRatings(rating, accessibility_rating, security_rating, price_rating){
+    loadRating(rating, 'trip-stats-rating');
+    loadRating(accessibility_rating, 'trip-stats-access-rating');
+    loadRating(security_rating, 'trip-stats-security-rating');
+    loadRating(price_rating, 'trip-stats-price-rating');
+}

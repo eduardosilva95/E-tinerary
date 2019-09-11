@@ -5,17 +5,20 @@
     <Name>HF Ipanema Park</Name>
     <Latitude>41.15444</Latitude>
     <Longitude>-8.649802</Longitude>
+    <FixedCost>119</FixedCost>
   </Hotel>
   <Hotel>
     <Number>14301</Number>
     <Name>Hotel Vila Galé Porto</Name>
     <Latitude>41.1508296</Latitude>
     <Longitude>-8.5991137</Longitude>
+    <FixedCost>97</FixedCost>
   </Hotel>
   <Hotel>
     <Number>14307</Number>
     <Name>Porto Palácio Hotel Congress &amp; Spa</Name>
     <Latitude>41.1594674</Latitude>
     <Longitude>-8.6386219</Longitude>
+    <FixedCost>150</FixedCost>
   </Hotel>
 </Hotels>

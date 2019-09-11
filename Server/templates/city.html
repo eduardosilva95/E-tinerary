@@ -93,6 +93,7 @@
                     </div>
                 </div>
             </div>
+            
 
             <br>
 
@@ -142,14 +143,16 @@
                         </form>
                     <% } %>
                     
-                    <br>
+                    <br><br>
 
 
-                    <div class="card" >
-                        <div class="card-body" id="place-description">
-                                <p class="card-text"><%= description %></p>
-                        </div>
+                    <hr>
+                    
+                    <div id="city-description">
+                        <h6 class="card-title" style="font-style: italic;"><b>About <%= city %></b></h6>
+                        <p class="card-text"><%= description %></p>
                     </div>
+                    
                 </div>
                     
                 <div class="col-md-4">
@@ -167,9 +170,17 @@
                                         <th scope="row"><i class="fas fa-map-pin" style="color: #1a73e8"></i></th>
                                         <td><span id="city-coordinates"><%= coordinates %></span></td>
                                     </tr>
-                                   
+                                    <tr>
+                                        <th scope="row"><i class="fas fa-clock" style="color: #1a73e8"></i></th>
+                                        <td><span id="city-time"></span></td>
+                                    </tr>
                                 </tbody>
                             </table>
+
+                            <hr>
+
+                            <img src="<%= icon %>" style="width: 54px; height: 45px;">
+                            <span id="city-current-weather"><%= weather %> • <%= temperature %></span></td>
                             
                         </div>
                     </div>
@@ -201,10 +212,16 @@
 
                 </div>
             </div>
+            
+            <script>
+                getCityDetails("<%= place_id %>");
+            </script>
         
             <br><br>
 
-            <h6 class="card-title"><b>Places to visit in <%= city %></b></h6>
+            <hr>
+
+            <h6 class="card-title" style="font-style: italic;"><b>Places to visit in <%= city %></b></h6>
 
             <div class="row">
                 <% count = 0 %>
@@ -232,7 +249,9 @@
 
             <br>
 
-            <h6 class="card-title"><b>Hotels in <%= city %></b></h6>
+            <hr>
+
+            <h6 class="card-title" style="font-style: italic;"><b>Hotels in <%= city %></b></h6>
 
             <div class="row">
                 <% count = 0 %>
@@ -260,7 +279,9 @@
 
             <br>
 
-            <h6 class="card-title"><b>Itineraries created for <%= city %></b></h6>
+            <hr>
+
+            <h6 class="card-title" style="font-style: italic;"><b>Itineraries created for <%= city %></b></h6>
 
             <% if (trips.length == 0) { %>
                 <br>
@@ -276,9 +297,9 @@
                     <% trips.forEach(function(trip) { %>
                         <div class="col-md col-12 cont">
                             <div style="width: 255px;" >
-                                <a href="/plan?id=<%= trip.id %>"><img class="card-img-top cities-imgs" id="plans-<%= count %>" src="img/plans/<%= trip.photo %>"></a>
+                                <a href="/trip?id=<%= trip.id %>"><img class="card-img-top cities-imgs" id="trips-<%= count %>" src="img/trips/<%= trip.photo %>"></a>
                                 <br><br>
-                                <a class="city-places-link" href="/plan?id=<%= trip.id %>"><h6><b><%= trip.name %></b></h6></a>
+                                <a class="city-places-link" href="/trip?id=<%= trip.id %>"><h6><b><%= trip.name %></b></h6></a>
                                 <p class="card-text" style="padding-top: 10px; height: 67.2px; font-size: 14px;"><%= trip.description %></p>
                             </div>
                         </div>
@@ -515,10 +536,6 @@
         loadPhotos(photos);
     </script>
 
-    <script>
-        var place_id = "<%= place_id %>";
-        getCityDetails(place_id);
-    </script>
 
     <script>
         var places = [];
@@ -528,7 +545,6 @@
         '<% }); %>'
 
         loadPlacesToMap(places);
-
     </script>
 
     
