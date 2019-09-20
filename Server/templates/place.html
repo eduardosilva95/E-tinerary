@@ -162,30 +162,23 @@
                         </form>
                     <% } %>
                     
-                    <br>
+                    <br><br><br>
 
-
-                    <div class="card" >
-                        <div class="card-body" id="place-description">
-                            <% if(isUserPremium == true) { %>
-                                <% if(description == "" || description == place) { %>
-                                    <div class="text-right">
-                                        <button class="btn btn-add-description-modal" data-toggle="modal" data-target="#add-description-modal" data-title="<%= place %>"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Add description</span></button>
-                                    </div>
-                                <% } else { %>
-                                    <div class="text-right">
-                                        <button class="btn btn-add-description-modal" data-toggle="modal" data-target="#add-description-modal" data-title="<%= place %>" data-description="<%= description %>"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Update description</span></button>
-                                    </div>
-                                <% } %>
-                                <br>
+                    <div id="place-description">
+                        <h6 class="card-title" style="font-style: italic;"><b>About <%= place %></b></h6>
+                        <p class="card-text"><%= description %></p>
+                        <% if(isUserPremium == true) { %>
+                            <% if(description == "" || description == place) { %>
+                                <div class="text-right">
+                                    <button class="btn btn-add-description-modal" data-toggle="modal" data-target="#add-description-modal" data-title="<%= place %>"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Add description</span></button>
+                                </div>
+                            <% } else { %>
+                                <div class="text-right">
+                                    <button class="btn btn-add-description-modal" data-toggle="modal" data-target="#add-description-modal" data-title="<%= place %>" data-description="<%= description %>"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Update description</span></button>
+                                </div>
                             <% } %>
-
-                            <p class="card-text"><%= description %></p>
-
-                            <!--<div class="text-right">
-                                <p><i class="fab fa-wikipedia-w" style="padding-left: 10px;"></i></p>
-                            </div>-->
-                        </div>
+                            <br>
+                        <% } %>
                     </div>
 
                     <br>

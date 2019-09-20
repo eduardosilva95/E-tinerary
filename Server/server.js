@@ -490,7 +490,7 @@ app.get('/places', function (req, res){
 	var destination = req.query['dest']; // destination
 	var query = ""; // query for a place 
 	var page = 1; // current page
-	var tripID = -1; // ID of plan -> default has no plan 
+	var tripID = -1; // ID of trip -> default has no trip 
 	var sort = "reviews"; // default sort -> number of reviews
 	
 	/* filters */
@@ -570,7 +570,7 @@ app.get('/places', function (req, res){
 		return; //send error msg
 
 	if(isNaN(tripID)){
-		res.redirect('http://localhost:8080/places?dest='+ destination);
+		res.redirect(req.baseUrl + '/places?dest='+ destination);
 		return;
 	}
 
@@ -588,7 +588,7 @@ app.get('/places', function (req, res){
 		result = result[0];
 
 		if(tripID != -1 && result[0].trip_exists == 0){
-			res.redirect('http://localhost:8080/places?dest='+ destination);
+			res.redirect(req.baseUrl + '/places?dest='+ destination);
 			return;
 		}
 
@@ -672,7 +672,9 @@ app.get('/places', function (req, res){
 			            place["rating"] = result[i].rating;
 			            place["num_reviews"] = result[i].num_reviews;
 			            place["price_level"] = result[i].price_level;
-			            place["price"] = result[i].price;
+
+			            if(result[i].price != null)
+			           		place["price"] = Math.round(result[i].price);
 
 			            if(result[i].photo != null)
 			        		place["photo"] = result[i].photo.replace(/\\/g,"/");
@@ -745,7 +747,7 @@ app.get('/places', function (req, res){
 			        var date_diff = 0;
 			        var days = [];
 
-			        // if plan has visits 
+			        // if trip has visits 
 			        if(result.length > 0){
 
 			        	start_date = new Date(result[0].start_date);
@@ -890,7 +892,7 @@ app.get('/place', function(req,res){
 		trip_id = parseInt(req.query['trip']);
 
 	if(isNaN(trip_id)){
-		res.redirect('http://localhost:8080/place?id='+ poi_id);
+		res.redirect(req.baseUrl + '/place?id='+ poi_id);
 		return;
 	}
 
@@ -900,7 +902,7 @@ app.get('/place', function(req,res){
 		result = result[0];
 
 		if(trip_id != -1 && result[0].trip_exists == 0){
-			res.redirect('http://localhost:8080/place?id='+ poi_id);
+			res.redirect(req.baseUrl + '/place?id='+ poi_id);
 			return;
 		}
 
@@ -1312,7 +1314,7 @@ app.get('/hotels', function(req,res){
 
 
 
-app.get('/create-plan', function(req, res){
+app.get('/create-trip', function(req, res){
 
 	var num_results = 4;
 
@@ -1779,7 +1781,7 @@ app.post('/create-trip-m', function(req, res){
 
     	console.log("MANUAL TRIP CREATED: ", trip_id);
 
-    	res.redirect('http://localhost:8080/trip-m?id='+ trip_id)
+    	res.redirect(req.baseUrl + '/trip-m?id='+ trip_id)
 
 	});
 
@@ -2053,7 +2055,7 @@ app.post('/share-trip', upload_trip.single('photo'), function (req, res, next){
 		con.query("call shareTrip(?,?,?,?,?,?,?,?)", [trip_id, user_id, description, filename, rating, accessibility, security, price_rating], function (err, result, fields) {
 			if (err) throw err;
 
-	    	res.redirect('http://localhost:8080/trips');
+	    	res.redirect(req.baseUrl + '/trips');
 
 		});
 	});
@@ -2652,7 +2654,7 @@ app.get('/trip', function(req, res){
 
 		result = result[0];
 
-		if(trip_id != -1 && result[0].trip_exists == 0){
+		if(result[0].trip_exists == 0){
 			res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
 			return;
 		}
@@ -2743,7 +2745,7 @@ app.get('/trip', function(req, res){
 
 	        	num_viewers = result[0].num_viewers;
 
-	        	travel_mode = result[0].travel_mode;
+	        	travel_mode = result[0].travel_mode.toUpperCase();
 
 	        	if(result[0].num_children > 1 && result[0].num_adults > 1)
 	        		num_persons = result[0].num_adults + " Adults + " + result[0].num_children + " Children";
@@ -2758,6 +2760,7 @@ app.get('/trip', function(req, res){
 	        	else if (result[0].num_children == 0 && result[0].num_adults == 1)
 	        		num_persons = result[0].num_adults + " Adult";
 			}
+
 
 			/* get the list of visits of the trip */
 			var trip = [];
@@ -3010,7 +3013,6 @@ app.get('/trip', function(req, res){
 				        				price_rating = result[0].priceRating.toFixed(1);
 
 				        		}
-					        		
 
 				        		if(source != "author"){
 				        			if(isPublic == "1"){
@@ -3156,7 +3158,7 @@ app.get('/trip-m', function(req,res){
 
 	        	num_viewers = result[0].num_viewers;
 
-	        	travel_mode = result[0].travel_mode;
+	        	travel_mode = result[0].travel_mode.toUpperCase();
 
 	        	if(result[0].num_children > 1 && result[0].num_adults > 1)
 	        		num_persons = result[0].num_adults + " Adults + " + result[0].num_children + " Children";
@@ -3206,7 +3208,7 @@ app.get('/trip-m', function(req,res){
 			        	else
 			        		name = 'Your visit to ' + city;
 
-			        	travel_mode = result[0].travel_mode;
+			        	travel_mode = result[0].travel_mode.toUpperCase();
 
 	        			if(result[0].num_children > 1 && result[0].num_adults > 1)
 			        		num_persons = result[0].num_adults + " Adults + " + result[0].num_children + " Children";
@@ -3422,6 +3424,7 @@ app.get('/trips', function(req, res){
 	        var past_trips = [];
 	        var development_trips = [];
 	        var interested_trips = [];
+	        var favorite_trips = [];
 
 	        for(var i=0 ; i < result.length; i++){
 
@@ -3463,6 +3466,10 @@ app.get('/trips', function(req, res){
 	        	else{
 	        		scheduled_trips.push(trip);
 	        	}
+
+	        	if(result[i].isFavorite[0] == 1)
+	        		favorite_trips.push(trip)
+
 	        }
 
 
@@ -3507,16 +3514,13 @@ app.get('/trips', function(req, res){
 
 	        	}
 
-				res.render(path.join(__dirname+'/templates/trips.html'),  {past_trips: past_trips, scheduled_trips: scheduled_trips, development_trips: development_trips, interested_trips: interested_trips});
+				res.render(path.join(__dirname+'/templates/trips.html'),  {past_trips: past_trips, scheduled_trips: scheduled_trips, development_trips: development_trips, interested_trips: interested_trips, favorite_trips: favorite_trips});
 			});
 	    });
 	}
 
 	else{
-
-		// mensagem a dizer que tem estar logado
-		
-		res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
+		res.render(path.join(__dirname+'/templates/need-login.html'));
 	}
 
 
@@ -3543,9 +3547,10 @@ app.post('/login-g', function(req, res){
 
 	 	var user_id = result[0].id;
        	var picture = result[0].picture;
+       	var type_use = result[0].type_use;
 
 		res.contentType('json');
-		res.send({user_id: user_id, picture: picture});
+		res.send({user_id: user_id, picture: picture, type: type_use});
 
 	});
 
@@ -3569,9 +3574,10 @@ app.post('/login-e', function(req, res){
 
 	    	 	var user_id = result[0].id;
 		       	var picture = result[0].picture;
+		       	var type_use = result[0].type_use;
 
       			res.contentType('json');
-				res.send({user_id: user_id, picture: picture});
+				res.send({user_id: user_id, picture: picture, type: type_use});
 
 			}
 
@@ -3603,7 +3609,6 @@ app.post('/register', upload.single('photo'), function (req, res, next){
 
 	var username = req.body.email;
 	var name = req.body.fname + " " + req.body.lname;
-	var country = req.body.country;
 	var phone_number = req.body.phone;
 
 	if(phone_number == '')
@@ -3615,8 +3620,6 @@ app.post('/register', upload.single('photo'), function (req, res, next){
 		picture = req.file.path.split('dist')[1];
 
 	var birthday = req.body.birthday;
-
-	console.log(birthday);
 
 	if(birthday != '' && birthday != null)
 		birthday = birthday.split('/')[2] + "-" + birthday.split('/')[1] + "-" + birthday.split('/')[0];
@@ -3633,6 +3636,11 @@ app.post('/register', upload.single('photo'), function (req, res, next){
 	if(type_use != 'Free' && type_use != 'Premium')
 		type_use = 'Free';
 
+
+	var country = req.body.country;
+
+	if(country == '' || country == null || country == 'null')
+		country = null;
 
 	var password = md5(req.body.password);
 
@@ -3688,8 +3696,12 @@ app.get('/profile', function(req, res){
 
 
         name = result.name;
-        picture = result.picture;
         username = result.username;
+        
+     	if(result.picture != null)
+        	picture = result.picture;
+        else
+        	picture = "img/login.png";
 
         if(result.birthday != null)
         	birthday = result.birthday;
@@ -3842,7 +3854,7 @@ app.post('/edit-profile-picture', upload.single('photo'), function (req, res, ne
 
     	res.cookie('picture', picture_url);
 
-    	res.redirect('http://localhost:8080/profile');
+    	res.redirect(req.baseUrl + '/profile');
 
     });
 
@@ -3850,6 +3862,13 @@ app.post('/edit-profile-picture', upload.single('photo'), function (req, res, ne
 
 
 app.get('/request-poi', function(req, res){
+
+	var user_id = req.cookies['user'];
+
+	if(isNaN(user_id)){
+		res.render(path.join(__dirname+'/templates/need-login.html'));
+		return;
+	}
 
 	con.query("call getUserType(?)", user_id, function (err, result, fields){
 		if (err) throw err;
@@ -3991,7 +4010,7 @@ app.post('/request-poi', upload_poi.single('photo'), function(req, res){
 				con.query(sql, values, function (err, result, fields) {
 			    	if (err) throw err;
 
-			    	res.redirect('http://localhost:8080/place?id=' + poi_id);
+			    	res.redirect(req.baseUrl + '/place?id=' + poi_id);
 	    			console.log("POI: ", poi_id, ' ADDED WITH SUCCESS');
 			    });
 			}
@@ -4118,7 +4137,7 @@ app.post('/accept-poi', function(req, res){
     	} 
 
     	if(result[0][0].isAproved[0] == 1){
-    		res.redirect('http://localhost:8080/place?id=' + poi_id);
+    		res.redirect(req.baseUrl + '/place?id=' + poi_id);
     		console.log("POI ACCEPTED: ", poi_id);
     	}
     
@@ -4146,7 +4165,7 @@ app.post('/reject-poi', function(req, res){
 
 
 
-    	res.redirect('http://localhost:8080/review-poi');
+    	res.redirect(req.baseUrl + '/review-poi');
     	console.log("POI REJECTED: ", poi_id);
     
     });
@@ -4326,7 +4345,7 @@ app.post('/upload-poi-photo', upload_poi.single('photo'), function(req, res){
     		//res.send(JSON.stringify('error'));
     	}
 
-    	res.redirect('http://localhost:8080/place?id=' + poi_id);
+    	res.redirect(req.baseUrl + '/place?id=' + poi_id);
 
     	//res.send(JSON.stringify('success'));
 
@@ -4363,7 +4382,7 @@ app.post('/upload-city-photo', upload_city.single('photo'), function(req, res){
 			res.send({result: 'error', msg: "Error uploading the photo."});
     	}
 
-    	res.redirect('http://localhost:8080/city?name=' + city_name);
+    	res.redirect(req.baseUrl + '/city?name=' + city_name);
 
     });
 
@@ -4473,8 +4492,6 @@ app.post('/update-info-poi-automatically', function(req, res){
 
 		con.query("call updatePOIOpeningHours(?,?)", [poi_id, opening_hours], function (err, result, fields) {
     		if (err) throw err;
-
-    		console.log(result);
 
 			res.contentType('json');
 			res.send({result: result[0][0].result});
@@ -5195,8 +5212,6 @@ function parsePoiOpeningHours(poi_op_hours){
 
     	poi_hours["Monday"] = [start_time, end_time];
 	}
-
-	console.log(poi_hours);
 
 	/*for(var i=0; i<poi_op_hours.length;i++){
         var weekday = poi_op_hours[i].split(':')[0];

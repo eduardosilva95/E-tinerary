@@ -280,6 +280,10 @@ function getPlaceDetails(place_id){
     else if (poi_type == 'Natural Feature'){
       document.getElementById(place_icon).className = "fas fa-umbrella-beach";
     }
+
+    else{
+      document.getElementById(place_icon).className = "fas fa-monument";
+    }
   
   
   }

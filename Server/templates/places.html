@@ -91,7 +91,7 @@
             <div class="row">
                 <div class="col-md-4 col-sm-3"></div>
                 <div class="col-md-4 col-sm-6 places-title">
-                    <h2 class="text-center" style="color: white; font-weight: bold;"><%= city %></h2>
+                    <h2 class="text-center" style="color: white; font-weight: bold;"><a class="city-link" href="./city?name=<%= city %>"><%= city %></a></h2>
                     <h3 class="text-center" style="color: white;"><%= country %></h3>
                 </div>
                 <div class="col-md-4 col-sm-3"></div>
@@ -219,9 +219,18 @@
                                                 <span style="color: #ffc107; font-weight: bold;" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Number of comments on Google"><i class="fas fa-comment"></i><span style="padding-left: 5px;"><%= place.num_reviews.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %></span></span>                                               
                                             </div>
                                             <div class="col-md text-right">
-                                                <div id="places-poi-<%= count %>-price">
-                                                    <span style="padding-right: 5px; color: #ffc107; font-style: italic;" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Price">Visits around <%= place.price %>€</span>
-                                                </div>
+                                                <% if(place.price != null) { %>
+                                                    <% if(place.price == 0) { %>
+                                                        <div id="places-poi-<%= count %>-price">
+                                                            <span style="padding-right: 5px; color: #ffc107; font-style: italic;" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Price">Free entrance</span>
+                                                        </div>
+                                                    <% } else { %>
+                                                        <div id="places-poi-<%= count %>-price">
+                                                            <span style="padding-right: 5px; color: #ffc107; font-style: italic;" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Price">Visits around <%= place.price %>€</span>
+                                                        </div>
+                                                    <% } %>
+                                                <% } %>
+
                                                 <script>
                                                     loadPriceRating("<%= place.price_level %>", "places-poi-<%= count %>-price");
                                                 </script>

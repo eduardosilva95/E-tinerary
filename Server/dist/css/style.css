@@ -494,6 +494,15 @@ hr {
   margin-right: 10px;
 }
 
+.city-link {
+  color: white;
+}
+
+.city-link:hover {
+  color: #ffc107;
+  text-decoration: none;
+}
+
 .places-title {
   background:rgb(0,0,0);  
   background: transparent\9;  
@@ -698,18 +707,9 @@ hr {
 }
 
 
-
-#place-description{
-  height: 300px;
-  overflow-y: scroll;
-}
-
 #place-description p{
   color: #80868b;
   display: -webkit-box;
-  -webkit-line-clamp: 7;
-  -webkit-box-orient: vertical;
-  max-width: 100%;
   text-align: justify;
   text-justify: newspaper;
 }
@@ -1501,6 +1501,15 @@ table tr td a{
 
 @media (max-width: 1200px) {
   #favorite-trip-div {display: none;}
+}
+
+.trips-city-link{
+  color: #aaaaaa;
+}
+
+.trips-city-link:hover{
+  text-decoration: none;
+  color: #cccccc;
 }
 
 /* ---------------------------------- CITY ------------------------------ */

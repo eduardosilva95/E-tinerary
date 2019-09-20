@@ -152,7 +152,7 @@ $(function (){
 
 function makeTripFavorite(trip_id){
 
-    $.post("/favorite-trip", {plan: trip_id}, function(result){
+    $.post("/favorite-trip", {trip: trip_id}, function(result){
         if(result.result == 'error'){
         }
         
@@ -164,7 +164,7 @@ function makeTripFavorite(trip_id){
 
 function unfavoriteTrip(trip_id){
 
-    $.post("/unfavorite-trip", {plan: trip_id}, function(result){
+    $.post("/unfavorite-trip", {trip: trip_id}, function(result){
         if(result.result == 'error'){
         }
         
@@ -237,6 +237,21 @@ $(function (){
         else{
             $('#interested-trips').show();
             $('#interested-trips').removeClass('out').addClass('active');
+        }
+    });
+
+    $('#favorite-trips-checkbox').on('change', function () {
+        if (!this.checked) {
+            $('#favorite-trips').removeClass('active').addClass('out');
+
+			setTimeout(function(){
+				$('#favorite-trips').hide() 
+            }, 300); //Same time as animation
+            
+        }
+        else{
+            $('#favorite-trips').show();
+            $('#favorite-trips').removeClass('out').addClass('active');
         }
     });
 });

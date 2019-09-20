@@ -418,9 +418,9 @@ function loadImage(place_id, dest){
 
 function viewPOI(place_dict){
 
-    console.log(place_dict);
-
     $("#poi-info-table").children().remove();
+
+    document.getElementById("change-day-div").style.display = "none";
 
     document.getElementById("sidebar-1").style.display = "none";
     document.getElementById("sidebar-2").style.display = "block";
@@ -535,7 +535,9 @@ $(document).ready(function () {
 
 });
 
-function backToPlan(){
+function backtoTrip(){
+  document.getElementById("change-day-div").style.display = "block";
+
   document.getElementById("sidebar-2").style.display = "none";
   document.getElementById("sidebar-1").style.display = "block";
 

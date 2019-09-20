@@ -75,6 +75,7 @@ DROP PROCEDURE getCityStats;
 DROP PROCEDURE discover;
 DROP PROCEDURE tripExists;
 DROP PROCEDURE updateCityPlaceID;
+DROP PROCEDURE userExists;
 
 
 DELIMITER //
@@ -844,7 +845,7 @@ BEGIN
     SELECT count(*) INTO hasAccount from user where username = userName;
     
     IF hasGoogleAccount = 1 THEN
-		SELECT id, picture from user join user_g on user.id = user_g.user_id where google_id = googleID;
+		SELECT id, picture, type_use from user join user_g on user.id = user_g.user_id where google_id = googleID;
 	ELSEIF hasAccount = 1 THEN
 		SELECT 1 as error;
     ELSE
@@ -853,7 +854,7 @@ BEGIN
 				INSERT INTO user (username, name, picture) values (userName, user_Name, userPhoto);
 				SET userID = LAST_INSERT_ID();
 				INSERT INTO user_g (user_id, google_id) values (userID, googleID);
-				SELECT id, picture from user where id = userID;
+				SELECT id, picture, type_use from user where id = userID;
 			COMMIT;
 		END;
 	END IF;
@@ -909,7 +910,7 @@ END //
 # login
 CREATE PROCEDURE login (userUsername VARCHAR(255))
 BEGIN
-	select id, picture, CAST(password AS CHAR(32) CHARACTER SET utf8) as password from user_e join user on user_e.user_id = user.id where username = userUsername;
+	select id, picture, CAST(password AS CHAR(32) CHARACTER SET utf8) as password, type_use from user_e join user on user_e.user_id = user.id where username = userUsername;
 END //
 
 # editar a descrição de um POI
@@ -1065,6 +1066,13 @@ CREATE PROCEDURE updateCityPlaceID (cityName VARCHAR(255), placeID VARCHAR(255))
 BEGIN
 	UPDATE city SET place_id = placeID WHERE name LIKE cityName;
 END //
+
+# verificar se um utilizador existe
+CREATE PROCEDURE userExists (userID INT)
+BEGIN
+	SELECT count(*) as user_exists from user where id = userID; 
+END //
+
 
 
 DELIMITER ;

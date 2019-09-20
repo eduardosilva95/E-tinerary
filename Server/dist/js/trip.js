@@ -965,6 +965,10 @@ function getIcon(type){
         return "fas fa-train";
     }
 
+    else{
+        return "fas fa-monument";
+    }
+
 }
 
 $(function () {
