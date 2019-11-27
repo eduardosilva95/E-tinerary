@@ -45,7 +45,7 @@
                     </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                    <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Cities & Places</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
@@ -76,7 +76,7 @@
                         <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
                         <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
                         <a class="dropdown-item header" href="./trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
-                        <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
+                        <a class="dropdown-item header" id="request-poi-btn" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
                         </div>   
@@ -118,8 +118,8 @@
                                     <i class="fas fa-plus"></i><span style="padding-left: 10px;">Add visit</span>
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <button class="dropdown-item" onclick="addVisit('<%= city %>');" style="cursor: pointer;">Add new visit or activity</button>
-                                    <a class="dropdown-item" href="/hotels?dest=<%= city %>">Book an hotel</a>
+                                    <button class="dropdown-item" onclick="addVisitBtnClicked('<%= city %>');" style="cursor: pointer;">Add new visit or activity</button>
+                                    <a class="dropdown-item" href="/hotels?dest=<%= city %>">View hotels</a>
                                 </div>
                             </div>
                         </div>
@@ -196,23 +196,25 @@
                             <div class="card-body">
                                 <h5 class="card-title text-center"><b>Visit also in <%= city %></b></h5>
                                 <% count = 0 %>
-                                <% suggested_visits.forEach(function(visit) { %>
+                                <% suggested_visits.forEach(function(place) { %>
                                     <br>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <% if(visit.photo != null) { %>
-                                                <a href="/place?id=<%= visit.id %>&trip=<%= trip_id %>" class="suggestions-title"><img id="suggested-visit-<%= count %>" class="card-img suggestions-img" src="<%= visit.photo %>"></a>
+                                            <% if(place.photo != null) { %>
+                                                <a href="/place?id=<%= place.id %>&trip=<%= trip_id %>" class="suggestions-title"><img id="suggested-place-<%= count %>" class="card-img suggestions-img" src="<%= place.photo %>"></a>
                                             <% } else { %>
-                                                <a href="/place?id=<%= visit.id %>&trip=<%= trip_id %>" class="suggestions-title"><img id="suggested-visit-<%= count %>" class="card-img suggestions-img"></a>
+                                                <a href="/place?id=<%= place.id %>&trip=<%= trip_id %>" class="suggestions-title"><img id="suggested-place-<%= count %>" class="card-img suggestions-img"></a>
                                                 <script>
-                                                    loadImage("<%= visit.place_id %>", "suggested-visit-<%= count %>");
+                                                    loadImage("<%= place.place_id %>", "suggested-place-<%= count %>");
                                                 </script>
                                             <% } %>
                                         </div>
                                         <div class="col-md-6">
-                                            <a href="/place?id=<%= visit.id %>&trip=<%= trip_id %>" class="suggestions-title"><%= visit.name %></a>
+                                            <a href="/place?id=<%= place.id %>&trip=<%= trip_id %>" class="suggestions-title"><%= place.name %></a>
                                             <br>
-                                            <span style="color: #767676;"><%= visit.poi_type %></span>
+                                            <span style="color: #767676;"><%= place.poi_type %></span>
+                                            <br><br>
+                                            <a class="btn-add-visit-modal" data-toggle="modal" data-target="#add-visit-modal" data-title="<%= place.name %>" data-poi="<%= place.id %>"><i class="far fa-calendar-alt"></i><span style="padding-left: 10px;">Add to your trip</span></a>
                                         </div>
                                     </div>
                                     
@@ -435,6 +437,32 @@
             </div>
         </div>
 
+        <!-- Add Visit Modal -->
+        <div class="modal fade" id="add-visit-modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add <span id="modal-title" style="font-weight: bold;"></span> to the trip</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger" id="add-visit-error" role="alert" style="display: none;">
+                            <i class="fas fa-times-circle"></i><span style="padding-left: 10px;" id="add-visit-error-msg"></span>
+                        </div>
+
+                        
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i><span style="padding-left: 10px;">Cancel</span></button>
+                        <button type="button" class="btn btn-success" id="confirm-add-visit-btn"><i class="fas fa-plus"></i><span style="padding-left: 10px;">Add</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Remove Trip Modal -->
         <div class="modal fade" id="remove-trip-modal" role="dialog">
             <div class="modal-dialog">
@@ -459,25 +487,47 @@
        
 
         <!-- Footer -->
-        <footer class="footer">
+      <footer class="footer">
+        <!-- Footer Elements -->
+        <div class="container cont">
+          <div class="row">
+            <div class="col-md-4">
+                <img src="img/logo-2.png">
+                <br><br>
+                <p><a class="footer-links" href="/about-us">About us</a></p>
+                <p><a class="footer-links" href="/help">Help</a></p>
+                <br><br>
+            </div>
+            <div class="col-md-4">
+              <br>
+              <h5><strong>Contacts</strong></h5>
+              <p class="footer-text"><i class="fas fa-map-marker-alt"></i><span style="padding-left: 10px;">Universidade de Aveiro, Portugal</span></p>
+              <p class="footer-text"><i class="fas fa-envelope"></i><span style="padding-left: 10px;">etinerary@gmail.com</span></p>
+              <p class="footer-text"><i class="fas fa-phone"></i><span style="padding-left: 10px;">234 234 234</span></p>
+            </div>
+            <div class="col-md-4">
+                <br>
+                <h5><strong>Social Media</strong></h5>
+                <div id="social">
+                    <a class="facebookBtn smGlobalBtn" href="#" ></a>
+                    <a class="twitterBtn smGlobalBtn" href="#" ></a>
+                    <a class="instagramBtn smGlobalBtn" href="#" ></a>
+                </div>
+            </div>
+
+          </div>
+          <br><br>
+        </div>
+
           <!-- Footer Elements -->
+      
+          <!-- Copyright -->
+          <div class="footer-copyright">
+            <span class="footer-text">&copy;2019 </span><a class="footer-links" href="/">E-tinerary&trade;</a><span class="footer-text">. All rights reserved</span>
+          </div>
 
-          <div id="social">
-              <a class="facebookBtn smGlobalBtn" href="#" ></a>
-              <a class="twitterBtn smGlobalBtn" href="#" ></a>
-              <a class="googleplusBtn smGlobalBtn" href="#" ></a>
-              <a class="linkedinBtn smGlobalBtn" href="#" ></a>
-              <a class="instagramBtn smGlobalBtn" href="#" ></a>
-            </div>
-            <!-- Footer Elements -->
-        
-            <!-- Copyright -->
-            <div class="footer-copyright"> 2019 Copyright:
-              <a href="">&copy; Aplicacao, todos os direitos reservados</a>
-            </div>
-
-        </footer>
-        <!-- Footer -->
+      </footer>
+      <!-- Footer -->
 
     <!-- Scripts -->
     <script>startGoogleSignIn();</script>

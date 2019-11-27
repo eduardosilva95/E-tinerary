@@ -6,7 +6,8 @@
     <meta name="author" content="Eduardo Silva">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Simple Map</title>
+    <title>e-tinerary</title>
+    <link rel="icon" href="img/logo-icon.ico">
 
     <!-- Custom styles -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
@@ -43,7 +44,7 @@
                   </li>
                 
                 <li class="nav-item">
-                  <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                  <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Cities & Places</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
@@ -74,7 +75,7 @@
                       <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
                         <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
                         <a class="dropdown-item header" href="./trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
-                        <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
+                        <a class="dropdown-item header" id="request-poi-btn" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
                       </div>   
@@ -199,11 +200,11 @@
                             <h6 class="card-title"><b><%= city %></b> in <span class="logo-letters">e &bull; t</span><span class="logo-letters-2">inerary </span><sup id="input-info-popover"><i class="fas fa-info-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Information provided by our users"></i></sup></h6>
                             <br>
 
-                            <p class="card-text"><i class="fas fa-monument"></i><strong style="padding-left: 10px;">Points of Interest: </strong><span id="" style="padding-left: 10px;"><%= num_pois %></span></p>
+                            <p><a class="card-text city-links" href="/places?dest=<%= city %>"><i class="fas fa-monument"></i><strong style="padding-left: 10px;">Points of Interest: </strong><span id="" style="padding-left: 10px;"><%= num_pois %></span></a></p>
                             
-                            <p class="card-text"><i class="fas fa-bed"></i><strong style="padding-left: 10px;">Hotels: </strong><span id="" style="padding-left: 10px;"><%= num_hotels %></span></p>
+                            <p><a class="card-text city-links" href="/hotels?dest=<%= city %>"><i class="fas fa-bed"></i><strong style="padding-left: 10px;">Hotels: </strong><span id="" style="padding-left: 10px;"><%= num_hotels %></span></a></p>
                             
-                            <p class="card-text"><i class="fas fa-map-marked-alt"></i><strong style="padding-left: 10px;">Trips: </strong><span id="" style="padding-left: 10px;"><%= num_trips %></span></p>
+                            <p><a class="card-text city-links" href="/discover?query=<%= city %>"><i class="fas fa-map-marked-alt"></i><strong style="padding-left: 10px;">Trips: </strong><span id="" style="padding-left: 10px;"><%= num_trips %></span></a></p>
                                       
                         </div>
                     </div>
@@ -221,7 +222,7 @@
 
             <hr>
 
-            <h6 class="card-title" style="font-style: italic;"><b>Places to visit in <%= city %></b></h6>
+            <h6 class="card-title" style="font-style: italic;"><a class="city-links" href="/places?dest=<%= city %>"><b>Places to visit in <%= city %></b></a></h6>
 
             <div class="row">
                 <% count = 0 %>
@@ -251,7 +252,7 @@
 
             <hr>
 
-            <h6 class="card-title" style="font-style: italic;"><b>Hotels in <%= city %></b></h6>
+            <h6 class="card-title" style="font-style: italic;"><a class="city-links" href="/hotels?dest=<%= city %>"><b>Hotels in <%= city %></b></a></h6>
 
             <div class="row">
                 <% count = 0 %>
@@ -281,7 +282,7 @@
 
             <hr>
 
-            <h6 class="card-title" style="font-style: italic;"><b>Itineraries created for <%= city %></b></h6>
+            <h6 class="card-title" style="font-style: italic;"><a class="city-links" href="/discover?query=<%= city %>"><b>Itineraries created for <%= city %></b></a></h6>
 
             <% if (trips.length == 0) { %>
                 <br>
@@ -500,26 +501,47 @@
 
 
         <!-- Footer -->
-        <footer class="footer">
+      <footer class="footer">
+        <!-- Footer Elements -->
+        <div class="container cont">
+          <div class="row">
+            <div class="col-md-4">
+                <img src="img/logo-2.png">
+                <br><br>
+                <p><a class="footer-links" href="/about-us">About us</a></p>
+                <p><a class="footer-links" href="/help">Help</a></p>
+                <br><br>
+            </div>
+            <div class="col-md-4">
+              <br>
+              <h5><strong>Contacts</strong></h5>
+              <p class="footer-text"><i class="fas fa-map-marker-alt"></i><span style="padding-left: 10px;">Universidade de Aveiro, Portugal</span></p>
+              <p class="footer-text"><i class="fas fa-envelope"></i><span style="padding-left: 10px;">etinerary@gmail.com</span></p>
+              <p class="footer-text"><i class="fas fa-phone"></i><span style="padding-left: 10px;">234 234 234</span></p>
+            </div>
+            <div class="col-md-4">
+                <br>
+                <h5><strong>Social Media</strong></h5>
+                <div id="social">
+                    <a class="facebookBtn smGlobalBtn" href="#" ></a>
+                    <a class="twitterBtn smGlobalBtn" href="#" ></a>
+                    <a class="instagramBtn smGlobalBtn" href="#" ></a>
+                </div>
+            </div>
+
+          </div>
+          <br><br>
+        </div>
+
           <!-- Footer Elements -->
+      
+          <!-- Copyright -->
+          <div class="footer-copyright">
+            <span class="footer-text">&copy;2019 </span><a class="footer-links" href="/">E-tinerary&trade;</a><span class="footer-text">. All rights reserved</span>
+          </div>
 
-          <div id="social">
-              <a class="facebookBtn smGlobalBtn" href="#" ></a>
-              <a class="twitterBtn smGlobalBtn" href="#" ></a>
-              <a class="googleplusBtn smGlobalBtn" href="#" ></a>
-              <a class="linkedinBtn smGlobalBtn" href="#" ></a>
-              <a class="instagramBtn smGlobalBtn" href="#" ></a>
-            </div>
-            <!-- Footer Elements -->
-        
-            <!-- Copyright -->
-            <div class="footer-copyright"> 2019 Copyright:
-              <a href="">&copy; Aplicacao, todos os direitos reservados</a>
-            </div>
-
-        </footer>
-        <!-- Footer -->
-        
+      </footer>
+      <!-- Footer -->
 
   
     <!-- Scripts -->

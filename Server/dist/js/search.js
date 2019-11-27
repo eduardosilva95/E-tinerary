@@ -1,12 +1,34 @@
 
 var slide = 0;
 
-
 $(function () {
-  $('#arrival-date').change(function() { 
-    console.log($('#arrival-date').val());
-  });
+  if($('#arrival-date').length > 0){
+    $('#arrival-date').datepicker({
+      uiLibrary: 'bootstrap4',
+      format: 'dd/mm/yyyy',
+      minDate: new Date(),
+    });
+
+    $('#departure-date').datepicker({
+      uiLibrary: 'bootstrap4',
+      format: 'dd/mm/yyyy',
+      minDate: new Date(),
+    });
+
+    $('#arrival-date').change(function() { 
+      arr_date = $('#arrival-date').val().split('/')[1] + '/' + $('#arrival-date').val().split('/')[0] + '/' + $('#arrival-date').val().split('/')[2];
+      arr_date = new Date(arr_date);
+
+      def_dep_date = new Date(arr_date.getTime()+1000*60*60*24);    
+      dep_date = (def_dep_date.getDate()<10?'0':'') + def_dep_date.getDate().toString()  + "/" + ((def_dep_date.getMonth()+1)<10?'0':'') + (def_dep_date.getMonth() + 1).toString() + "/" + def_dep_date.getFullYear();
+
+      $("#departure-date").val(dep_date);
+    });
+  }
 });
+
+
+
 
 $(function () {
   $(document).scroll(function () {
@@ -31,11 +53,11 @@ $(function () {
 });
 
 function enableBudgetBox(){
-    document.getElementById('inputBudget').disabled = false;
+    document.getElementById('input-budget').disabled = false;
 }
   
 function disableBudgetBox(){
-    document.getElementById('inputBudget').disabled = true;
+    document.getElementById('input-budget').disabled = true;
 }
   
   
@@ -162,18 +184,6 @@ function autocomplete(inp, arr) {
       alert("Must select a valid destination !");
     }
   }
-  
-  function verify(){
-    var user_id = getUserCookie();
-
-    if(user_id == null){
-      $("#need-login-error").css("display", "block");
-      $("#login-modal").modal();
-      return false;
-    }
-
-    return true;
-  }
 
 
   function loadPlaceImage(dest, place_id){
@@ -195,3 +205,145 @@ function autocomplete(inp, arr) {
           document.getElementById(dest).src = "img/no-photo-found.png";
     });
   }
+
+
+  function verify(){
+    var user_id = getUserCookie();
+    var isChecked = true;
+
+    if(user_id == null){
+      $("#need-login-error").css("display", "block");
+      $("#login-modal").modal();
+      return false;
+    }
+
+    var destination = $("#inputDestination").val();
+    var arrival_date = $("#arrival-date").val();
+    var departure_date = $("#departure-date").val();
+    var num_adults = parseInt($("#select-adults").val());
+    var num_children = parseInt($("#select-children").val());
+    
+    /* check if destination is valid */
+    if(!list_cities.includes(destination)){
+      $("#invalid-destination").css("display", "block");
+      document.getElementById("inputDestination").classList.add("is-invalid");
+      isChecked = false;
+    }
+
+    var errorMsg = checkDate(arrival_date);
+
+    if(errorMsg != ""){
+      $("#invalid-arrival-date").css("display", "block");
+      $("#invalid-arrival-date").html(errorMsg);
+      document.getElementById("arrival-date").classList.add("is-invalid");
+      isChecked = false;
+    }
+
+    errorMsg = checkDate(departure_date)
+
+    if(errorMsg != ""){
+      $("#invalid-departure-date").css("display", "block");
+      $("#invalid-departure-date").html(errorMsg);
+      document.getElementById("departure-date").classList.add("is-invalid");
+      isChecked = false;
+    }
+
+    if(errorMsg == "" && !compareDates(arrival_date, departure_date)){
+      $("#invalid-arrival-date").css("display", "block");
+      $("#invalid-departure-date").css("display", "block");
+      $("#invalid-arrival-date").html('Arrival must occur before departure');
+      $("#invalid-departure-date").html('Departure must occur after arrival');
+      document.getElementById("arrival-date").classList.add("is-invalid");
+      document.getElementById("departure-date").classList.add("is-invalid");
+      isChecked = false;
+    }
+
+    if(isNaN(num_adults) || num_adults < 1 || num_adults > 8){
+      $("#invalid-adults").css("display", "block");
+      document.getElementById("select-adults").classList.add("is-invalid");
+      isChecked = false;
+    }
+
+    if(isNaN(num_children) || num_children < 0 || num_children > 5){
+      $("#invalid-children").css("display", "block");
+      document.getElementById("select-children").classList.add("is-invalid");
+      isChecked = false;
+    }
+
+    return isChecked;
+  }
+
+
+  $(function () {
+    $('#arrival-date').change(function() { 
+      arr_date = $('#arrival-date').val().split('/')[1] + '/' + $('#arrival-date').val().split('/')[0] + '/' + $('#arrival-date').val().split('/')[2];
+      arr_date = new Date(arr_date);
+  
+      def_dep_date = new Date(arr_date.getTime()+1000*60*60*24);    
+      dep_date = (def_dep_date.getDate()<10?'0':'') + def_dep_date.getDate().toString()  + "/" + ((def_dep_date.getMonth()+1)<10?'0':'') + (def_dep_date.getMonth() + 1).toString() + "/" + def_dep_date.getFullYear();
+  
+      $("#departure-date").val(dep_date);
+    });
+  });
+
+
+  function checkDate(date){
+    var minYear = (new Date()).getFullYear();
+    var maxYear = 2030;
+    var errorMsg = "";
+
+    // regular expression to match required date format
+    re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+
+    if(date != '') {
+      if(regs = date.match(re)) {
+        if(regs[1] < 1 || regs[1] > 31) {
+          errorMsg = "Invalid value for day: " + regs[1];
+        } else if(regs[2] < 1 || regs[2] > 12) {
+          errorMsg = "Invalid value for month: " + regs[2];
+        } else if(regs[3] < minYear || regs[3] > maxYear) {
+          errorMsg = "Invalid value for year: " + regs[3] + " - must be between " + minYear + " and " + maxYear;
+        } 
+      } else {
+        errorMsg = "Invalid date format: " + date;
+      }
+    }
+
+    if(errorMsg != "") {
+      return errorMsg;
+    }
+
+    else{
+      date = new Date(date.split('/')[1]+"/"+date.split('/')[0]+"/"+date.split('/')[2]);
+      if(date < new Date())
+        return "Invalid date";
+      else
+        return errorMsg
+    }
+  }
+
+
+  function compareDates(arrival, departure){
+    arrival = new Date(arrival.split('/')[1]+"/"+arrival.split('/')[0]+"/"+arrival.split('/')[2]);
+    departure = new Date(departure.split('/')[1]+"/"+departure.split('/')[0]+"/"+departure.split('/')[2]);
+
+    if(arrival > departure)
+      return false;
+
+    return true;
+  }
+
+
+  /* on enter keyboard click  */
+
+$(function(){
+  var input = document.getElementById("inputDestination");
+
+  input.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {
+    event.preventDefault();
+    $('#btn-search-place').trigger('click');
+    }
+  });
+
+});

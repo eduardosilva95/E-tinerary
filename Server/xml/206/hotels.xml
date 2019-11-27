@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<Hotels>
+  <Hotel>
+    <Number>14598</Number>
+    <Name>Hotel The Savoy</Name>
+    <Latitude>51.5102932</Latitude>
+    <Longitude>-0.1205788</Longitude>
+  </Hotel>
+  <Hotel>
+    <Number>14599</Number>
+    <Name>Strand Palace Hotel</Name>
+    <Latitude>51.5108951</Latitude>
+    <Longitude>-0.1206784</Longitude>
+  </Hotel>
+  <Hotel>
+    <Number>14590</Number>
+    <Name>Corinthia Hotel London</Name>
+    <Latitude>51.5067575</Latitude>
+    <Longitude>-0.1243777</Longitude>
+  </Hotel>
+</Hotels>

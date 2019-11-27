@@ -53,14 +53,8 @@
                 <li class="nav-item">
                     <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
-                      <a class="dropdown-item header" href="./about-us">Aplicacao</a>
-                      <a class="dropdown-item header" href="./help">Help</a>
-                    </div>
+                <li class="nav-item">
+                    <a class="nav-link header" href="./about-us"><i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us</a>  
                 </li>
               </ul>
               <ul class="navbar-nav ml-auto">
@@ -99,33 +93,29 @@
                 <form autocomplete="off" action="/create-trip" method="POST" onsubmit="return verify();">
                     <div class="form-group autocomplete">
                       <input type="text" class="form-control" id="inputDestination" name="destination" placeholder="Enter your destination" required>
+                      <div class="invalid-feedback" id="invalid-destination" style="display: none; font-weight: bold;">
+                        Invalid destination.
+                      </div>
                     </div>
+                    
                     
                     <div class="row">
                       <div class='col-6'>
                         <div class="input-group date">
-                          <input type="text" class="form-control" placeholder="Arrival" id="arrival-date" name="arrival" required>
-                          <script>
-                            $('#arrival-date').datepicker({
-                                uiLibrary: 'bootstrap4',
-                                format: 'dd/mm/yyyy',
-                                minDate: new Date()
-                            });
-                          </script>
+                          <input type="text" class="form-control" placeholder="Arrival" id="arrival-date" name="arrival_date" required>
+                          <div class="invalid-feedback" id="invalid-arrival-date" style="display: none; font-weight: bold;">
+                              Invalid arrival date.
+                          </div>
                         </div>
                       </div>
 
                       <br>
                       <div class='col-6' >
                           <div class="input-group date" >
-                            <input type="text" class="form-control" placeholder="Departure" id="departure-date" name="departure" required>
-                            <script>
-                              $('#departure-date').datepicker({
-                                  uiLibrary: 'bootstrap4',
-                                  format: 'dd/mm/yyyy',
-                                  minDate: new Date()
-                              });
-                            </script>
+                            <input type="text" class="form-control" placeholder="Departure" id="departure-date" name="departure_date" required>
+                            <div class="invalid-feedback" id="invalid-departure-date" style="display: none; font-weight: bold;">
+                                Invalid departure date.
+                            </div>
                           </div>
                       </div>
                     </div>
@@ -139,7 +129,12 @@
                           <option selected value="1">1</option>
                           <option value="2">2</option>
                           <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
                         </select>
+                        <div class="invalid-feedback" id="invalid-adults" style="display: none; font-weight: bold;">
+                            Invalid number of adults.
+                        </div>
                       </div>
                       <div class="col-6">
                         <label class="my-1 mr-2" for="select-children" style="color: white; font-weight: bold;">Children <sup id="input-info-popover"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Children to 12 years old"></i></sup></label>
@@ -149,6 +144,9 @@
                           <option value="2">2</option>
                           <option value="3">3</option>
                         </select>
+                        <div class="invalid-feedback" id="invalid-children" style="display: none; font-weight: bold;">
+                            Invalid number of children.
+                        </div>
                       </div>
                     </div>
 
@@ -190,11 +188,20 @@
               </div>
               <div class="col-md-6 col-1"></div>
           </div>
+
+          <div class="row">
+            <div class="col-md-10"></div>
+            <div class="col-md-2">
+                <a class="ct-btn-scroll ct-js-btn-scroll" href="#how-to-div"><i class="fas fa-chevron-circle-down fa-3x"></i></a>
+            </div>
+          </div>
+
+
         </div>
 
         <!-- HOW TO USE DIV -->
 
-        <div class="container-fluid cont" style="background-color: #343a40; ">
+        <div class="container-fluid cont" id="how-to-div" style="background-color: #343a40; ">
           <div class="container cont text-center">
               <h2 style="color: white; font-weight: bold;">How to use <span class="logo-letters">e &bull; t</span><span class="logo-letters-2">inerary</span> ? </h2>
               <p style="color: #fff; font-size: 23px; opacity: .7">Easy to use, get an itinerary for your travel within a few seconds</p>
@@ -306,9 +313,9 @@
                               <div class="card-body">
                                 <h5 class="card-title"><b><%= dest.name %></b></h5>
                                 <% if(dest.trips == 1) { %>
-                                  <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trip planned for <%= dest.name %></p>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trip planned for <strong><%= dest.name %></strong></p>
                                 <% } else { %>
-                                  <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trips planned for <%= dest.name %></p>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trips planned for <strong><%= dest.name %></strong></p>
                                 <% } %>
                               </div>
                             </div>
@@ -353,9 +360,9 @@
                               <div class="card-body">
                                 <h5 class="card-title"><b><%= dest.name %></b></h5>
                                 <% if(dest.trips == 1) { %>
-                                  <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trip planned for <%= dest.name %></p>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trip planned for <strong><%= dest.name %></strong></p>
                                 <% } else { %>
-                                  <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trips planned for <%= dest.name %></p>
+                                  <p class="card-text" style="padding-top: 10px;"><%= dest.trips %> trips planned for <strong><%= dest.name %></strong></p>
                                 <% } %>
                               </div>
                             </div>
@@ -402,9 +409,9 @@
                               <h5 class="card-title"><b><%= place.name %></b></h5>
                               <span style="color: #767676;"><%= place.city %></span>
                               <% if(place.trips == 1) { %>
-                                <p class="card-text" style="padding-top: 10px;"><%= place.trips %> planned trips contain <span><%= place.name %></span></p>
+                                <p class="card-text" style="padding-top: 10px;"><strong><%= place.name %></strong> is in one planned trip</p>
                               <% } else { %>
-                                <p class="card-text" style="padding-top: 10px;"><%= place.trips %> planned trips contain <span><%= place.name %></span></p>
+                                <p class="card-text" style="padding-top: 10px;"><strong><%= place.name %></strong> is in <%= place.trips %> planned trip</p>
                               <% } %>
                             </div>
                           </div>
@@ -491,26 +498,48 @@
       </div>
 
 
-        <!-- Footer -->
-        <footer class="footer">
+      <!-- Footer -->
+      <footer class="footer">
+        <!-- Footer Elements -->
+        <div class="container cont">
+          <div class="row">
+            <div class="col-md-4">
+                <img src="img/logo-2.png">
+                <br><br>
+                <p><a class="footer-links" href="/about-us">About us</a></p>
+                <p><a class="footer-links" href="/help">Help</a></p>
+                <br><br>
+            </div>
+            <div class="col-md-4">
+              <br>
+              <h5><strong>Contacts</strong></h5>
+              <p class="footer-text"><i class="fas fa-map-marker-alt"></i><span style="padding-left: 10px;">Universidade de Aveiro, Portugal</span></p>
+              <p class="footer-text"><i class="fas fa-envelope"></i><span style="padding-left: 10px;">etinerary@gmail.com</span></p>
+              <p class="footer-text"><i class="fas fa-phone"></i><span style="padding-left: 10px;">234 234 234</span></p>
+            </div>
+            <div class="col-md-4">
+                <br>
+                <h5><strong>Social Media</strong></h5>
+                <div id="social">
+                    <a class="facebookBtn smGlobalBtn" href="#" ></a>
+                    <a class="twitterBtn smGlobalBtn" href="#" ></a>
+                    <a class="instagramBtn smGlobalBtn" href="#" ></a>
+                </div>
+            </div>
+
+          </div>
+          <br><br>
+        </div>
+
           <!-- Footer Elements -->
+      
+          <!-- Copyright -->
+          <div class="footer-copyright">
+            <span class="footer-text">&copy;2019 </span><a class="footer-links" href="/">E-tinerary&trade;</a><span class="footer-text">. All rights reserved</span>
+          </div>
 
-          <div id="social">
-              <a class="facebookBtn smGlobalBtn" href="#" ></a>
-              <a class="twitterBtn smGlobalBtn" href="#" ></a>
-              <a class="googleplusBtn smGlobalBtn" href="#" ></a>
-              <a class="linkedinBtn smGlobalBtn" href="#" ></a>
-              <a class="instagramBtn smGlobalBtn" href="#" ></a>
-            </div>
-            <!-- Footer Elements -->
-        
-            <!-- Copyright -->
-            <div class="footer-copyright"> 2019 Copyright:
-              <a href="">&copy; Aplicacao, todos os direitos reservados</a>
-            </div>
-
-        </footer>
-        <!-- Footer -->
+      </footer>
+      <!-- Footer -->
 
 
   

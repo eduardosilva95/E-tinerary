@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<Clients>
+  <Client>
+    <Number>14758</Number>
+    <Name>Ria Aveiro</Name>
+    <Latitude>40.64131723</Latitude>
+    <Longitude>-8.65572806</Longitude>
+  </Client>
+  <Client>
+    <Number>14757</Number>
+    <Name>Forum Aveiro</Name>
+    <Latitude>40.64106526</Latitude>
+    <Longitude>-8.65198221</Longitude>
+  </Client>
+  <Client>
+    <Number>10827</Number>
+    <Name>Costa Nova Beach</Name>
+    <Latitude>40.617471</Latitude>
+    <Longitude>-8.753421</Longitude>
+  </Client>
+  <Client>
+    <Number>4654</Number>
+    <Name>Parque Dom Pedro Infante - City Park</Name>
+    <Latitude>40.6364238</Latitude>
+    <Longitude>-8.6531216</Longitude>
+  </Client>
+  <Client>
+    <Number>4656</Number>
+    <Name>Jardim Oudinot</Name>
+    <Latitude>40.6425667</Latitude>
+    <Longitude>-8.7291107</Longitude>
+  </Client>
+  <Client>
+    <Number>10813</Number>
+    <Name>Praia da Barra</Name>
+    <Latitude>40.6288024</Latitude>
+    <Longitude>-8.7501818</Longitude>
+  </Client>
+  <Client>
+    <Number>4673</Number>
+    <Name>Quinta do Ega</Name>
+    <Latitude>40.55415</Latitude>
+    <Longitude>-8.676433</Longitude>
+  </Client>
+</Clients>

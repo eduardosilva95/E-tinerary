@@ -90,6 +90,40 @@ $(function () {
 });
 
 
+$(function () {
+    $('#confirm-remove-all-btn').on('click', function () {
+        $("#modal-confirm-delete-msg").css("display", "block");
+        $("#remove-confirm-error").css("display", "none");
+        $("#confirm-remove-confirm-btn").css("display", "block");
+        $("#confirm-remove-no-btn").css("display", "block");
+        $("#confirm-remove-cancel-btn").css("display", "none");
+
+        var count = 0;
+        $('#remove-all-table').find(':checkbox').each(function() {
+            if(this.checked){
+                count++;
+            }                        
+        });
+
+        if(count == 0){
+            $("#modal-confirm-delete-msg").css("display", "none");
+            $("#remove-confirm-error").css("display", "block");
+            $("#confirm-remove-confirm-btn").css("display", "none");
+            $("#confirm-remove-no-btn").css("display", "none");
+            $("#confirm-remove-cancel-btn").css("display", "block");
+        }
+
+        else if(count == 1){
+            $("#modal-confirm-delete-msg-no-trips").text("trip");
+        }
+
+        else{
+            $("#modal-confirm-delete-msg-no-trips").text(count + " trips");
+
+        }
+    });
+});
+
 
 function deleteTrip(trip_id){
     $.post("/delete-trip", {trip: trip_id}, function(result){
@@ -103,6 +137,26 @@ function deleteTrip(trip_id){
     
     });
 }
+
+
+function deleteTrips(){
+    var trips_to_remove = [];
+    $('#remove-all-table').find(':checkbox').each(function() {
+        if(this.checked){
+            trips_to_remove.push($(this).data('id'));
+        }                        
+    });
+
+    $.post("/delete-trips", {trips: trips_to_remove}, function(result){
+        if(result.result == 'error'){
+        }
+        
+        else{
+            window.location.reload();
+        }
+    });
+}
+
 
 function renameTrip(trip_id){
     var name = document.getElementById("inputName").value;
@@ -324,4 +378,20 @@ function returnReviewPage(){
 $(function () {
     $('#pills-more-info-tab').click(
       function(){ changeReviewPage(); return false;})
+});
+
+
+$(function() {
+    $( "#remove-all-select-all-btn" ).click(function() {
+        if(this.checked) {
+            // Iterate each checkbox
+            $('#remove-all-table').find(':checkbox').each(function() {
+                this.checked = true;                        
+            });
+        } else {
+            $('#remove-all-table').find(':checkbox').each(function() {
+                this.checked = false;                       
+            });
+        }
+    });
 });

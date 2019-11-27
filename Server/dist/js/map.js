@@ -16,7 +16,9 @@ var place_info = [];
 
 
 var places = {}; // dictionary with all visits
+var hotels = {}; // dictionary with all hotels already in the trip
 var suggested_places = {}; // dictionary with all suggested places
+var suggested_hotels = {}; // dictionary with all suggested hotels
 var hotels = {}; // dictionary with all suggested hotels
 
 /* variables to store map markers and markers cluster */
@@ -42,6 +44,14 @@ function initMap(latitude, longitude) {
 
     directionsService = new google.maps.DirectionsService();
     directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
+    
+
+    directionsDisplay.setOptions({
+        polylineOptions: {
+          strokeColor: '#5fcfe7'
+        }
+    });
+
     directionsDisplay.setMap(map);
 
     // Style map
@@ -64,20 +74,22 @@ function initMap(latitude, longitude) {
         for(var key in places){
             if(places[key].day.replace(/\s/g, '') == trip_days[day].replace(/\s/g, '')){
                 data = {color: visits_color, icon: getIcon(places[key]["poi_type"])};
-                createMarker(places[key]['coordinates'], places[key]['name'], data, "visits", count);
+                createMarker(places[key], data, "visits", 'green', count);
                 count++;
             }
         }
 
-        /*for(var key in suggested_places){
-            data = {color: suggested_visits_color, icon: getIcon(suggested_places[key]["poi_type"])};
-            createMarker(suggested_places[key]['coordinates'], suggested_places[key]['name'], data, "suggestions");
+        for(var key in hotels){
+            if(hotels[key].day.replace(/\s/g, '') == trip_days[day].replace(/\s/g, '')){
+                data = {color: visits_color, icon: getIcon(hotels[key]["poi_type"])};
+                createMarker(hotels[key], data, "hotels", 'yellow', 'H');
+            }
         }
 
-        for(var key in hotels){
-            data = {color: hotels_color, icon: getIcon(hotels[key]["poi_type"])};
-            createMarker(hotels[key]['coordinates'], hotels[key]['name'], data, "hotels");
-        }*/
+        for(var key in suggested_places){
+            data = {color: suggested_visits_color, icon: getIcon(suggested_places[key]["poi_type"])};
+            createMarker(suggested_places[key], data, "suggestions", 'blue', 'I');
+        }
 
         /* Markers clustering */
         markerCluster = new MarkerClusterer(map, markers,
@@ -97,24 +109,27 @@ function initMap(latitude, longitude) {
 }
 
 
-function createMarker(local, name, data, type, position){
+function createMarker(place, data, type, color, position){
     // if place has already a marker in the map, ignore 
-    if(markerList.includes(name))
+    if(markerList.includes(place["name"]))
       return;
     
-    var coordinates = new google.maps.LatLng({lat: parseFloat(local.split(', ')[0]), lng: parseFloat(local.split(', ')[1])}); 
+    var coordinates = new google.maps.LatLng({lat: parseFloat(place["coordinates"].split(', ')[0]), lng: parseFloat(place["coordinates"].split(', ')[1])}); 
     
     marker = new Marker({
       position: coordinates,
       map: map,
-      title: name,
-      icon: 'https://raw.githubusercontent.com/Concept211/Google-Maps-Markers/master/images/marker_green' + position + '.png',
+      title: place["name"],
+      icon: 'https://raw.githubusercontent.com/Concept211/Google-Maps-Markers/master/images/marker_' + color + position + '.png',
     });
+
+    
+    var contentString;
 
 
     if(type == "visits"){
         marker.addListener('click', function () {
-            viewPOI(places[this.title]);
+            viewPOI(places[this.title], false);
             if($("#add-remove-visit-btn").length > 0){
                 $("#add-remove-visit-btn").attr("class","btn btn-danger btn-remove-modal");
                 $("#add-remove-visit-btn").attr("data-toggle","modal");
@@ -125,31 +140,120 @@ function createMarker(local, name, data, type, position){
                 document.getElementById("add-remove-visit-btn").style.visibility = 'visible';
             }
         });
+
+        contentString = '<div id="content">'+
+        '<div id="siteNotice">'+
+        '</div>'+
+        '<h5 id="firstHeading" class="firstHeading">' + place["name"] + '</h5>'+
+        '<div class="row" id="bodyContent">'+
+        '<div class="col-md-4">' +
+        '<img src="' + place["photo"] + '" style="height: 100%; width: 100%;">'+
+        '</div>' +
+        '<div class="col-md-8">' +
+        '<p><i class="fas fa-calendar-alt"></i><span style="padding-left: 10px;"> Scheduled for ' + place["schedule"] + '</span></p>' + 
+        '</div>' +
+        '</div>' +
+        '</div>';
+
+        var infowindow = new google.maps.InfoWindow({
+            content: contentString,
+            maxWidth: 400,
+            maxHeight: 100
+        });
+
+        marker.addListener('mouseover', function() {
+            infowindow.open(map, this);
+        });
+
+        marker.addListener('mouseout', function() {
+            infowindow.close();
+        });
+    
     }
 
     else if(type == "suggestions"){
         marker.addListener('click', function () {
-            viewPOI(suggested_places[this.title]);
+            viewPOI(suggested_places[this.title], false);
             if($("#add-remove-visit-btn").length > 0){
                 $("#add-remove-visit-btn").attr("class","btn btn-success");
                 $("#add-remove-visit-btn").html('<i class="fas fa-calendar-alt"></i><span style="padding-left: 10px;">Add to trip</span>');
                 document.getElementById("add-remove-visit-btn").style.visibility = 'visible';
             }
         });
+
+        contentString = '<div id="content">'+
+        '<div id="siteNotice">'+
+        '</div>'+
+        '<h5 id="firstHeading" class="firstHeading">' + place["name"] + '</h5>'+
+        '<div class="row" id="bodyContent">'+
+        '<div class="col-md-4">' +
+        '<img src="' + place["photo"] + '" style="height: 100%; width: 100%;">'+
+        '</div>' +
+        '<div class="col-md-8">' +
+        '<p><i class="fas fa-calendar-alt"></i><span style="padding-left: 10px;"> Suggestion </span></p>' + 
+        '</div>' +
+        '</div>' +
+        '</div>';
+
+        var infowindow = new google.maps.InfoWindow({
+            content: contentString,
+            maxWidth: 400,
+            maxHeight: 100
+        });
+
+        marker.addListener('mouseover', function() {
+            infowindow.open(map, this);
+        });
+
+        marker.addListener('mouseout', function() {
+            infowindow.close();
+        });
     }
 
     else if(type == "hotels"){
         marker.addListener('click', function () {
-            viewPOI(hotels[this.title]);
+            viewPOI(hotels[trip_days[day]], true);
             if($("#add-remove-visit-btn").length > 0){
-                $("#add-remove-visit-btn").attr("class","btn btn-success");
-                $("#add-remove-visit-btn").html('<i class="fas fa-calendar-alt"></i><span style="padding-left: 10px;">Book hotel</span>');
+                $("#add-remove-visit-btn").attr("class","btn btn-danger btn-remove-modal");
+                $("#add-remove-visit-btn").attr("data-toggle","modal");
+                $("#add-remove-visit-btn").attr("data-target","#remove-modal");
+                $("#add-remove-visit-btn").attr("data-poi-id",hotels[trip_days[day]].id);
+                $("#add-remove-visit-btn").attr("data-poi-name",this.title);
+                $("#add-remove-visit-btn").html('<i class="fas fa-trash-alt"></i><span style="padding-left: 10px;">Remove from trip</span>');
                 document.getElementById("add-remove-visit-btn").style.visibility = 'visible';
             }
         });
 
-    }
+        contentString = '<div id="content">'+
+        '<div id="siteNotice">'+
+        '</div>'+
+        '<h5 id="firstHeading" class="firstHeading">' + place["name"] + '</h5>'+
+        '<div class="row" id="bodyContent">'+
+        '<div class="col-md-4">' +
+        '<img src="' + place["photo"] + '" style="height: 100%; width: 100%;">'+
+        '</div>' +
+        '<div class="col-md-8">' +
+        '<p><i class="fas fa-calendar-alt"></i><span style="padding-left: 10px;"> Scheduled for arrival at ' + place["schedule"] + '</span></p>' + 
+        '</div>' +
+        '</div>' +
+        '</div>';
+
+        var infowindow = new google.maps.InfoWindow({
+            content: contentString,
+            maxWidth: 400,
+            maxHeight: 100
+        });
+
+        marker.addListener('mouseover', function() {
+            infowindow.open(map, this);
+        });
+
+        marker.addListener('mouseout', function() {
+            infowindow.close();
+        });
     
+    }
+
     markers.push(marker);
     markerList.push(marker.title);
 }
@@ -178,9 +282,21 @@ function updateMarkers(){
     for(var key in places){
         if(places[key].day.replace(/\s/g, '') == trip_days[day].replace(/\s/g, '')){
             data = {color: visits_color, icon: getIcon(places[key]["poi_type"])};
-            createMarker(places[key]['coordinates'], places[key]['name'], data, "visits", count);
+            createMarker(places[key], data, "visits", 'green', count);
             count++;
         }
+    }
+
+    for(var key in hotels){
+        if(hotels[key].day.replace(/\s/g, '') == trip_days[day].replace(/\s/g, '')){
+            data = {color: visits_color, icon: getIcon(hotels[key]["poi_type"])};
+            createMarker(hotels[key], data, "visits", 'yellow', 'H');
+        }
+    }
+
+    for(var key in suggested_places){
+        data = {color: suggested_visits_color, icon: getIcon(suggested_places[key]["poi_type"])};
+        createMarker(suggested_places[key], data, "suggestions", 'blue', 'I');
     }
 
     /* Markers clustering */
@@ -199,18 +315,26 @@ function renderDirections(result) {
 }     
 
 
-function calcRoute(start, end, waypts) {
+function calcRoute(start, start_coord, end, end_coord, waypts) {
 
     var request = {
-        origin: {
-            placeId: start
-        },
-        destination: {
-            placeId: end
-        },     
         waypoints: waypts, 
         travelMode: TRAVEL_MODE
     };
+
+    if(start != undefined){
+        request["origin"] = {placeId: start};
+    }
+    else{
+        request["origin"] = start_coord;
+    }
+
+    if(end != undefined){
+        request["destination"] = {placeId: end};
+    }
+    else{
+        request["destination"] = end_coord;
+    }
     
     directionsService.route(request, function(result, status) {
       if (status == 'OK') {
@@ -252,7 +376,8 @@ function calcRoute(start, end, waypts) {
     delayed();
 }  
 
-function loadTrip(trip_array, days, days_shortname, travel_mode){
+
+function loadTrip(trip_array, hotels_array, days, days_shortname, travel_mode, openslots){
     TRAVEL_MODE = travel_mode;
     trip = trip_array;
     day = 0;
@@ -262,7 +387,7 @@ function loadTrip(trip_array, days, days_shortname, travel_mode){
     dif_days = days.length / 2 - 1;
 
     for(var i=1; i < days.length ; i+=2){
-        trip_days.push(days[i]);
+        trip_days.push(days[i].substring(1));
     }
 
     for(var i=0; i < days.length ; i+=2){
@@ -274,10 +399,15 @@ function loadTrip(trip_array, days, days_shortname, travel_mode){
         places[p.name] = p;
     }
 
+    for(var j=0 ; j < hotels_array.length ; j++){
+        h = JSON.parse(hotels_array[j]);
+        hotels[h.day] = h;
+    }
+
     for(var i=0; i < days_shortname.length ; i++){
         shortdays.push(days_shortname[i]);
     }
-
+    
     loadVisits();
 
     document.getElementById('previous-day-btn').disabled = true;
@@ -286,11 +416,28 @@ function loadTrip(trip_array, days, days_shortname, travel_mode){
         document.getElementById('next-day-btn').disabled = true;
     }
 
+
+    directionsService = new google.maps.DirectionsService();
+    loadItinerary();
+
+    openslots = JSON.parse(openslots);
+  
+    for(d in openslots){
+      var list = [];
+      for(var i=0; i < openslots[d].length ; i++){
+        list.push(openslots[d][i]);
+      }
+      open_slots[d] = list;
+    }
+
 }
 
 
 function loadItinerary(){
     var visits_tmp = [];
+    var origin_coord, dest_coord;
+    var dest_placeID;
+    var hotel = null;
 
     for(var key in places){
         if(places[key].day.replace(/\s/g, '') == trip_days[day].replace(/\s/g, '')){
@@ -298,8 +445,20 @@ function loadItinerary(){
         }
     }
 
+    for(var key in hotels){
+        if(hotels[key].day.replace(/\s/g, '') == trip_days[day].replace(/\s/g, '')){
+            hotel = hotels[key];
+            break;
+        }
+    }
+
     var waypoints = [];
-    for(var i=1; i < visits_tmp.length - 1; i++){
+    var waypoints_size = visits_tmp.length;
+
+    if(hotel == null)
+        waypoints_size = visits_tmp.length-1;
+    
+    for(var i=1; i < waypoints_size; i++){
         if(visits_tmp[i].place_id != undefined)
             waypoints.push({ stopover: true, location: { placeId: visits_tmp[i].place_id } });
         else{
@@ -309,7 +468,20 @@ function loadItinerary(){
         }
     }
 
-    calcRoute(visits_tmp[0].place_id, visits_tmp[visits_tmp.length-1].place_id, waypoints);
+    origin_coord = new google.maps.LatLng(visits_tmp[0].coordinates.split(', ')[0], visits_tmp[0].coordinates.split(', ')[1]);
+
+    if(hotel == null){
+        dest_coord = new google.maps.LatLng(visits_tmp[visits_tmp.length-1].coordinates.split(', ')[0], visits_tmp[visits_tmp.length-1].coordinates.split(', ')[1]);
+        dest_placeID = visits_tmp[visits_tmp.length-1].place_id;
+    }
+
+    else{
+        dest_coord = new google.maps.LatLng(hotel.coordinates.split(', ')[0], hotel.coordinates.split(', ')[1]);
+        dest_placeID = hotel.place_id;
+    }
+        
+
+    calcRoute(visits_tmp[0].place_id, origin_coord, dest_placeID, dest_coord, waypoints);
 }
 
 
@@ -324,14 +496,16 @@ function loadSuggestions(suggested_visits){
     }
 }
 
-function loadHotels(suggested_hotels){
 
-    for(var j=0 ; j < suggested_hotels.length ; j++){
-        p = JSON.parse(suggested_hotels[j]);
+function loadHotels(suggested_hotels_arr){
 
-        hotels[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number, 'poi_type': p.poi_type};
+    for(var j=0 ; j < suggested_hotels_arr.length ; j++){
+        p = JSON.parse(JSON.stringify(suggested_hotels_arr[j]));
+
+       suggested_hotels[p.name] = {'id': p.id, 'name': p.name, 'city': p.city, 'place_id': p.place_id, 'address': p.address, 'coordinates': p.coordinates, 'website': p.website, 'phone_number': p.phone_number, 'poi_type': p.poi_type};
     }
 }
+
 
 function nextDay(){
     if(day == trip_days.length){
@@ -416,7 +590,7 @@ function loadImage(place_id, dest){
 }
 
 
-function viewPOI(place_dict){
+function viewPOI(place_dict, isHotel){
 
     $("#poi-info-table").children().remove();
 
@@ -443,7 +617,12 @@ function viewPOI(place_dict){
 
     document.getElementById('poi-name').innerHTML = place_dict['name'];
 
-    document.getElementById('visit-schedule').innerHTML = '<i class="fas fa-check-circle"></i>' + '<span style="padding-left: 5px;"> Scheduled for ' + place_dict['day'] + ' from ' + place_dict['start_time'] + ' to ' + place_dict['end_time'] + '</span>';
+    if(!isHotel)
+        document.getElementById('visit-schedule').innerHTML = '<i class="fas fa-check-circle"></i>' + '<span style="padding-left: 5px;"> Scheduled for ' + place_dict['day'] + ' from ' + place_dict['start_time'] + ' to ' + place_dict['end_time'] + '</span>';
+
+    else
+        document.getElementById('visit-schedule').innerHTML = '<i class="fas fa-check-circle"></i>' + '<span style="padding-left: 5px;"> Arrived at the hotel scheduled for ' + place_dict['day'] + ' at ' + place_dict['start_time'] + '</span>';
+
 
     document.getElementById("poi-info").style.visibility = 'visible';
     document.getElementById("poi-opening-hours").style.visibility = 'visible';

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<Depots>
+  <Depot>
+    <Number>14759</Number>
+    <Name>Meliá Ria Hotel &amp; Spa</Name>
+    <Latitude>40.638277</Latitude>
+    <Longitude>-8.645169</Longitude>
+    <FixedCost>135</FixedCost>
+  </Depot>
+  <Depot>
+    <Number>4619</Number>
+    <Name>Hotel Ílhavo Plaza</Name>
+    <Latitude>40.603239</Latitude>
+    <Longitude>-8.672907</Longitude>
+    <FixedCost>98</FixedCost>
+  </Depot>
+  <Depot>
+    <Number>4617</Number>
+    <Name>Hotel Moliceiro - Aveiro</Name>
+    <Latitude>40.6419041</Latitude>
+    <Longitude>-8.6560605</Longitude>
+  </Depot>
+</Depots>

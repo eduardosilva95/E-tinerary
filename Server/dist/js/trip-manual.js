@@ -127,6 +127,15 @@ $(function () {
     });
 });
 
+$(function () {
+    $('.btn-add-visit-modal').on('click', function () {
+  
+        $('#modal-title').text($(this).data('title')); 
+        
+        document.getElementById('confirm-add-visit-btn').setAttribute( "onClick", "javascript: addVisit("+$(this).data('poi')+");" );
+  
+    });
+  });
 
 $(function () {
     $('.btn-remove-modal').on('click', function () {
@@ -149,7 +158,73 @@ $(function () {
     });
 });
 
-function addVisit(city){
+function addVisit(poi_id){
+    var href = new URL(window.location.href);
+    var trip_id = parseInt(href.searchParams.get('id'));
+  
+    var schedule;
+  
+    if($('#radio-choose-schedule-man').is(':checked')){
+
+      if($('#visit-day option:selected').val() == "null" || $('#visit-start-hour option:selected').val() == "null"){
+        $('#schedule-error').css("display", "block");
+      }
+
+      else{
+        $('#schedule-error').css("display", "none");
+
+        var day = new Date ($('#visit-day option:selected').val());
+        day = day.getFullYear() + "-" + (day.getMonth()<10?'0':'') + (day.getMonth() + 1)  + "-" + (day.getDate()<10?'0':'') + day.getDate();
+        var hour = $('#visit-start-hour option:selected').val();
+        schedule = day + " " + hour;
+
+        $.post("/add-visit", {trip: trip_id, poi: poi_id, schedule: schedule}, function(result){
+        
+          if(result.result == 'error'){
+            if(result.msg == 'schedule error'){
+              $('#add-visit-error').css("display", "block");
+              $('#add-visit-error-msg').text("Could not find a schedule for the visit in this trip")
+            }
+          }
+          
+          else{
+            if(result.isManual == true)
+              window.location.href = "/trip-m?id=" + trip_id;
+            else
+              window.location.href = "/trip?id=" + trip_id;
+          
+          }
+        });
+
+      }
+    }
+
+    else{
+
+      $('#schedule-error').css("display", "none");
+  
+      $.post("/add-visit", {trip: trip_id, poi: poi_id}, function(result){
+        
+        if(result.result == 'error'){
+          if(result.msg == 'schedule error'){
+            $('#add-visit-error').css("display", "block");
+            $('#add-visit-error-msg').text("Could not find a schedule for the visit in this trip")
+          }
+        }
+        
+        else{
+          if(result.isManual == true)
+            window.location.href = "/trip-m?id=" + trip_id;
+          else
+            window.location.href = "/trip?id=" + trip_id;
+        
+        }
+      });
+  
+    }
+  }
+
+function addVisitBtnClicked(city){
     var href = new URL(window.location.href);
     var trip_id = parseInt(href.searchParams.get('id'));
 

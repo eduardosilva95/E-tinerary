@@ -51,7 +51,7 @@
                 </li>
             
             <li class="nav-item">
-                <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
+                <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Cities & Places</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
@@ -82,7 +82,7 @@
                     <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
                     <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
                     <a class="dropdown-item header" href="./trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
-                    <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
+                    <a class="dropdown-item header" id="request-poi-btn" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
                     <div class="dropdown-divider"></div>
                     <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
                     </div>   
@@ -166,7 +166,7 @@
                             <div class="col-md-6 text-center">
                                 <button class="change-view" onclick="changeView('full');"><img class="img-responsive change-view-img" src="img/view-full.jpg" /></button>
                                 <br>
-                                <button class="change-view" onclick="changeView('full');">Plan view</button>
+                                <button class="change-view" onclick="changeView('full');">List view</button>
                             </div>
                         </div>
                     </div>
@@ -305,34 +305,61 @@
     <!-- Footer -->
     <footer class="footer">
         <!-- Footer Elements -->
+        <div class="container cont">
+          <div class="row">
+            <div class="col-md-4">
+                <img src="img/logo-2.png">
+                <br><br>
+                <p><a class="footer-links" href="/about-us">About us</a></p>
+                <p><a class="footer-links" href="/help">Help</a></p>
+                <br><br>
+            </div>
+            <div class="col-md-4">
+              <br>
+              <h5><strong>Contacts</strong></h5>
+              <p class="footer-text"><i class="fas fa-map-marker-alt"></i><span style="padding-left: 10px;">Universidade de Aveiro, Portugal</span></p>
+              <p class="footer-text"><i class="fas fa-envelope"></i><span style="padding-left: 10px;">etinerary@gmail.com</span></p>
+              <p class="footer-text"><i class="fas fa-phone"></i><span style="padding-left: 10px;">234 234 234</span></p>
+            </div>
+            <div class="col-md-4">
+                <br>
+                <h5><strong>Social Media</strong></h5>
+                <div id="social">
+                    <a class="facebookBtn smGlobalBtn" href="#" ></a>
+                    <a class="twitterBtn smGlobalBtn" href="#" ></a>
+                    <a class="instagramBtn smGlobalBtn" href="#" ></a>
+                </div>
+            </div>
 
-        <div id="social">
-            <a class="facebookBtn smGlobalBtn" href="#" ></a>
-            <a class="twitterBtn smGlobalBtn" href="#" ></a>
-            <a class="googleplusBtn smGlobalBtn" href="#" ></a>
-            <a class="linkedinBtn smGlobalBtn" href="#" ></a>
-            <a class="instagramBtn smGlobalBtn" href="#" ></a>
-        </div>
-        <!-- Footer Elements -->
-    
-        <!-- Copyright -->
-        <div class="footer-copyright"> 2019 Copyright:
-            <a href="">&copy; Aplicacao, todos os direitos reservados</a>
+          </div>
+          <br><br>
         </div>
 
-    </footer>
-    <!-- Footer -->
+          <!-- Footer Elements -->
+      
+          <!-- Copyright -->
+          <div class="footer-copyright">
+            <span class="footer-text">&copy;2019 </span><a class="footer-links" href="/">E-tinerary&trade;</a><span class="footer-text">. All rights reserved</span>
+          </div>
+
+      </footer>
+      <!-- Footer -->
 
     <!-- Scripts -->
     
     <script>startGoogleSignIn();</script>
     <script>
         var trip = [];
+        var hotels_array = [];
         var suggested_visits = [];
         var suggested_hotels = [];
         
         '<% trip.forEach(function(visit) { %>'
             trip.push('<%- JSON.stringify(visit) %>');
+        '<% }); %>'
+
+        '<% hotels.forEach(function(hotel) { %>'
+            hotels_array.push('<%- JSON.stringify(hotel) %>');
         '<% }); %>'
 
         '<% suggested_visits.forEach(function(visit) { %>'
@@ -343,12 +370,12 @@
             suggested_hotels.push('<%- JSON.stringify(hotel) %>');
         '<% }); %>'
 
-        loadTrip(trip, '<%= days %>', '<%= days_shortname %>', '<%= travel_mode %>');
+
+        loadTrip(trip, hotels_array, '<%= days %>', '<%= days_shortname %>', '<%= travel_mode %>', '<%- JSON.stringify(openslots) %>');
         loadSuggestions(suggested_visits);
         loadHotels(suggested_hotels);
     
     </script>
-        
         
   </body>
 </html>

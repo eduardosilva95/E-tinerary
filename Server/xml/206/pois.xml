@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<POIs>
+  <POI>
+    <Number>3356</Number>
+    <Name>Buckingham Palace</Name>
+    <Latitude>51.501364</Latitude>
+    <Longitude>-0.14189</Longitude>
+    <Longitude>-0.14189</Longitude>
+  </POI>
+  <POI>
+    <Number>3351</Number>
+    <Name>Coca-Cola London Eye</Name>
+    <Latitude>51.503324</Latitude>
+    <Longitude>-0.119543</Longitude>
+    <Longitude>-0.119543</Longitude>
+  </POI>
+  <POI>
+    <Number>3404</Number>
+    <Name>The British Museum</Name>
+    <Latitude>51.5194133</Latitude>
+    <Longitude>-0.1269566</Longitude>
+    <Longitude>-0.1269566</Longitude>
+  </POI>
+  <POI>
+    <Number>3341</Number>
+    <Name>Tower Bridge</Name>
+    <Latitude>51.5054564</Latitude>
+    <Longitude>-0.0753565</Longitude>
+    <Longitude>-0.0753565</Longitude>
+  </POI>
+  <POI>
+    <Number>3320</Number>
+    <Name>Hyde Park</Name>
+    <Latitude>51.5072682</Latitude>
+    <Longitude>-0.1657303</Longitude>
+    <Longitude>-0.1657303</Longitude>
+  </POI>
+  <POI>
+    <Number>3343</Number>
+    <Name>Tower of London</Name>
+    <Latitude>51.5081124</Latitude>
+    <Longitude>-0.0759493</Longitude>
+    <Longitude>-0.0759493</Longitude>
+  </POI>
+  <POI>
+    <Number>3406</Number>
+    <Name>Science Museum</Name>
+    <Latitude>51.4978095</Latitude>
+    <Longitude>-0.1745235</Longitude>
+    <Longitude>-0.1745235</Longitude>
+  </POI>
+</POIs>

@@ -66,17 +66,20 @@ function login(type=null) {
 
   var email;
   var pwd;
-  var dest
+  var dest;
+  var remember;
 
   if(type == 'r'){
     email = document.getElementById("inputEmail-2").value;
     pwd = document.getElementById("inputPassword-2").value;
+    remember = $('#remember-me-2').is(":checked");
     dest = 'login-error-2';
   }
 
   else{
     email = document.getElementById("inputEmail").value;
     pwd = document.getElementById("inputPassword").value;
+    remember = $('#remember-me').is(":checked");
     dest = 'login-error';
   }
 
@@ -90,7 +93,11 @@ function login(type=null) {
       }
       
       else{
-        setUserCookie(result.user_id, result.picture, result.type);
+        if(remember)
+          setUserCookie(result.user_id, result.picture, result.type);
+        else
+          setSessionCookie(result.user_id, result.picture, result.type);
+        
         window.location.href = '/';
       }
 
@@ -125,6 +132,13 @@ function setUserCookie(user_id, picture, type){
   document.cookie = "picture=" + picture + "; " + expires + ";path=/";
   document.cookie = "type=" + type + "; " + expires + ";path=/";
 
+}
+
+
+function setSessionCookie(user_id, picture, type){
+  document.cookie = "user=" + user_id + ";path=/";
+  document.cookie = "picture=" + picture + ";path=/";
+  document.cookie = "type=" + type + ";path=/";
 }
 
 function hasUserCookies() {
@@ -249,3 +263,18 @@ function deleteUserCookie(){
   document.cookie = "picture=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   document.cookie = "type=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 }
+
+
+/* on enter keyboard click  */
+
+$(function(){
+  var input = document.getElementById("inputPassword");
+
+  input.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {
+    event.preventDefault();
+    login();
+    }
+  });
+
+});

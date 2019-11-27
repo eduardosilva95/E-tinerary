@@ -29,58 +29,58 @@
   <body onload="loadNavbar();">
         <!-- header navbar -->
         <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-between">
-          <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
+            <a class="navbar-brand" href="./"><img src="img/logo-2.png" style="height: 40px"></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ml-auto">
+                  <li class="nav-item">
+                    <a class="nav-link header" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+                  </li>
+                
                 <li class="nav-item">
-                  <a class="nav-link header active" href="./search"><i class="fas fa-search" style="padding-right: 5px;"></i>Plan a trip</a>
+                  <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Cities & Places</a>
                 </li>
-              
-              <li class="nav-item">
-                <a class="nav-link header" href="./search-places"><i class="fas fa-monument" style="padding-right: 5px;"></i>Places</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
-              </li>
-              <li class="nav-item dropdown">
-                  <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
-                  </a>
-                  <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
-                    <a class="dropdown-item header" href="./about-us">Aplicacao</a>
-                    <a class="dropdown-item header" href="./help">Help</a>
-                  </div>
-              </li>
-            </ul>
-            <ul class="navbar-nav ml-auto">
-              <li>
-                <div id="login-user">
-                  <div id="login" style="display: none;">
-                    <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
-                  </div>
-                  <div id="profile" class="dropleft" style="display: none;">
-                    <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img id="user-profile-pic" class="rounded-circle border border-light">
+                <li class="nav-item">
+                  <a class="nav-link header" href="./search-hotels"><i class="fas fa-bed" style="padding-right: 5px;"></i>Hotels</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link header" href="./discover"><i class="fas fa-globe-europe" style="padding-right: 5px;"></i>Discover</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link header dropdown-toggle" href="#aboutus-menu" id="aboutUsDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-info-circle" style="padding-right: 5px;"></i>About us
                     </a>
-                    <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
-                      <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
-                      <a class="dropdown-item header" href="./trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
-                      <a class="dropdown-item header" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
-                      <div class="dropdown-divider"></div>
-                      <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
-                    </div>   
-                  </div>        
-                </div>
-              </li>
-            </ul>
-          </div>
-      </nav>
+                    <div class="dropdown-menu" aria-labelledby="aboutUsDropdownMenuLink">
+                      <a class="dropdown-item header" href="./about-us">Aplicacao</a>
+                      <a class="dropdown-item header" href="./help">Help</a>
+                    </div>
+                </li>
+              </ul>
+              <ul class="navbar-nav ml-auto">
+                <li>
+                  <div id="login-user">
+                    <div id="login" style="display: none;">
+                      <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="button" data-toggle="modal" data-target="#login-modal">Login</button>
+                    </div>
+                    <div id="profile" class="dropleft" style="display: none;">
+                      <a class="nav-link dropdown-toggle" href="#profile-menu" id="profile-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <img id="user-profile-pic" class="rounded-circle border border-light">
+                      </a>
+                      <div class="dropdown-menu" id="profile-menu" aria-labelledby="profile-btn">
+                        <a class="dropdown-item header" href="./profile"><i class="fas fa-user"></i><span style="padding-left: 10px;">Profile</span></a>
+                        <a class="dropdown-item header" href="./trips"><i class="fas fa-plane"></i><span style="padding-left: 10px;">My trips</span></a>
+                        <a class="dropdown-item header" id="request-poi-btn" href="./request-poi"><i class="fas fa-monument"></i><span style="padding-left: 10px;">Submit POI<sup style="color: #ffc107"><i style="padding-left: 5px;" class="fas fa-star"></i></sup></span></span></a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item header" onclick="signOut();"><i class="fas fa-sign-out-alt"></i><span style="padding-left: 10px;">Sign out</span></button>
+                      </div>   
+                    </div>        
+                  </div>
+                </li>
+              </ul>
+            </div>
+        </nav>
 
 
         <div class="container cont" style="height: 100%;">
@@ -157,25 +157,47 @@
         </div>
         
         <!-- Footer -->
-        <footer class="footer">
+      <footer class="footer">
+        <!-- Footer Elements -->
+        <div class="container cont">
+          <div class="row">
+            <div class="col-md-4">
+                <img src="img/logo-2.png">
+                <br><br>
+                <p><a class="footer-links" href="/about-us">About us</a></p>
+                <p><a class="footer-links" href="/help">Help</a></p>
+                <br><br>
+            </div>
+            <div class="col-md-4">
+              <br>
+              <h5><strong>Contacts</strong></h5>
+              <p class="footer-text"><i class="fas fa-map-marker-alt"></i><span style="padding-left: 10px;">Universidade de Aveiro, Portugal</span></p>
+              <p class="footer-text"><i class="fas fa-envelope"></i><span style="padding-left: 10px;">etinerary@gmail.com</span></p>
+              <p class="footer-text"><i class="fas fa-phone"></i><span style="padding-left: 10px;">234 234 234</span></p>
+            </div>
+            <div class="col-md-4">
+                <br>
+                <h5><strong>Social Media</strong></h5>
+                <div id="social">
+                    <a class="facebookBtn smGlobalBtn" href="#" ></a>
+                    <a class="twitterBtn smGlobalBtn" href="#" ></a>
+                    <a class="instagramBtn smGlobalBtn" href="#" ></a>
+                </div>
+            </div>
+
+          </div>
+          <br><br>
+        </div>
+
           <!-- Footer Elements -->
+      
+          <!-- Copyright -->
+          <div class="footer-copyright">
+            <span class="footer-text">&copy;2019 </span><a class="footer-links" href="/">E-tinerary&trade;</a><span class="footer-text">. All rights reserved</span>
+          </div>
 
-          <div id="social">
-              <a class="facebookBtn smGlobalBtn" href="#" ></a>
-              <a class="twitterBtn smGlobalBtn" href="#" ></a>
-              <a class="googleplusBtn smGlobalBtn" href="#" ></a>
-              <a class="linkedinBtn smGlobalBtn" href="#" ></a>
-              <a class="instagramBtn smGlobalBtn" href="#" ></a>
-            </div>
-            <!-- Footer Elements -->
-        
-            <!-- Copyright -->
-            <div class="footer-copyright"> 2019 Copyright:
-              <a href="">&copy; Aplicacao, todos os direitos reservados</a>
-            </div>
-
-        </footer>
-        <!-- Footer -->
+      </footer>
+      <!-- Footer -->
         
 
   

@@ -1,3 +1,10 @@
+/* 
+
+
+*/
+
+
+/* NODE JS Modules Required */
 var express = require("express");
 var app     = express();
 var path    = require("path");
@@ -17,12 +24,16 @@ const mkdirp = require('mkdirp');
 var distance = require('google-distance-matrix');
 var builder = require('xmlbuilder');
 var edge = require('edge-js');
+var open = require('open');
+
+/* API KEYS FOR GOOGLE AND OPEN WEATHER MAP */
 
 const GOOGLE_API_KEY = 'AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw';
 const OPEN_WEATHER_API_KEY = '8271fd206ceeef12df4e7bb6063241c3';
 
-distance.key(GOOGLE_API_KEY);
+distance.key(GOOGLE_API_KEY); // set GOOGLE API KEY to Google Distance Matrix Module
 
+/* Constant Variables */
 const RELIGION_TYPES = ['CHURCH', 'PLACE OF WORSHIP'];
 const HISTORIC_TYPES = ['CHURCH', 'CASTLE', 'MUSEUM', 'PALACE'];
 const RECREATION_TYPES = ['AMUSEUMENT PARK', 'AQUARIUM', 'ZOO'];
@@ -31,7 +42,7 @@ const CULTURE_TYPES = ['THEATER', 'THEATRE', 'MUSEUM'];
 
 const MANUAL_TRIP_TOTAL_TIME = "2 hours";
 
-/* store images of users */
+/* store users's images  */
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(__dirname, 'dist/img/users'))
@@ -51,7 +62,7 @@ var trip_storage = multer.diskStorage({
   }
 });
 
-/* store points of interest images */
+/* store POI's images */
 var poi_storage = multer.diskStorage({
   destination: function (req, file, cb) {
   	var dir;
@@ -68,7 +79,7 @@ var poi_storage = multer.diskStorage({
   }
 });
 
-/* store cities images */
+/* store city's images */
 var city_storage = multer.diskStorage({
   destination: function (req, file, cb) {
   	var dir;
@@ -85,14 +96,13 @@ var city_storage = multer.diskStorage({
   }
 });
 
-
-
 var upload = multer({storage: storage});
 var upload_trip = multer({storage: trip_storage});
 var upload_poi = multer({storage: poi_storage});
 var upload_city = multer({storage: city_storage});
 
 
+/* CREATE CONNECTION WITH THE MYSQL DB */
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -111,7 +121,7 @@ app.use(express.static(path.join(__dirname, 'dist')));
 app.use(cookieParser());
 
 
-// make a connection with the Database
+// connect with the DB
 con.connect(function(err) {
    if (err) throw err;
    console.log("Connected with the DB");
@@ -128,7 +138,7 @@ app.get('/', function(req, res){
 
     var number_results = 4; // number of cities and pois to show in the home page sections
 
-    // get the list of cities (name) available in the app
+    // get the list of cities (name) available
     con.query("call getCities()", function (err, result, fields) {
         if (err) throw err;
 
@@ -256,7 +266,9 @@ app.get('/search', function(req,res){
 app.get('/search-places',function(req,res){
     var list_cities = [];
 	var top_dest = [];
+    var number_results = 4; // number of cities and pois to show in the home page sections
 
+	// get the list of cities (name) available in the app    
     con.query("call getCities()", function (err, result, fields) {
         if (err) throw err;
 
@@ -266,7 +278,8 @@ app.get('/search-places',function(req,res){
         	list_cities.push(result[i].name);
         }
 
-        con.query("call GetTopCities(?)", 4, function (err, result, fields) {
+        // get the top N cities with the most trips made
+        con.query("call GetTopCities(?)", number_results, function (err, result, fields) {
         	if (err) throw err;
 
         	result = result[0];
@@ -291,8 +304,8 @@ app.get('/search-places',function(req,res){
 app.get('/city', function(req, res){
 	var connection;
 
-	var city_name = req.query['name'];	
-	var user_id = 0;
+	var city_name = req.query['name'];	// name of the city provided in the URL (ex: /city?name=Aveiro)
+	var user_id = 0; // ID of the user -> default = 0
 
 	if(req.cookies['user'] != undefined && !isNaN(req.cookies['user']))
 		user_id = parseInt(req.cookies['user']);
@@ -303,12 +316,13 @@ app.get('/city', function(req, res){
 
 	    result = result[0];
 
+	    /* if the name provided by the user does not exits in the DB, return 404 page */
 	    if(result.length == 0){
 	    	res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
 	    	return;
 	    }
 
-
+	    // city attributes
 	    var city = result[0].name;
 	    var city_id = result[0].id;
 	    var place_id = result[0].place_id;
@@ -317,15 +331,17 @@ app.get('/city', function(req, res){
 	    var address = result[0].name + ", " + result[0].country;
 
 
+	    /* Get 8 POIs of the City (not Hotels and Restaurants) */
 	    con.query("call getPOIsFromCity(?,?,?,?)", [city, '', -1, 'reviews'], function(err, result, fields){
 	    	if (err) throw err;
 
 	    	result = result[0];
 
 	    	var places = [];
+	    	var num_pois_toSearch = 8;
 
 	    	var i = 0;
-	    	while(places.length < 8 && i < result.length){
+	    	while(places.length < num_pois_toSearch && i < result.length){
 	    		if(result[i].poi_type.toUpperCase() != 'Hotel'.toUpperCase() && result[i].poi_type.toUpperCase() != 'Restaurant'.toUpperCase()){
 	    			var place = new Object();
 		    		place["id"] = result[i].id;
@@ -343,6 +359,7 @@ app.get('/city', function(req, res){
 	    		i++;
 	    	}
 
+	    	/* Get the Photos of the City Stored */
 	    	con.query("call getCityPhotos(?)", city_id, function (err, result, fields) {
 	    		if (err) throw err;
 
@@ -355,15 +372,17 @@ app.get('/city', function(req, res){
 	    			photos.push(photo);
 	    		}
 
+	    		/* Get the Top 4 Hotels in the City */
 	    	 	con.query("call getHotels(?)", [city], function(err, result, fields){
 			    	if (err) throw err;
 
 			    	result = result[0];
 
 			    	var hotels = [];
+			    	var num_hotels_toSearch = 4;
 
 			    	var i = 0;
-			    	while(hotels.length < 4 && i < result.length){
+			    	while(hotels.length < num_hotels_toSearch && i < result.length){
 			    		if(result[i].poi_type.toUpperCase() == 'Hotel'.toUpperCase()){
 			    			var hotel = new Object();
 				    		hotel["id"] = result[i].id;
@@ -381,7 +400,7 @@ app.get('/city', function(req, res){
 			    		i++;
 			    	}
 
-
+			    	/* Get the Trips Created in the City (maximum = 4) */
 			    	con.query("call getCityTrips(?)", [city_id], function(err, result, fields){
 			    		if (err) throw err;
 
@@ -412,6 +431,7 @@ app.get('/city', function(req, res){
 			    		}
 
 
+			    		/* Get the Stats (number of POI, number of Hotels, number of Trips) of the City */
 			    		con.query("call getCityStats(?)", [city_id], function(err, result, fields){
 			    			if (err) throw err;
 
@@ -421,6 +441,7 @@ app.get('/city', function(req, res){
 			    			var num_hotels = result.num_hotels;
 			    			var num_trips = result.num_trips;
 
+			    			/* Check the User type to enable / disable premium actions */
 			    			con.query("call getUserType(?)", user_id, function (err, result, fields){
 				    			if (err) throw err;
 
@@ -438,10 +459,11 @@ app.get('/city', function(req, res){
 				    				isUserRegistered = true;
 
 
+				    			/* Get data of the current weather in the City from Open Weather Map */
+
 				    			var temperature;
 				    			var weather;
 				    			var icon;
-
 
 				    			var url = "https://api.openweathermap.org/data/2.5/weather?lat=" + parseFloat(coordinates.split(',')[0]) + "&lon=" + parseFloat(coordinates.split(',')[1]) + "&appid=" + OPEN_WEATHER_API_KEY + "&units=metric";
 
@@ -480,18 +502,19 @@ app.get('/city', function(req, res){
 
 
 
+/* List of POIs in a city */
 app.get('/places', function (req, res){
 
 	var connection;
 
 	var sort_options = ["az", "za", "reviews", "rating"]; // sort options 
-	var default_poi_types = ["Hotel", "Restaurant", "Museum", "Church", "Park"];
+	var default_poi_types = ["Hotel", "Restaurant", "Museum", "Church", "Park"]; // default POI types
 
-	var destination = req.query['dest']; // destination
+	var destination = req.query['dest']; // destination (name of the city)
 	var query = ""; // query for a place 
 	var page = 1; // current page
-	var tripID = -1; // ID of trip -> default has no trip 
-	var sort = "reviews"; // default sort -> number of reviews
+	var tripID = -1; // ID of trip -> default = no trip 
+	var sort = "reviews"; // default sort = number of reviews
 	
 	/* filters */
 	var hotelsFilter = true;
@@ -507,7 +530,7 @@ app.get('/places', function (req, res){
 	var reviewsMin = 1;
 	var reviewsMax = 500000;
 
-
+	/* check URL parameters (query, page, ID of trip, sort)  */
 	if(req.query['query'] != undefined)
 		query = req.query['query'];
 
@@ -566,8 +589,10 @@ app.get('/places', function (req, res){
 		hotelsFilter = false;
 
 
-	if(isNaN(page))
-		return; //send error msg
+	if(isNaN(page)){
+		res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
+    	return;
+	}
 
 	if(isNaN(tripID)){
 		res.redirect(req.baseUrl + '/places?dest='+ destination);
@@ -582,17 +607,19 @@ app.get('/places', function (req, res){
 	var num_max_reviews = 0;
 
 
+	/* If tripID is provided, check if trip exists */
 	con.query("call tripExists(?)", tripID, function (err, result, fields) {
 		if (err) throw err;
 
 		result = result[0];
 
 		if(tripID != -1 && result[0].trip_exists == 0){
-			res.redirect(req.baseUrl + '/places?dest='+ destination);
+			res.redirect(req.baseUrl + '/places?dest='+ destination); // if trip doesn't exist, refresh page without tripID
 			return;
 		}
 
 
+		/* get the names of all POIs in the City */
 		con.query("call getPOIsNamesFromCity(?)", [destination], function (err, result, fields) {
 			if (err) throw err;
 
@@ -604,7 +631,7 @@ app.get('/places', function (req, res){
 
 		});
 
-
+		/* get all POIs in the City from DB, and then filter the results */
 		con.query("call getPOIsFromCity(?,?,?,?)", [destination, query, tripID, sort], function (err, result, fields) {
 	        if (err) throw err;
 
@@ -623,6 +650,7 @@ app.get('/places', function (req, res){
 	        	city = result[0].city;
 	        	country = result[0].country;
 
+	        	// the maximum number of reviews of a POI in the city is needed in the interface (filter by number of reviews)
 	        	for(var i = 0 ; i < result.length ; i++){
 	        		if(result[i].num_reviews != null && result[i].num_reviews > num_max_reviews)
 	        			num_max_reviews = result[i].num_reviews;
@@ -642,24 +670,24 @@ app.get('/places', function (req, res){
 		        	if(result[i].num_reviews != null)
 		        		poi_num_reviews = result[i].num_reviews;
 
-		        	if(!hotelsFilter && poi_type == "Hotel"){}
+		        	if(!hotelsFilter && poi_type == "Hotel"){} // ignore if the POI is an Hotel, and the filter is not selected
 
-		        	else if(!restaurantsFilter && poi_type == "Restaurant"){}
+		        	else if(!restaurantsFilter && poi_type == "Restaurant"){} // ignore if the POI is a Restaurant, and the filter is not selected
 
-		        	else if(!museumsFilter && poi_type == "Museum"){}
+		        	else if(!museumsFilter && poi_type == "Museum"){} // ignore if the POI is a Museum, and the filter is not selected
 
-		        	else if(!churchsFilter && poi_type == "Church"){}
+		        	else if(!churchsFilter && poi_type == "Church"){} // ignore if the POI is a Church, and the filter is not selected
 
-		        	else if(!churchsFilter && poi_type == "Church"){}
+		        	else if(!parksFilter && poi_type == "Park"){} // ignore if the POI is a Park, and the filter is not selected
 
-		        	else if(!parksFilter && poi_type == "Park"){}
+		        	else if(!othersFilter && !default_poi_types.includes(poi_type)){} // ignore if the POI type is not in the default list, and the filter by 'Other Places' is not selected
 
-		        	else if(!othersFilter && !default_poi_types.includes(poi_type)){}
+	        		else if(poi_google_rating == null || poi_google_rating < ratingMin || poi_google_rating > ratingMax){} // ignore if the POI rating is not in the range selected by the user
 
-	        		else if(poi_google_rating == null || poi_google_rating < ratingMin || poi_google_rating > ratingMax){}
+        			else if(poi_num_reviews == null || poi_num_reviews < reviewsMin || poi_num_reviews > reviewsMax){} // ignore if the POI number of reviews is not in the range selected by the user
 
-        			else if(poi_num_reviews == null || poi_num_reviews < reviewsMin || poi_num_reviews > reviewsMax){}
 
+        			/* if the POI meets all requirements, return it*/
 	        		else if(i >= limit_inf && list_places.length < total_results){
 
 			        	var place = new Object();
@@ -714,6 +742,7 @@ app.get('/places', function (req, res){
 		        }
 		    }
 
+		    /* If the request has tripID, check all openslots where a visit can be added in the trip*/
 
 	    	if(tripID != -1){
 
@@ -733,7 +762,6 @@ app.get('/places', function (req, res){
 				}).then(function(result){
 
 					isManual = parseInt(result[0][0].isManual[0]);
-
 
 					return connection.query("call getVisitTimes(?,?)", [tripID, isManual]);
 
@@ -819,6 +847,8 @@ app.get('/places', function (req, res){
 					if(result == 1)
 						return;
 
+					/* if trip has no visits yet */
+
 					var start_date = "n/a";
 			        var end_date = "n/a";
 			        var date_diff = 0;
@@ -868,45 +898,51 @@ app.get('/places', function (req, res){
 		});
 
 	});
-
 });
 
 
+/* return the page of a POI */
 app.get('/place', function(req,res){  	
 	var connection;
-	var user_id = 0;
-	var trip_id = -1;
+	var user_id = 0; // ID of the user -> default = 0
+	var tripID = -1; // ID of trip -> default = no trip 
 
-	var poi_id = parseInt(req.query['id']);
+	var poi_id = parseInt(req.query['id']); // ID of the POI (provided in the URL)
 
+	/* if the POI ID is not a integer number, doesn't exist (404 page) */
 	if(isNaN(poi_id)){
 		res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
 		return;
 	}
 
+	/* get the user ID (cookies) */
 	if(req.cookies['user'] != undefined && !isNaN(req.cookies['user']))
 		user_id = parseInt(req.cookies['user']);
 
 
+	/* get the tripID (provided in the URL) */
 	if(req.query['trip'] != undefined)
-		trip_id = parseInt(req.query['trip']);
+		tripID = parseInt(req.query['trip']);
 
-	if(isNaN(trip_id)){
+	/* if the trip ID is not a integer number, ignore it */	
+	if(isNaN(tripID)){
 		res.redirect(req.baseUrl + '/place?id='+ poi_id);
 		return;
 	}
 
-	con.query("call tripExists(?)", trip_id, function (err, result, fields) {
+	/* check if trip exists */
+	con.query("call tripExists(?)", tripID, function (err, result, fields) {
 		if (err) throw err;
 
 		result = result[0];
 
-		if(trip_id != -1 && result[0].trip_exists == 0){
+		if(tripID != -1 && result[0].trip_exists == 0){ // ignore trip, if not exists
 			res.redirect(req.baseUrl + '/place?id='+ poi_id);
 			return;
 		}
 
-		con.query("call getInfoPOI(?,?)", [poi_id, trip_id], function (err, result, fields) {
+		/* Get all the POI info stored in the DB */
+		con.query("call getInfoPOI(?,?)", [poi_id, tripID], function (err, result, fields) {
 		    if (err) throw err;
 
 		    result = result[0];
@@ -916,6 +952,7 @@ app.get('/place', function(req,res){
 				return;
 		    }
 
+			/* POI attributes */
 		    var id = result[0].id;
 		    var place_id = result[0].place_id;
 			var name = result[0].name;
@@ -924,6 +961,7 @@ app.get('/place', function(req,res){
 			var lat = result[0].latitude;
 			var lon = result[0].longitude;
 			var google_rating = result[0].google_rating;
+			var num_reviews = result[0].num_reviews;
 			var type = result[0].poi_type.charAt(0).toUpperCase() + result[0].poi_type.slice(1);
 
 			var price = result[0].price;
@@ -1006,7 +1044,7 @@ app.get('/place', function(req,res){
 			else
 				duration = ((parseInt(duration) / 60)<10?'0':'') + (parseInt(duration) / 60)  + ":" + ((parseInt(duration) % 60)<10?'0':'') + (parseInt(duration) % 60);
 
-
+			// get Reviews of the POI */
 			con.query("call getPOIReviews(?)", poi_id, function (err, result, fields) {
 		    	if (err) throw err;
 
@@ -1024,6 +1062,7 @@ app.get('/place', function(req,res){
 		    		reviews.push(review);
 		    	}
 
+				/* get Photos of the POI */
 		    	con.query("call getPOIPhotos(?)", poi_id, function (err, result, fields) {
 		    		if (err) throw err;
 
@@ -1036,6 +1075,7 @@ app.get('/place', function(req,res){
 		    			photos.push(photo);
 		    		}
 
+					/* check user's type to enable/disabled actions */
 		    		con.query("call getUserType(?)", user_id, function (err, result, fields){
 		    			if (err) throw err;
 
@@ -1052,8 +1092,10 @@ app.get('/place', function(req,res){
 		    			else if(result.length > 0)
 		    				isUserRegistered = true;
 
-			    		if(trip_id == -1)
-							res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, price: price, price_children: price_children, no_trips: no_trips, rating: rating, accessibility: accessibility, security: security, rating_price: rating_price, duration: duration, reviews: reviews, fromTrip: false, schedule: null, openslots: [], photos: photos, isUserRegistered: isUserRegistered, isUserPremium: isUserPremium});
+						/* If the request has tripID, check all openslots where a visit can be added in the trip*/
+
+			    		if(tripID == -1)
+							res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, num_reviews: num_reviews, phone_number: phone_number, website: website, type: type, price: price, price_children: price_children, no_trips: no_trips, rating: rating, accessibility: accessibility, security: security, rating_price: rating_price, duration: duration, reviews: reviews, fromTrip: false, schedule: null, openslots: [], photos: photos, isUserRegistered: isUserRegistered, isUserPremium: isUserPremium});
 
 						else {
 
@@ -1068,13 +1110,13 @@ app.get('/place', function(req,res){
 							}).then(function(conn){
 								connection = conn;
 
-								return connection.query("call isTripManual(?)", [trip_id]);
+								return connection.query("call isTripManual(?)", [tripID]);
 
 							}).then(function(result){
 
 								isManual = parseInt(result[0][0].isManual[0]);
 
-								return connection.query("call getVisitTimes(?,?)", [trip_id, isManual]);
+								return connection.query("call getVisitTimes(?,?)", [tripID, isManual]);
 
 							}).then(function(result){
 
@@ -1140,7 +1182,7 @@ app.get('/place', function(req,res){
 					    			}
 
 
-						        	res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, price: price, price_children: price_children, no_trips: no_trips, rating: rating, accessibility: accessibility, security: security, rating_price: rating_price, duration: duration, reviews: reviews, fromTrip: true, isManual: isManual, schedule: schedule, inTrip: inTrip, days: days, openslots: openslots, photos: photos, isUserRegistered: isUserRegistered, isUserPremium: isUserPremium});
+						        	res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, num_reviews: num_reviews, phone_number: phone_number, website: website, type: type, price: price, price_children: price_children, no_trips: no_trips, rating: rating, accessibility: accessibility, security: security, rating_price: rating_price, duration: duration, reviews: reviews, fromTrip: true, isManual: isManual, schedule: schedule, inTrip: inTrip, days: days, openslots: openslots, photos: photos, isUserRegistered: isUserRegistered, isUserPremium: isUserPremium});
 
 						        	return 1;
 
@@ -1156,12 +1198,15 @@ app.get('/place', function(req,res){
 								if(result == 1)
 									return result;
 
-								return connection.query("call getTripDates(?)", [trip_id]);
+								return connection.query("call getTripDates(?)", [tripID]);
 
 							}).then(function(result){
 
 								if(result == 1)
 									return;
+
+								/* if trip has no visits yet */
+
 
 								result = result[0];
 
@@ -1202,7 +1247,7 @@ app.get('/place', function(req,res){
 
 							    }
 							    
-							    res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, phone_number: phone_number, website: website, type: type, price: price, price_children: price_children, no_trips: no_trips, rating: rating, accessibility: accessibility, security: security, rating_price: rating_price, duration: duration, reviews: reviews, fromTrip: true, isManual: isManual, schedule: schedule, inTrip: false, days: days, openslots: openslots, photos: photos, isUserRegistered, isUserRegistered, isUserPremium: isUserPremium});
+							    res.render(path.join(__dirname+'/templates/place.html'), {place_id: place_id, place: name, id: id, description: description, address: address, lat: lat, lon: lon, google_rating: google_rating, num_reviews: num_reviews, phone_number: phone_number, website: website, type: type, price: price, price_children: price_children, no_trips: no_trips, rating: rating, accessibility: accessibility, security: security, rating_price: rating_price, duration: duration, reviews: reviews, fromTrip: true, isManual: isManual, schedule: schedule, inTrip: false, days: days, openslots: openslots, photos: photos, isUserRegistered, isUserRegistered, isUserPremium: isUserPremium});
 
 							});	        		
 			        	}
@@ -1222,7 +1267,9 @@ app.get('/search-hotels',function(req,res){
 
    	var list_cities = [];
 	var top_dest = [];
+    var number_results = 4; // number of cities and pois to show in the home page sections
 
+	// get the list of cities (name) available
 	con.query("call getCities()", function (err, result, fields) {
 	    if (err) throw err;
 
@@ -1232,7 +1279,8 @@ app.get('/search-hotels',function(req,res){
 	    	list_cities.push(result[i].name);
 	    }
 
-	    con.query("call GetTopCities(?)", 4, function (err, result, fields) {
+		// get the top N cities with the most trips made
+	    con.query("call GetTopCities(?)", number_results, function (err, result, fields) {
 	    	if (err) throw err;
 
 	    	result = result[0];
@@ -1253,29 +1301,32 @@ app.get('/search-hotels',function(req,res){
 });
 
 
-// hotels page
+// list of hotels in a city 
 app.get('/hotels', function(req,res){
 
-	var destination = req.query['dest']; // destination
-    var list_hotels = []
+	var destination = req.query['dest']; // destination (name of the city)
+    var list_hotels = [];
 
+	// get all Hotels in a city
 	con.query("call getHotels(?)", destination, function (err, result, fields) {
         if (err) throw err;
 
         result = result[0];
 
+		/* if the list of hotels in the destination provided is empty , return 404 page */
         if(result.length == 0){
-
+			res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
+	    	return;
         } 
 
         else{
-
         	var city = result[0].city;
         	var city_latitude = result[0].city_latitude;
         	var city_longitude = result[0].city_longitude;
 
 	        for(var i =0 ; i < result.length; i++){
 
+				// hotel main attributes
 	        	var hotel = new Object();
 	        	hotel["id"] = result[i].id;
 	        	hotel["city"] = result[i].city;
@@ -1306,22 +1357,20 @@ app.get('/hotels', function(req,res){
 	        res.render(path.join(__dirname+'/templates/hotels.html'), {hotels: list_hotels, city: city, city_latitude: city_latitude, city_longitude: city_longitude});
 
         }
-
 	});
-
 });
 
 
 
-
+// create manual trip page (step 1)
 app.get('/create-trip', function(req, res){
 
-	var num_results = 4;
-
+	var num_results = 4; // number of cities and pois to show in the home page sections
 	var list_cities = [];
 	var top_dest = [];
 	var recommended_dest = [];
 
+	// get the list of cities (name) available
 	con.query("call getCities()", function (err, result, fields) {
         if (err) throw err;
 
@@ -1331,7 +1380,7 @@ app.get('/create-trip', function(req, res){
         	list_cities.push(result[i].name);
         }
 
-       
+       	// get the top N cities with the most trips made
         con.query("call getTopCities(?)", num_results, function (err, result, fields) {
         	if (err) throw err;
 
@@ -1340,11 +1389,11 @@ app.get('/create-trip', function(req, res){
         	for(var i=0; i<result.length;i++){
         		var dest = new Object();
         		dest.name = result[i].name;
-        		dest.plans = result[i].plans;
+        		dest.trips = result[i].trips;
         		top_dest.push(dest);
         	}
 
-        	
+			// get recommended destinations for each user (for now its random)
         	con.query("call getRandomCities(?)", num_results, function (err, result, fields) {
 	        	if (err) throw err;
 
@@ -1353,7 +1402,7 @@ app.get('/create-trip', function(req, res){
 	        	for(var i=0; i<result.length;i++){
 	        		var dest = new Object();
 	        		dest.name = result[i].name;
-	        		dest.plans = result[i].plans;
+	        		dest.trips = result[i].trips;
 	        		recommended_dest.push(dest);
 	        	}
 
@@ -1368,10 +1417,16 @@ app.get('/create-trip', function(req, res){
 });
 
 
-
+/* CREATE A TRIP:
+1) create a trip in DB
+2) select POI based on user preferences, rating and number of reviews
+3) select hotel based on location, rating and number of reviews
+4) insert visits chosen in DB
+*/
 app.post('/create-trip', function(req, res){
 	var connection;
 
+	// check user ID (cookies)
 	var user_id = parseInt(req.cookies['user']);
 
 	if(isNaN(user_id)){
@@ -1379,32 +1434,34 @@ app.post('/create-trip', function(req, res){
 		return;
 	}
 
-	var destination = req.body.destination;
+	var destination = req.body.destination; // name of the city 
 
 	if(destination == null)
 		return; // send error message
 
-	var arrival = req.body.arrival;
+	var arrival = req.body.arrival_date;
 
 	if(arrival == null)
 		return; // send error message
 
-	var departure = req.body.departure;
+	var departure = req.body.departure_date;
 
 	if(departure == null)
 		return; // send error message
 
+	var num_days = diffBetweenDays(arrival, departure); // compute number of days of the trip 
+
+	// attributes of the trip
 	var num_adults = req.body.adults;
 	var num_children = req.body.children;
 	var hasBudgetConstraint = req.body.has_budget;
 	var budget = req.body.budget;
-
-	var travel_mode = 'DRIVING';
+	var travel_mode = 'DRIVING'; // travel mode -> default = DRIVING
 
 	if(req.body.travel_mode != null)
 		travel_mode = travel_mode.toUpperCase();
 
-
+	// check user preferences
 	var isReligionSitesInterestChecked = false;
 	if(req.body['interests_religion'] != undefined){
 		isReligionSitesInterestChecked = true;
@@ -1449,19 +1506,17 @@ app.post('/create-trip', function(req, res){
 		category = "RECREATION";
 
 
-
-
 	var xml;
-
 	var num_max_pois = 7;
 	var num_max_hotels = 3;
 
+	var pois, chosen_pois, hotels;
+
+	// score the POIs based on its attributes and the user's preferences
 	con.query("call getPOIsInfoFromCity(?)", [destination], function (err, result, fields) {
         if (err) throw err;
 
         result = result[0];
-
-        var places_score = {};
 
         for(var i=0; i < result.length; i++){
         	result[i].score = result[i].num_reviews / 100 + result[i].google_rating * 10;
@@ -1482,245 +1537,316 @@ app.post('/create-trip', function(req, res){
 
         	if(isTopRatedInterestChecked)
         		result[i].score += result[i].num_reviews * 2 / 100 + result[i].google_rating * 10;
+
+        	if(result[i].poi_type.toUpperCase() == 'RESTAURANT')
+        		result[i].score = 0;
         }
 
-        pois = sortPOIs(result, 'score');
+        pois = sortPOIs(result, 'score'); // sort the list of POIs by its score (maximum score first)
 
-        var poi_root = builder.create('POIs');
-        var hotels_root = builder.create('Hotels');
-        var graphs_root = builder.create('Graphs');
+        chosen_pois = pois.slice(0,num_days*5);
+        chosen_pois = shuffleVisits(chosen_pois); // without the algorithms working, the POIs are randomly assigned to a schedule
 
-        var num_pois = 0;
-        var num_hotels = 0;
+		// score the Hotels based on its attributes
+        con.query("call getHotelsInfoFromCity(?)", [destination], function (err, result, fields) {
+	        if (err) throw err;
 
-        var places = [];
-        var coordinates = [];
+	        result = result[0];
 
-        for(var i=0; i < pois.length; i++){
+	        for(var i=0; i < result.length; i++){
+        		result[i].score = result[i].num_reviews / 100 + result[i].google_rating * 10;
 
-        	if(pois[i].poi_type.toUpperCase() == "HOTEL" && num_hotels < num_max_hotels){
-        		var item = hotels_root.ele('Hotel');
-	        	item.ele('Number', pois[i].id);
-	        	item.ele('Name', pois[i].name);
-	        	item.ele('Latitude', pois[i].latitude);
-	        	item.ele('Longitude', pois[i].longitude);
-	        	item.ele('FixedCost', pois[i].price);
-
-	        	var place = new Object();
-	        	place["id"] = pois[i].id;
-	        	place["name"] = pois[i].name;
-	        	place["coordinates"] = pois[i].latitude + ", " + pois[i].longitude;
-	        	place["type"] = pois[i].poi_type;
-
-	        	places.push(place);
-	        	coordinates.push(pois[i].latitude + ", " + pois[i].longitude);
-
-
-	        	num_hotels++;
         	}
 
-        	else if(pois[i].poi_type.toUpperCase() != "HOTEL" && pois[i].poi_type.toUpperCase() != "RESTAURANT" && num_pois < num_max_pois){
-        		var item = poi_root.ele('POI');
-	        	item.ele('Number', pois[i].id);
-	        	item.ele('Name', pois[i].name);
-	        	item.ele('Latitude', pois[i].latitude);
-	        	item.ele('Longitude', pois[i].longitude);
-	        	item.ele('Longitude', pois[i].longitude);
+        	hotels = sortPOIs(result, 'score'); // sort the list of Hotels by its score (maximum score first)
 
-	        	var place = new Object();
-	        	place["id"] = pois[i].id;
-	        	place["name"] = pois[i].name;
-	        	place["coordinates"] = pois[i].latitude + ", " + pois[i].longitude;
-	        	place["type"] = pois[i].poi_type;
+			/* GENERATE THE XMLs to be sent to the algorithms */
 
-	        	places.push(place);
-	        	coordinates.push(pois[i].latitude + ", " + pois[i].longitude);
+	        var clients_root = builder.create('Clients'); 
+	        var depots_root = builder.create('Depots');
+	        var graphs_root = builder.create('Graphs');
+	        var clients_data_root = builder.create('ClientsTwData');
 
+	        var num_pois = 0;
+	        var num_hotels = 0;
 
-	        	num_pois++;
-        	}
+	        var places = [];
+	        var coordinates = [];
 
-        	if(num_hotels == num_max_hotels && num_pois == num_max_pois)
-        		break;
-        	
-        }
+	        for(var i=0; i < pois.length; i++){
 
-		
-		promise.createConnection({
-		    host: 'localhost',
-		    user: 'root',
-		    password: 'password',
-		    database: 'placesdb'
-
-		}).then(function(conn){
-			connection = conn;
-
-			// ADD TRIP WITH ITS VALUES TO THE DB
-			var values = [destination,
-		    	arrival.split('/')[2] + "-" + (arrival.split('/')[1]<10?'0':'') + arrival.split('/')[1] + "-" + (arrival.split('/')[0]<10?'0':'') + arrival.split('/')[0], 
-		    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0],
-		    	user_id, num_adults, num_children, category, travel_mode];
-
-		    var result = connection.query("call createTrip(?, ?, ?, ?, ?, ?, ?, ?)", values);
-
-		    return result;
-
-		}).then(function(result){
-			trip_id = parseInt(result[0][0].tripID);
+	        	if(pois[i].poi_type.toUpperCase() != "HOTEL" && pois[i].poi_type.toUpperCase() != "RESTAURANT" && num_pois < num_max_pois){
+	        		var item = clients_root.ele('Client');
+		        	item.ele('Number', pois[i].id);
+		        	item.ele('Name', pois[i].name);
+		        	item.ele('Latitude', pois[i].latitude);
+		        	item.ele('Longitude', pois[i].longitude);
 
 
-			/* Generate XML and write to a file */
-	        xml = poi_root.end({pretty: true});
+		        	var item_data = clients_data_root.ele('ClientTwData');
+		        	item_data.ele('Number', pois[i].id);
+		        	item_data.ele('Profit', Math.round(pois[i].score));
 
-	        var dir = 'xml/' + trip_id;
-	        try {
-			  if (!fs.existsSync(dir)){
-			    fs.mkdirSync(dir)
-			  }
-			} catch (err) {
-			  console.error(err)
-			}
+		        	if(pois[i].price == null)
+		        		item_data.ele('Price', 0);
+		        	else
+		        		item_data.ele('Price', pois[i].price);
 
-			fs.writeFile('xml/' + trip_id + '/pois.xml', xml, function(err, data) {
-		   		if (err) console.log(err);
+		        	item_data.ele('Time', 60);
 
-	     	 	console.log('XML for POIs Generated');
-		  	});
+		        	var opening_hours = parsePoiOpeningHours(pois[i].opening_hours);
+		        	var oh = opening_hours["Monday"];
 
-
-			/* Generate XML and write to a file */
-			xml = hotels_root.end({ pretty: true});
-			fs.writeFile('xml/' + trip_id + '/hotels.xml', xml, function(err, data) {
-		   		if (err) console.log(err);
-
-	     	 	console.log('XML for Hotels Generated');
-		  	});
+		        	item_data.ele('Open', oh[0]);
+		        	item_data.ele('Close', oh[1]);
 
 
-			var item = graphs_root.ele('Graph');
-			item.ele('Number', 1);
-			item.ele('Name', 'Distance Matrix');
-			item.ele('Complete', 'True');
-			item.ele('Directed', 'True');
+		        	var place = new Object();
+		        	place["id"] = pois[i].id;
+		        	place["name"] = pois[i].name;
+		        	place["coordinates"] = pois[i].latitude + ", " + pois[i].longitude;
+		        	place["type"] = pois[i].poi_type;
 
-			distance.mode(travel_mode.toLowerCase());
-
-			distance.matrix(coordinates, coordinates, function (err, distances) {
-			    if (err) {
-			        return console.log(err);
-			    }
-
-			    if (distances.status == 'OK') {
-			    	for (var i=0; i < coordinates.length; i++) {
-			    		var arc = item.ele('Arcs');
-
-			    		if(places[i].type == 'Hotel')
-			    			arc.ele("SrcObject", "H");
-			    		else
-			    			arc.ele("SrcObject", "P");
-
-			    		arc.ele("SrcNumber", places[i].id);
+		        	places.push(place);
+		        	coordinates.push(pois[i].latitude + ", " + pois[i].longitude);
 
 
-			    		for (var j=0; j < coordinates.length; j++) {
-
-			    			// only add if there is a distance between the two places and if it's not the same place
-			    			if(j != i && distances.rows[0].elements[j].status == 'OK'){
-				    			var des = arc.ele('Des');
-
-				    			if(places[j].type == 'Hotel')
-					    			des.ele("Obj", "H");
-					    		else
-					    			des.ele("Obj", "P");
-
-				    			des.ele('Num', places[j].id);
-				    			des.ele('Len', {'units': 'meters'}, distances.rows[i].elements[j].distance.value);
-				    			des.ele('Time', {'units': 'seconds'}, distances.rows[i].elements[j].duration.value);
-				    		}
-			    		}
-			    	}
-		    	}
-
-		    	xml = graphs_root.end({ pretty: true});
-
-
-		    	/* Generate XML and write to a file */
-				fs.writeFile('xml/' + trip_id + '/graphs.xml', xml, function(err, data) {
-			   		if (err) console.log(err);
-
-	     	 		console.log('XML for Distances Generated');
-			  	});
-
-			});
-
-			
-			/* REPLACE WITH THE RESULTS FROM THE ALGORITHMS */
-
-			var num_days = diffBetweenDays(arrival, departure);
-
-			arrival = arrival.split('/')[0] + "-" + arrival.split('/')[1] + "-" + arrival.split('/')[2];
-
-	  		var days = getTripDays(arrival, parseInt(num_days), false);
-
-	  		var start_hours = ["10:00", "13:00", "15:00", "16:15", "18:00"];
-	  		var end_hours = ["12:00", "14:30", "16:00", "18:00", "20:00"];
-
-	  		var start_time_list = [];
-	  		var end_time_list = [];
-
-	  		for(var i=0 ; i < days.length ; i++){
-	  			day = days[i].split('-')[2] + "-" + (days[i].split('-')[1]<10?'0':'') + days[i].split('-')[1] + "-" + (days[i].split('-')[0]<10?'0':'') + days[i].split('-')[0]
-	  			for(var j=0 ; j < start_hours.length; j++){
-	  				start_time_list.push(day + " " + start_hours[j]);
-	  				end_time_list.push(day + " " + end_hours[j]);
-	  			}
-	  		}
-
-	  		var i=0;
-
-	        var list_pois_in_plan = [];
-
-	        while(i < start_time_list.length){
-
-	        	if(pois.length == list_pois_in_plan.length){
-        			break;
-        		}
-	        	
-	        	var poiIsValid = false;
-
-	        	while(!poiIsValid){
-	        		var poi = pois[i].id;
-
-	        		if(!list_pois_in_plan.includes(poi)){
-	        			list_pois_in_plan.push(poi);
-	        			poiIsValid = true;
-	        		}
+		        	num_pois++;
 	        	}
 
-			  	con.query("call addVisitToTrip(?, ?, ?, ?, ?)", [trip_id, poi, start_time_list[i], end_time_list[i], 0], function (err, result) {
-			    	if (err) throw err;
+	        	if(num_pois == num_max_pois)
+	        		break;
+	        	
+	        }
 
+
+	        for(var i=0; i < hotels.length; i++){
+	        	if(pois[i].poi_type.toUpperCase() == "HOTEL" && num_hotels < num_max_hotels){
+	        		var item = depots_root.ele('Depot');
+		        	item.ele('Number', pois[i].id);
+		        	item.ele('Name', pois[i].name);
+		        	item.ele('Latitude', pois[i].latitude);
+		        	item.ele('Longitude', pois[i].longitude);
+		        	item.ele('FixedCost', pois[i].price);
+
+
+		        	var place = new Object();
+		        	place["id"] = pois[i].id;
+		        	place["name"] = pois[i].name;
+		        	place["coordinates"] = pois[i].latitude + ", " + pois[i].longitude;
+		        	place["type"] = pois[i].poi_type;
+
+		        	places.push(place);
+		        	coordinates.push(pois[i].latitude + ", " + pois[i].longitude);
+
+
+		        	num_hotels++;
+	        	}
+
+	        	if(num_hotels == num_max_hotels)
+	        		break;
+
+	        }
+
+			
+			promise.createConnection({
+			    host: 'localhost',
+			    user: 'root',
+			    password: 'password',
+			    database: 'placesdb'
+
+			}).then(function(conn){
+				connection = conn;
+
+				// ADD TRIP WITH ITS ATTRIBUTES TO THE DB
+				var values = [destination,
+			    	arrival.split('/')[2] + "-" + (arrival.split('/')[1]<10?'0':'') + arrival.split('/')[1] + "-" + (arrival.split('/')[0]<10?'0':'') + arrival.split('/')[0], 
+			    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0],
+			    	user_id, num_adults, num_children, category, travel_mode];
+
+			    var result = connection.query("call createTrip(?, ?, ?, ?, ?, ?, ?, ?)", values);
+
+			    return result;
+
+			}).then(function(result){
+				trip_id = parseInt(result[0][0].tripID);
+
+
+				// Generate XML and write to a file 
+		        xml = clients_root.end({pretty: true});
+
+		        var dir = 'xml/' + trip_id;
+		        try {
+				  if (!fs.existsSync(dir)){
+				    fs.mkdirSync(dir)
+				  }
+				} catch (err) {
+				  console.error(err)
+				}
+
+				fs.writeFile('xml/' + trip_id + '/clients.xml', xml, function(err, data) {
+			   		if (err) console.log(err);
+
+		     	 	console.log('XML for Clients/POIs Generated');
 			  	});
 
-			  	i++;	
-	  		}
+
+				// Generate XML and write to a file 
+				xml = depots_root.end({ pretty: true});
+				fs.writeFile('xml/' + trip_id + '/depots.xml', xml, function(err, data) {
+			   		if (err) console.log(err);
+
+		     	 	console.log('XML for Depots/Hotels Generated');
+			  	});
+
+			  	// Generate XML and write to a file 
+				xml = clients_data_root.end({ pretty: true});
+				fs.writeFile('xml/' + trip_id + '/clientsTwData.xml', xml, function(err, data) {
+			   		if (err) console.log(err);
+
+		     	 	console.log('XML for Clients Data Generated');
+			  	});
 
 
-		    connection.end();
+				var item = graphs_root.ele('Graph');
+				item.ele('Number', 1);
+				item.ele('Name', 'Distance Matrix');
+				item.ele('Complete', 'True');
+				item.ele('Directed', 'True');
+
+				distance.mode(travel_mode.toLowerCase());
+
+				distance.matrix(coordinates, coordinates, function (err, distances) {
+				    if (err) {
+				        return console.log(err);
+				    }
+
+				    if (distances.status == 'OK') {
+				    	for (var i=0; i < coordinates.length; i++) {
+				    		var arc = item.ele('Arcs');
+
+				    		if(places[i].type == 'Hotel')
+				    			arc.ele("SrcObject", "H");
+				    		else
+				    			arc.ele("SrcObject", "P");
+
+				    		arc.ele("SrcNumber", places[i].id);
 
 
-	    	console.log("TRIP CREATED: ", trip_id);
+				    		for (var j=0; j < coordinates.length; j++) {
 
-	    	res.render(path.join(__dirname+'/templates/see-trip.html'), {trip: trip_id});
+				    			// only add if there is a distance between the two places and if it's not the same place
+				    			if(j != i && distances.rows[0].elements[j].status == 'OK'){
+					    			var des = arc.ele('Des');
 
-	    });
+					    			if(places[j].type == 'Hotel')
+						    			des.ele("Obj", "H");
+						    		else
+						    			des.ele("Obj", "P");
+
+					    			des.ele('Num', places[j].id);
+					    			des.ele('Len', {'units': 'meters'}, distances.rows[i].elements[j].distance.value);
+					    			des.ele('Time', {'units': 'seconds'}, distances.rows[i].elements[j].duration.value);
+					    		}
+				    		}
+				    	}
+			    	}
+
+			    	xml = graphs_root.end({ pretty: true});
+
+
+			    	// Generate XML and write to a file 
+					fs.writeFile('xml/' + trip_id + '/graphs.xml', xml, function(err, data) {
+				   		if (err) console.log(err);
+
+		     	 		console.log('XML for Distances Generated');
+				  	});
+
+				});
+
+				
+				// REPLACE WITH THE RESULTS FROM THE ALGORITHMS 
+				// WITHOUT THE ALGORITHMS, THE SCHEDULES OF THE VISITS ARE STATIC AND THE POIS ARE DISTRIBUTED RANDOMLY IN THE STATIC SCHEDULES
+			
+				arrival = arrival.split('/')[0] + "-" + arrival.split('/')[1] + "-" + arrival.split('/')[2];
+
+		  		var days = getTripDays(arrival, parseInt(num_days), false);
+
+		  		var start_hours = ["10:00", "13:00", "15:00", "16:15", "18:00"]; // static start hours for the visits
+		  		var end_hours = ["12:00", "14:30", "16:00", "18:00", "20:00"]; // static end hours for the visits
+
+		  		var start_time_list = [];
+		  		var end_time_list = [];
+
+		  		for(var i=0 ; i < days.length ; i++){
+		  			day = days[i].split('-')[2] + "-" + (days[i].split('-')[1]<10?'0':'') + days[i].split('-')[1] + "-" + (days[i].split('-')[0]<10?'0':'') + days[i].split('-')[0];
+		  			for(var j=0 ; j < start_hours.length; j++){
+		  				start_time_list.push(day + " " + start_hours[j]);
+		  				end_time_list.push(day + " " + end_hours[j]);
+		  			}
+		  		}
+
+		  		var i=0;
+
+		        var list_pois_in_plan = [];
+
+		        while(i < start_time_list.length){
+
+		        	if(pois.length == list_pois_in_plan.length){
+	        			break;
+	        		}
+		        	
+		        	var poiIsValid = false;
+
+		        	while(!poiIsValid){
+		        		var poi = pois[i].id;
+
+		        		if(!list_pois_in_plan.includes(poi)){
+		        			list_pois_in_plan.push(poi);
+		        			poiIsValid = true;
+		        		}
+		        	}
+
+					/* add the visits to the DB */
+				  	con.query("call addVisitToTrip(?, ?, ?, ?, ?, ?)", [trip_id, poi, start_time_list[i], end_time_list[i], 0, 0], function (err, result) {
+				    	if (err) throw err;
+
+				  	});
+
+				  	i++;	
+		  		}
+
+		  		var j=0;
+
+		  		while(j < days.length){
+		  			var day = days[j].split('-')[2] + "-" + (days[j].split('-')[1]<10?'0':'') + days[j].split('-')[1] + "-" + (days[j].split('-')[0]<10?'0':'') + days[j].split('-')[0];
+		  			day = day + " " + "20:30";
+
+					/* add the hotels to the DB */
+		  			con.query("call addVisitToTrip(?, ?, ?, ?, ?, ?)", [trip_id, hotels[0].id, day, day, 0, 1], function (err, result) {
+				    	if (err) throw err;
+
+				  	});
+
+				  	j++;
+		  		}
+
+
+
+				connection.end();
+				
+		    	console.log("TRIP CREATED: ", trip_id);
+		    	res.render(path.join(__dirname+'/templates/see-trip.html'), {trip: trip_id});
+
+		    });
+	 	});
    	});
 });
 
 
 
 
-// create trip manual
+// create trip manual (step 1)
 app.post('/create-trip-m', function(req, res){
 	var connection;
 
@@ -1736,23 +1862,22 @@ app.post('/create-trip-m', function(req, res){
 	if(destination == null)
 		return; // send error message
 
-	var arrival = req.body.arrival;
+	var arrival = req.body.arrival_date;
 
 	if(arrival == null)
 		return; // send error message
 
-	var departure = req.body.departure;
+	var departure = req.body.departure_date;
 
 	if(departure == null)
 		return; // send error message
 
-
+	// attributes of the trip
 	var num_adults = req.body.adults;
 	var num_children = req.body.children;
 	var hasBudgetConstraint = req.body.has_budget;
 	var budget = req.body.budget;
-	
-	var travel_mode = 'DRIVING';
+	var travel_mode = 'DRIVING'; // travel mode -> default = DRIVING
 
 	if(req.body.travel_mode != null)
 		travel_mode = travel_mode.toUpperCase();
@@ -1761,12 +1886,12 @@ app.post('/create-trip-m', function(req, res){
 	    host: 'localhost',
 	    user: 'root',
 	    password: 'password',
-	    database: 'placesdb'
-
-
+		database: 'placesdb'
+		
 	}).then(function(conn){
 		connection = conn;
 
+		// ADD THE MANUAL TRIP WITH ITS ATTRIBUTES TO THE DB
 		var values = [destination,
 	    	arrival.split('/')[2] + "-" + (arrival.split('/')[1]<10?'0':'') + arrival.split('/')[1] + "-" + (arrival.split('/')[0]<10?'0':'') + arrival.split('/')[0], 
 	    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0],
@@ -1787,7 +1912,7 @@ app.post('/create-trip-m', function(req, res){
 
 });
 
-// create a trip from a already created trip
+// create a trip from a already existing trip
 app.post('/create-child-trip', function(req, res){
 	var connection;
 
@@ -1890,7 +2015,7 @@ app.post('/create-child-trip', function(req, res){
 
 			while(i < start_time_list.length){
 
-				con.query("call addVisitToTrip(?,?,?,?, ?);", [child_trip, visits[i].poi_id, start_time_list[i], end_time_list[i], 0], function (err, result) {
+				con.query("call addVisitToTrip(?,?,?,?,?,?);", [child_trip, visits[i].poi_id, start_time_list[i], end_time_list[i], 0, 0], function (err, result) {
 			    	if (err) throw err;
 			  	});
 
@@ -1913,25 +2038,27 @@ app.post('/create-child-trip', function(req, res){
 });
 
 
+// delete a trip
 app.post('/delete-trip', function(req, res){
-
-	var user_id = parseInt(req.cookies['user']);
-
+	var user_id = parseInt(req.cookies['user']); // user ID
+	
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.contentType('json');
 		res.send({result: 'error'});
 		return;
 	}
 
-	var trip_id = req.body.trip;
+	var trip_id = req.body.trip; // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.contentType('json');
 		res.send({result: 'error'});
 		return;
 	}
 
-
+	// delete trip (if trip exits and user is the owner)
 	con.query("call deleteTrip(?,?)", [trip_id, user_id], function(err, result) {
 		if (err) throw err;
 
@@ -1943,32 +2070,77 @@ app.post('/delete-trip', function(req, res){
 });
 
 
-app.post('/rename-trip', function(req, res){
-	var user_id = parseInt(req.cookies['user']);
+// delete multiple trips
+app.post('/delete-trips', function(req, res){
+	var user_id = parseInt(req.cookies['user']); // user ID
+	
+	// check if user ID is an integer number
+	if(isNaN(user_id)){
+		res.contentType('json');
+		res.send({result: 'error'});
+		return;
+	}
 
+	var trips_to_delete = req.body.trips; // number of trips to be deleted
+	var trips_deleted = 0; // trips deleted 
+
+	// delete trips (one at a time)
+	for(var i=0; i < trips_to_delete.length; i++){
+
+		// delete trip (if trip exits and user is the owner)
+		con.query("call deleteTrip(?,?)", [trips_to_delete[i], user_id], function(err, result) {
+			if (err) throw err;
+
+			else{
+				trips_deleted++;
+			}
+		});
+	}
+
+	// check if all trips where deleted
+	if(trips_deleted == trips_deleted.length){
+		res.contentType('json');
+		res.send({result: 'success'});
+	}
+
+	else{
+		res.contentType('json');
+		res.send({result: 'error', msg: 'Error deleting trips'});
+	}
+
+
+});
+
+// rename a trip
+app.post('/rename-trip', function(req, res){
+	var user_id = parseInt(req.cookies['user']); // user ID
+
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "You need to be logged in to do this action."});
 		return;
 	}
 
-	var trip_id = req.body.trip;
+	var trip_id = req.body.trip; // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
 
-	var name = req.body.name;
+	var name = req.body.name; // new name for the trip
 
+	// check if new name is valid
 	if(name == undefined || name == null || name == ""){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The name of the trip is not valid."});
 		return;
 	}
 
-
+	// rename the trip
 	con.query("call renameTrip(?,?,?)", [trip_id, user_id, name], function(err, result) {
 		if (err) throw err;
 
@@ -1980,45 +2152,49 @@ app.post('/rename-trip', function(req, res){
 });
 
 
-
+// share a trip
 app.post('/share-trip', upload_trip.single('photo'), function (req, res, next){
 
-	var user_id = parseInt(req.cookies['user']);
+	var user_id = parseInt(req.cookies['user']); // user ID
 
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "You need to be logged in to do this action."});
 		return;
 	}
 
-	var trip_id = req.body.trip;
+	var trip_id = req.body.trip; // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
 
-
+	// check if trip exists
 	con.query("call tripExists(?)", trip_id, function (err, result, fields) {
 		if (err) throw err;
 
 		result = result[0];
 
+		// if not exists, return a error msg
 		if(result[0].trip_exists == 0){
 			res.contentType('json');
 			res.send({result: 'error', msg: "The trip is not valid."});
 			return;
 		}
 
+		// attributes
 		var filename = req.file.filename;
 		var description = req.body.description;
 		var rating = req.body.rating;	
 		var accessibility = req.body.accessibility;	
 		var security = req.body.security;	
-		var price_rating = req.body.price_rating;	
+		var price_rating = req.body.price_rating;
 
-		if(accessibility == "")
+		if(accessibility == "" || accessibility == undefined)
 			accessibility = null;
 
 		else{
@@ -2029,7 +2205,7 @@ app.post('/share-trip', upload_trip.single('photo'), function (req, res, next){
 			}
 		}
 
-		if(security == "")
+		if(security == "" || security == undefined)
 			security = null;
 
 		else{
@@ -2040,7 +2216,7 @@ app.post('/share-trip', upload_trip.single('photo'), function (req, res, next){
 			}
 		}
 
-		if(price_rating == "")
+		if(price_rating == "" || price_rating == undefined)
 			price_rating = null;
 
 		else{
@@ -2051,7 +2227,7 @@ app.post('/share-trip', upload_trip.single('photo'), function (req, res, next){
 			}
 		}
 
-
+		// share the trip
 		con.query("call shareTrip(?,?,?,?,?,?,?,?)", [trip_id, user_id, description, filename, rating, accessibility, security, price_rating], function (err, result, fields) {
 			if (err) throw err;
 
@@ -2063,41 +2239,46 @@ app.post('/share-trip', upload_trip.single('photo'), function (req, res, next){
 });
 
 
-
+// make a review of a trip
 app.post('/review-trip', function(req, res){
 
-	var user_id = parseInt(req.cookies['user']);
-
+	var user_id = parseInt(req.cookies['user']); // user ID
+	
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "You need to be logged in to do this action."});
 		return;
 	}
 
-	var trip_id = req.body.trip;
+	var trip_id = req.body.trip; // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
 
+	// check if trip exists
 	con.query("call tripExists(?)", trip_id, function (err, result, fields) {
 		if (err) throw err;
 
 		result = result[0];
 
+		// if not exists, return a error msg
 		if(result[0].trip_exists == 0){
 			res.contentType('json');
 			res.send({result: 'error', msg: "The trip is not valid."});
 			return;
 		}
 
+		// review text
 		var review = null;
-
 		if(req.body.review != undefined)
 			review = req.body.review;
 
+		/* review ratings */
 		var review_rating = req.body.rating;	
 		var review_accessibility = req.body.rating_access;
 		var review_security = req.body.rating_security;
@@ -2152,7 +2333,7 @@ app.post('/review-trip', function(req, res){
 			}
 		}
 
-
+		// create the review
 		con.query("call reviewTrip(?,?,?,?,?,?,?)", [trip_id, user_id, review_rating, review, review_accessibility, review_security, review_price], function (err, result, fields) {
 			if (err){
 				throw err;
@@ -2169,23 +2350,27 @@ app.post('/review-trip', function(req, res){
 });
 
 
+// archive a trip 
 app.post('/archive-trip', function(req, res){
-	var user_id = parseInt(req.cookies['user']);
+	var user_id = parseInt(req.cookies['user']); // user ID
 
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "You need to be logged in to do this action."});
 		return;
 	}
 
-	var trip_id = req.body.trip;
+	var trip_id = req.body.trip; // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
 
+	// archive the trip
 	con.query("call archiveTrip(?,?)", [trip_id, user_id], function (err, result, fields) {
 		if (err) throw err;
 
@@ -2196,27 +2381,27 @@ app.post('/archive-trip', function(req, res){
 });
 
 
-
-
+// save a trip (for manual trips)
 app.post('/save-trip', function(req, res){
 	var connection;
 
-	var user_id = parseInt(req.cookies['user']);
+	var user_id = parseInt(req.cookies['user']); // user ID
 
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "You need to be logged in to do this action."});
 		return;
 	}
 
-	var trip_id = req.body.trip;
+	var trip_id = req.body.trip; // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
-
 
 	promise.createConnection({
 	    host: 'localhost',
@@ -2248,27 +2433,31 @@ app.post('/save-trip', function(req, res){
 		}
 
 	});
-
 });
 
 
+// set trip as favorite
 app.post('/favorite-trip', function(req, res){
-	var user_id = parseInt(req.cookies['user']);
 
+	var user_id = parseInt(req.cookies['user']); // user ID 
+
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "You need to be logged in to do this action."});
 		return;
 	}
 
-	var trip_id = req.body.trip;
+	var trip_id = req.body.trip; // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
 
+	// set trip as favorite
 	con.query("call setFavoriteTrip(?,?)", [user_id, trip_id], function (err, result, fields) {
     	if (err){
     		throw err;
@@ -2278,28 +2467,30 @@ app.post('/favorite-trip', function(req, res){
     	res.send(JSON.stringify('success'));
 
     });
-
 });
 
 
-
+// unset trip as favorite 
 app.post('/unfavorite-trip', function(req, res){
-	var user_id = parseInt(req.cookies['user']);
+	var user_id = parseInt(req.cookies['user']); // user ID
 
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "You need to be logged in to do this action."});
 		return;
 	}
 
-	var trip_id = req.body.trip;
+	var trip_id = req.body.trip; // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
 
+	// unset trip as favorite
 	con.query("call unfavoriteTrip(?,?)", [user_id, trip_id], function (err, result, fields) {
     	if (err){
     		throw err;
@@ -2314,25 +2505,28 @@ app.post('/unfavorite-trip', function(req, res){
 });
 
 
-
+// set user interested in a trip
 app.post('/user-interested', function(req, res){
 
-	var user_id = parseInt(req.cookies['user']);
+	var user_id = parseInt(req.cookies['user']); // user ID
 
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "You need to be logged in to do this action."});
 		return;
 	}
 
-	var trip_id = req.body.trip;
+	var trip_id = req.body.trip; // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
 
+	// set user interested in the trip
 	con.query("call setUserInterested(?,?)", [user_id, trip_id], function (err, result, fields) {
     	if (err){
     		throw err;
@@ -2345,26 +2539,28 @@ app.post('/user-interested', function(req, res){
 });
 
 
-
-
+// unset user interested in a trip
 app.post('/user-not-interested', function(req, res){
 
-	var user_id = parseInt(req.cookies['user']);
+	var user_id = parseInt(req.cookies['user']); // user ID
 
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "You need to be logged in to do this action."});
 		return;
 	}
 
-	var trip_id = req.body.trip;
+	var trip_id = req.body.trip; // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
 
+	// unset user interested in the trip
 	con.query("call unsetUserInterested(?,?)", [user_id, trip_id], function (err, result, fields) {
     	if (err){
     		throw err;
@@ -2377,35 +2573,38 @@ app.post('/user-not-interested', function(req, res){
 });
 
 
-
+// add a visit to a trip
 app.post('/add-visit', function(req, res){
 	var connection;
 
-	var user_id = parseInt(req.cookies['user']);
+	var user_id = parseInt(req.cookies['user']); // user ID
 
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "You need to be logged in to do this action."});
 		return;
 	}
 
-	var trip_id = req.body.trip;
+	var trip_id = req.body.trip; // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
 
-	var poi_id = req.body.poi;
+	var poi_id = req.body.poi; // poi to be added (poi ID)
 
+	// check if poi ID is an integer number
 	if(isNaN(poi_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The place is not valid."});
 		return;
 	}
 
-	var schedule = req.body.schedule;
+	var schedule = req.body.schedule; // schedule chosen (undefined if it will be chosen by the system)
 
 	var isManual;
 
@@ -2418,13 +2617,13 @@ app.post('/add-visit', function(req, res){
     }).then(function(conn){
     	connection = conn;
 
-		return connection.query("call isTripManual(?)", [trip_id]);
+		return connection.query("call isTripManual(?)", [trip_id]); // check if trip is manual
 
 	}).then(function(result){
 
 		isManual = parseInt(result[0][0].isManual[0]);
 
-		return connection.query("call getVisitTimes(?,?)", [trip_id, isManual]);
+		return connection.query("call getVisitTimes(?,?)", [trip_id, isManual]); // get schedules for the visits already in the trip
 
 	}).then(function(result){
 
@@ -2432,7 +2631,7 @@ app.post('/add-visit', function(req, res){
 
 		var trip = {};
 
-        // if trip has visits 
+        // if trip has visits, parse the schedules and add to a dictionary (keys = days, values = start time & end time)
         if(result.length > 0){
 
         	for(var i=0; i < result.length; i++){
@@ -2460,25 +2659,26 @@ app.post('/add-visit', function(req, res){
 	        var chosen_schedule;
 
 	        if(schedule != undefined){
-	        	chosen_schedule = getFinalSchedule(schedule.split(" ")[0], schedule.split(" ")[1]);
+	        	chosen_schedule = getFinalSchedule(schedule.split(" ")[0], schedule.split(" ")[1]); // if user chose a schedule, parse the schedule to the right format 
 	        }
 	        else
-	    		chosen_schedule = getTripOpenSlot(trip);
+	    		chosen_schedule = getTripOpenSlot(trip); // check the openslots available and select one
 
 
+			// if a schedule was found, add the visit to the DB
 	    	if(chosen_schedule != false){
-
-				connection.query("call addVisitToTrip(?,?,?,?,?)", [trip_id, poi_id, chosen_schedule[0], chosen_schedule[1], isManual], function (err, result) {
+				connection.query("call addVisitToTrip(?,?,?,?,?,?)", [trip_id, poi_id, chosen_schedule[0], chosen_schedule[1], isManual, 0], function (err, result) {
 		    		if (err) throw err;
 				  	
-		    		res.contentType('json');
+					res.contentType('json');
+					
+					console.log("ADDED VISIT " + req.body.poi + " TO THE TRIP " + req.body.trip);
 
 		    		if(isManual == 1)
 						res.send({result: 'success', isManual: true});
 					else
 						res.send({result: 'success', isManual: false});
 				});
-
 	        }
 
 	        else{
@@ -2490,6 +2690,7 @@ app.post('/add-visit', function(req, res){
 
         }
 
+		/* if trip has no visits */
         else{
         	return connection.query("call getTripDates(?)", [trip_id]);
 
@@ -2497,29 +2698,33 @@ app.post('/add-visit', function(req, res){
 
 	}).then(function(result){
 
+		// ignore
 		if(result == 1)
 			return;
+
+		/* if trip has no visits */
 
 		result = result[0];
 
 		var chosen_schedule;
 
         if(schedule != undefined){
-    		chosen_schedule = getFinalSchedule(schedule.split(" ")[0], schedule.split(" ")[1]);
+    		chosen_schedule = getFinalSchedule(schedule.split(" ")[0], schedule.split(" ")[1]); // if user chose a schedule, parse the schedule to the right format
         }
 
+		// select the first schedule from the first day of the trip to the visit
         else{
         	day = new Date(result[0].start_date);
 			day = day.getFullYear() + "-" + (day.getMonth()<10?'0':'') + (day.getMonth() + 1)  + "-" + (day.getDate()<10?'0':'') + day.getDate();
 
 			var schedules = getSchedules();
-			chosen_schedule = getFinalSchedule(day, schedules[0]);
-
+			chosen_schedule = getFinalSchedule(day, schedules[0]);	
         }
-
+		
+		// if a schedule was found, add the visit to the DB
 		if(chosen_schedule != false){
         	
-        	connection.query("call addVisitToTrip(?,?,?,?,?)", [trip_id, poi_id, chosen_schedule[0], chosen_schedule[1], isManual], function (err, result) {
+        	connection.query("call addVisitToTrip(?,?,?,?,?,?)", [trip_id, poi_id, chosen_schedule[0], chosen_schedule[1], isManual, 0], function (err, result) {
 	    		if (err) throw err;
 			  	
 	    		res.contentType('json');
@@ -2547,28 +2752,31 @@ app.post('/add-visit', function(req, res){
 
 
 
-
+// delete a visit
 app.post('/delete-visit', function(req, res){
 	var connection;
 
-	var user_id = parseInt(req.cookies['user']);
+	var user_id = parseInt(req.cookies['user']); // user ID
 
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "You need to be logged in to do this action."});
 		return;
 	}
 
-	var trip_id = req.body.trip;
+	var trip_id = req.body.trip; // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The trip is not valid."});
 		return;
 	}
 
-	var poi_id = req.body.poi;
+	var poi_id = req.body.poi; // poi to be added (poi ID)
 
+	// check if poi ID is an integer number
 	if(isNaN(poi_id)){
 		res.contentType('json');
 		res.send({result: 'error', msg: "The place is not valid."});
@@ -2586,18 +2794,19 @@ app.post('/delete-visit', function(req, res){
 	}).then(function(conn){
     	connection = conn;
 
-		return connection.query("call isTripManual(?)", [trip_id]);
+		return connection.query("call isTripManual(?)", [trip_id]); // check if trip is manual
 
 	}).then(function(result){
 
 		isManual = parseInt(result[0][0].isManual[0]);
 
-	    var result = connection.query("call getOwnerOfTrip(?);", [trip_id]);
+	    var result = connection.query("call getOwnerOfTrip(?);", [trip_id]); // get the owner of the trip
 
 	    return result;
 
 	}).then(function(result){
 
+		//if the owner of the trip is the same as the one that made the request, delete the visit
 		if(result[0][0].user == user_id){
 
 			result = connection.query("call deleteVisit(?,?,?)", [trip_id, poi_id, isManual]);
@@ -2618,26 +2827,28 @@ app.post('/delete-visit', function(req, res){
 
 
 
-
+// page of the trip
 app.get('/trip', function(req, res){
 	var connection;
 
-	var user_id = parseInt(req.cookies['user']);
+	var user_id = parseInt(req.cookies['user']); // user ID
 
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.render(path.join(__dirname+'/templates/need-login.html'));
 		return;	
 	}
 
-	var trip_id = parseInt(req.query['id']);
+	var trip_id = parseInt(req.query['id']); // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
 	}
 
 	var view_method = req.query['v']; // method chose by the user to see his/her trip
 
-	/* variables to store the information from the trip */
+	/* variables to store the information of the trip */
 	var start_date = "n/a";
     var end_date = "n/a";
     var city = "";
@@ -2659,7 +2870,7 @@ app.get('/trip', function(req, res){
 			return;
 		}
 
-
+		/* get the visits of the trip */
 		con.query("call getVisitsFromTrip(?,?)", [user_id, trip_id], function (err, result, fields) {
 			if (err) throw err;
 
@@ -2697,6 +2908,7 @@ app.get('/trip', function(req, res){
 	        	/* get the open slots of the trip that can have a new visit or move a visit to */
 	        	var list_places_trip = [];
     			var trip = {};
+    			var hotels = {};
 
     			for(var i=0 ; i < days.length; i++){
     				var d = new Date(days[i]);
@@ -2717,6 +2929,7 @@ app.get('/trip', function(req, res){
 		        	visit["start_time"] = start_time.getHours() + ":" + (start_time.getMinutes()<10?'0':'') + start_time.getMinutes();
 		        	visit["end_time"] = end_time.getHours() + ":" + (end_time.getMinutes()<10?'0':'') + end_time.getMinutes();
 
+
 		        	if(trip[day] != undefined){
 		        		trip[day].push(visit);
 		        	}
@@ -2725,17 +2938,19 @@ app.get('/trip', function(req, res){
 		        		trip[day] = [];
 		        		trip[day].push(visit);
 		        	}
+
 		        }
 
 		        openslots = getAllOpenSlotsAvailable(trip);
 
 
-	        	/* if the user didn't give a name to his trip, use the default 'Your visit to <name of the city>' */
+	        	/* if the user didn't give a name to his/her trip, use the default 'Your visit to <name of the city>' */
 	        	if(result[0].trip_name != null && result[0].trip_name.length > 0)
 	        		name = result[0].trip_name;
 	        	else
 	        		name = 'Your visit to ' + city;
 
+				/* other information to be provided to the UI */
 	        	isPublic = result[0].isPublic[0];
 
 	        	if(parseInt(result[0].user) == parseInt(user_id))
@@ -2764,6 +2979,7 @@ app.get('/trip', function(req, res){
 
 			/* get the list of visits of the trip */
 			var trip = [];
+			var hotels = [];
 	        for(var i=0; i < result.length; i++){
 	        	var visit = new Object();
 
@@ -2774,7 +2990,31 @@ app.get('/trip', function(req, res){
 	        	visit["day"] = (start_time.getDate()<10?'0':'') + start_time.getDate() + " " + convertToTextMonth(start_time.getMonth()) + " " + start_time.getFullYear();
 	         	visit["start_time"] = start_time.getHours() + ":" + (start_time.getMinutes()<10?'0':'') + start_time.getMinutes();
 	        	visit["end_time"] = end_time.getHours() + ":" + (end_time.getMinutes()<10?'0':'') + end_time.getMinutes();
-	        	
+
+	        	/* full schedule  */
+
+			 	if(result[i].start_time != undefined && result[i].end_time != undefined){
+		        	st_date = new Date(result[i].start_time);
+		        	en_date = new Date(result[i].end_time);
+
+		        	if(st_date.getDate() == "1" || st_date.getDate() == "21" || st_date.getDate() == "31")
+		        		day = st_date.getDate() + "st"
+		        	else if(st_date.getDate() == "2" || st_date.getDate() == "22")
+		        		day = st_date.getDate() + "nd"
+		        	else if(st_date.getDate() == "3" || st_date.getDate() == "23")
+		        		day = st_date.getDate() + "rd"
+		        	else
+		        		day = st_date.getDate() + "th"
+
+
+		        	var schedule = convertToTextMonth(st_date.getMonth()) +  " " + day + " from " + 
+		        	st_date.getHours() + ":" + (st_date.getMinutes()<10?'0':'') + st_date.getMinutes() + " to " + 
+		        	en_date.getHours() + ":" + (en_date.getMinutes()<10?'0':'') + en_date.getMinutes();
+
+		        	visit["schedule"] = schedule;
+		        }
+
+		        	
 	        	/* point of interest information */
 
 	        	visit["id"] = result[i].id;
@@ -2853,10 +3093,17 @@ app.get('/trip', function(req, res){
 				visit["distance_km"] = null;
 				visit["deslocation_duration"] = null;
 
-	        	trip.push(visit);
-	        }
+				if(result[i].isHotel[0]){
+					
+					hotels.push(visit);
+				}
 
+				else{
+	        		trip.push(visit);
+				}
 
+			}
+			
 	        /* get the weather forecast if it's possible from OPEN WEATHER MAP*/
 	        var weather = [];
 	        var weather_icons = [];
@@ -2953,6 +3200,8 @@ app.get('/trip', function(req, res){
 				        	visit["name"] = result[i].name;
 				        	visit["place_id"] = result[i].place_id;
 				        	visit["poi_type"] = result[i].poi_type;
+    						visit["coordinates"] = result[i].latitude + ", " + result[i].longitude;
+    						visit["address"] = result[i].address;
 
 				        	if(result[i].photo != null)
 				        		visit["photo"] = result[i].photo.replace(/\\/g,"/");
@@ -2967,6 +3216,7 @@ app.get('/trip', function(req, res){
 				        	i = (i + 1) % result.length;
 				        }
 
+						/* get trip reviews */
 						con.query("call getTripReviews(?)", trip_id, function (err, result, fields) {
 					    	if (err) throw err;
 
@@ -2984,12 +3234,13 @@ app.get('/trip', function(req, res){
 					    		reviews.push(review);
 					    	}
 
-								    
+							/* get trip stats */	   	 
 					        con.query("call getTripStats(?)", trip_id, function (err, result, fields) {
 				        		if (err) throw err;
 
 				        		result = result[0];
 
+								/* default values */
 				        		var rating = "0.0";
 				        		var accessibility_rating = "No information available";
 				        		var security_rating = "No information available";
@@ -3014,6 +3265,7 @@ app.get('/trip', function(req, res){
 
 				        		}
 
+								/* if the page was requested by other person (not the owner)*/
 				        		if(source != "author"){
 				        			if(isPublic == "1"){
 					        			con.query("call isUserInterested (?, ?)", [user_id, trip_id], function (err, result, fields) {
@@ -3023,7 +3275,7 @@ app.get('/trip', function(req, res){
 
 					        				var isInterested = result[0].isInterested;
 
-					        				data = {trip_id: trip_id, name: name, trip: trip, start_date: start_date, end_date: end_date, city: city, city_latitude: city_latitude, city_longitude: city_longitude, days: days, days_shortname: days_shortname, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, accessibility_rating: accessibility_rating, security_rating: security_rating, price_rating: price_rating, num_reviews: num_reviews, num_trips: num_trips, num_interests: num_interests, isInterested: isInterested, isEditable: 0, travel_mode: travel_mode, num_persons: num_persons, openslots: openslots};
+					        				data = {trip_id: trip_id, name: name, trip: trip, hotels: hotels, start_date: start_date, end_date: end_date, city: city, city_latitude: city_latitude, city_longitude: city_longitude, days: days, days_shortname: days_shortname, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, accessibility_rating: accessibility_rating, security_rating: security_rating, price_rating: price_rating, num_reviews: num_reviews, num_trips: num_trips, num_interests: num_interests, isInterested: isInterested, isEditable: 0, travel_mode: travel_mode, num_persons: num_persons, openslots: openslots};
 
 					        				if(view_method == "full")
 					        					res.render(path.join(__dirname+'/templates/full-trip.html'), data);
@@ -3039,14 +3291,16 @@ app.get('/trip', function(req, res){
 						        		res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
 				        		}
 
+								/* if the page was requested by the owner of the trip*/
 				        		else{
 
 				        			isEditable = 1;
 
+									/* if the trip is Public or has already made -> it's not editable */
 				        			if(isPublic == "1" || new Date(start_date) <= new Date())
 				        				isEditable = 0;
 
-				        			data = {trip_id: trip_id, name: name, trip: trip, start_date: start_date, end_date: end_date, city: city, city_latitude: city_latitude, city_longitude: city_longitude, days: days, days_shortname: days_shortname, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, accessibility_rating: accessibility_rating, security_rating: security_rating, price_rating: price_rating, num_reviews: num_reviews, num_trips: num_trips, num_interests: num_interests, isInterested: 0, isEditable: isEditable, travel_mode: travel_mode, num_persons: num_persons, openslots: openslots};
+				        			data = {trip_id: trip_id, name: name, trip: trip, hotels: hotels, start_date: start_date, end_date: end_date, city: city, city_latitude: city_latitude, city_longitude: city_longitude, days: days, days_shortname: days_shortname, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, accessibility_rating: accessibility_rating, security_rating: security_rating, price_rating: price_rating, num_reviews: num_reviews, num_trips: num_trips, num_interests: num_interests, isInterested: 0, isEditable: isEditable, travel_mode: travel_mode, num_persons: num_persons, openslots: openslots};
 
 				        			if(view_method == "full")
 			        					res.render(path.join(__dirname+'/templates/full-trip.html'), data);
@@ -3060,7 +3314,7 @@ app.get('/trip', function(req, res){
 		        		});
 	        		});
 				}).then(function(result){
-				    result = connection.query("call updateTripViewers (?)", [trip_id]);
+				    result = connection.query("call updateTripViewers (?)", [trip_id]); // update the number of vieweres of this trip
 				    connection.end();
 				});
 			});
@@ -3070,25 +3324,26 @@ app.get('/trip', function(req, res){
 });
 
 
-
-
-
+// page of the manual trip
 app.get('/trip-m', function(req,res){
 	var connection;
 
-	var user_id = req.cookies['user'];
-	var trip_id = parseInt(req.query['id']);
+	var user_id = parseInt(req.cookies['user']); // user ID
+	var trip_id = parseInt(req.query['id']); // trip ID
 
+	// check if trip ID is an integer number
 	if(isNaN(trip_id)){
 		res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
 		return;
 	}
 
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.render(path.join(__dirname+'/templates/need-login.html'));
 		return;
 	}
 
+	/* variables to store the information of the trip */
 	var start_date = "n/a";
     var end_date = "n/a";
     var city = "";
@@ -3103,6 +3358,7 @@ app.get('/trip-m', function(req,res){
 	var num_visits = 0;
 	var expiration_time;
 
+	/* check if trip exists and is Manual */
 	con.query("call isTripManual(?)", trip_id, function (err, result, fields) {
 		if (err) throw err;
 
@@ -3113,6 +3369,7 @@ app.get('/trip-m', function(req,res){
 			return;
 		}
 
+		/* get the visits of the trip */
 		con.query("call getVisitsFromTrip(?, ?)", [user_id, trip_id], function (err, result, fields) {
 			if (err) throw err;
 
@@ -3120,7 +3377,7 @@ app.get('/trip-m', function(req,res){
 
 			num_visits = result.length;
 
-			/* atributos do plano */
+			/* trip information */
 			if(result.length > 0){
 
 				start_date = new Date(result[0].start_date);
@@ -3138,17 +3395,21 @@ app.get('/trip-m', function(req,res){
 	        	city_latitude = result[0].city_latitude;
 	        	city_longitude = result[0].city_longitude;
 
+				/* get a list of all days of the trip */
 	        	days = getTripDays(start_date_aux, parseInt(date_diff));
 
+				/* date with short format (ex: 29-08-2019) */
 	        	for(var i=0; i < days.length; i++){
 	        		days_shortname.push(convertToDateFormat(days[i].split(', ')[1]));
 	        	}
 
+				/* if the user didn't give a name to his/her trip, use the default 'Your visit to <name of the city>' */
 	        	if(result[0].trip_name != null && result[0].trip_name.length > 0)
 	        		name = result[0].trip_name;
 	        	else
 	        		name = 'Your visit to ' + city;
 
+				/* other information to be provided to the UI */
 	        	isPublic = result[0].isPublic[0];
 
 	        	if(parseInt(result[0].user) == parseInt(user_id))
@@ -3240,7 +3501,7 @@ app.get('/trip-m', function(req,res){
 	        for(var i=0; i < result.length; i++){
 	        	var visit = new Object();
 
-	        	/* atributos da visita */
+	        	/* visit information */
 	        	var start_time = new Date(result[i].start_time);
 	        	var end_time = new Date(result[i].end_time);
 
@@ -3248,7 +3509,7 @@ app.get('/trip-m', function(req,res){
 	        	visit["start_time"] = start_time.getHours() + ":" + (start_time.getMinutes()<10?'0':'') + start_time.getMinutes();
 	        	visit["end_time"] = end_time.getHours() + ":" + (end_time.getMinutes()<10?'0':'') + end_time.getMinutes();
 	        	
-	        	/* atributos do POI */
+	        	/* POI information */
 
 	        	visit["id"] = result[i].id;
 	        	visit["name"] = result[i].name;
@@ -3345,17 +3606,17 @@ app.get('/trip-m', function(req,res){
 			}).then(function(result){
 				var city_id = result[0][0].city;
 
-				/* obter sugestões */
+				/* get suggestions */
 
 		        con.query("call getOtherSuggestionsFromTrip(?, ?)", [trip_id, city_id], function (err, result, fields) {
 		        	if (err) throw err;
 
 		        	result = result[0];
-
-		        	var suggested_visits = []; // lista com POIs sugeridos
-		        	var suggested_hotels = []; // lista com Hoteis sugeridos
-		        	var size = 6; // numero de sugestões
-		        	var total_hotels = 0;
+		        
+					var suggested_visits = []; // list of POIs suggested
+					var suggested_hotels = []; // list of hotels suggested
+					var size = 6; // total number of suggestions
+					var total_hotels = 0;
 
 		        	if(result.length < size)
 		        		size = result.length;
@@ -3405,7 +3666,7 @@ app.get('/calendar', function(req, res){
 
 
 
-// trips page -> page that contains all the past and future trips of the user
+// trips page -> page that contains all the scheduled, made, in development, favorite and with interest trips of the user
 app.get('/trips', function(req, res){
 
 	var user_id = -1;
@@ -3420,6 +3681,7 @@ app.get('/trips', function(req, res){
 
 	        result = result[0];
 
+			/* different types of trips */
 	        var scheduled_trips = [];
 	        var past_trips = [];
 	        var development_trips = [];
@@ -3428,6 +3690,7 @@ app.get('/trips', function(req, res){
 
 	        for(var i=0 ; i < result.length; i++){
 
+				/* trip information*/
 	        	var trip = new Object();
 	        	trip["id"] = result[i].trip_id;
 
@@ -3454,6 +3717,7 @@ app.get('/trips', function(req, res){
 	        	trip["start"] = start_date.getDate() + " " + convertToTextMonth(start_date.getMonth()) + " " + start_date.getFullYear();
 	        	trip["end"] = end_date.getDate() + " " + convertToTextMonth(end_date.getMonth()) + " " + end_date.getFullYear();
 
+				/* filter the trips */
 	        	if(result[i].isManual[0] == 1 && result[i].isActive[0] == 0){
 	        		trip["expiration_time"] = result[i].expiration_time;
 	        		development_trips.push(trip);
@@ -3472,10 +3736,10 @@ app.get('/trips', function(req, res){
 
 	        }
 
-
 	        sortTrips(scheduled_trips,"cresc");
 	        sortTrips(past_trips,"desc");
 
+			/* get the trips that the user is interested in */
 	        con.query("call getInterestedTripsByUser(?)", user_id, function (err, result, fields) {
 	        	if (err) throw err;
 
@@ -3530,11 +3794,13 @@ app.get('/trips', function(req, res){
 // login using GOOGLE
 app.post('/login-g', function(req, res){
 
+	/* attributes providede by Google */
 	var googleID = req.body.google_id;
 	var username = req.body.username;
 	var name = req.body.name;
 	var picture = req.body.picture;
 
+	/* login: if exists, returns the attributes needed in the UI (user ID, picture and type) ; if not exists yet, creates a new user and then returns the attributes */
 	con.query("call loginWithGoogle(?,?,?,?)", [googleID, username, name, picture], function (err, result, fields) {
     	if (err) throw err;
 
@@ -3560,9 +3826,10 @@ app.post('/login-g', function(req, res){
 
 // login using user account
 app.post('/login-e', function(req, res){
-	var username = req.body.email;
-	var password = md5(req.body.password);
+	var username = req.body.email; 
+	var password = md5(req.body.password); // hash the password
 
+	/* login is made here (not very secure !!) */ 
 	con.query("call login(?)", [username], function (err, result, fields) {
     	if (err) throw err;
 
@@ -3604,9 +3871,10 @@ app.get('/register', function(req, res){
 });
 
 
-
+/* register a new user */
 app.post('/register', upload.single('photo'), function (req, res, next){
 
+	/* data provided */
 	var username = req.body.email;
 	var name = req.body.fname + " " + req.body.lname;
 	var phone_number = req.body.phone;
@@ -3669,17 +3937,18 @@ app.post('/register', upload.single('photo'), function (req, res, next){
 });
 
 
-
-
+/* profile page */
 app.get('/profile', function(req, res){
 
-	var user_id = req.cookies['user'];
+	var user_id = req.cookies['user']; // user ID
 
+	// check if user ID is an integer number
 	if(isNaN(user_id)){
 		res.render(path.join(__dirname+'/templates/need-login.html'));
 		return;
 	}
 
+	// get the user's info
 	con.query("call getInfoUser(?)", user_id, function (err, result, fields) {
         if (err) throw err;
 
@@ -3742,7 +4011,7 @@ app.get('/profile', function(req, res){
 	
 });
 
-
+/* edit the user's info */
 app.post('/edit-profile', function(req, res){
 
 	var user_id = req.cookies['user'];
@@ -3836,7 +4105,7 @@ app.post('/edit-profile', function(req, res){
 
 });
 
-
+/* edit the user's picture */
 app.post('/edit-profile-picture', upload.single('photo'), function (req, res, next){
 
 	var user_id = req.cookies['user'];
@@ -3860,16 +4129,18 @@ app.post('/edit-profile-picture', upload.single('photo'), function (req, res, ne
 
 });
 
-
+/* request a new POI page */
 app.get('/request-poi', function(req, res){
 
-	var user_id = req.cookies['user'];
+	var user_id = req.cookies['user']; // user ID
 
+	/* check if user ID is an integer number */
 	if(isNaN(user_id)){
 		res.render(path.join(__dirname+'/templates/need-login.html'));
 		return;
 	}
 
+	// check if user has access to this feature
 	con.query("call getUserType(?)", user_id, function (err, result, fields){
 		if (err) throw err;
 
@@ -3882,6 +4153,7 @@ app.get('/request-poi', function(req, res){
 			return;
 		}
 
+		// get all cities (names)
 		con.query("call getCities();", function (err, result, fields) {
 			if (err) throw err;
 
@@ -3908,8 +4180,7 @@ app.post('/request-poi', upload_poi.single('photo'), function(req, res){
 
 	var poi_id;
 
-	// verificar se o utilizador pode submeter
-
+	// check if user can request a new POI
 	con.query("call getUserType(?)", user_id, function (err, result, fields){
 		if (err) throw err;
 
@@ -3917,12 +4188,13 @@ app.post('/request-poi', upload_poi.single('photo'), function(req, res){
 
 		var isUserPremium = false;
 
+		/* if user does not exists or is not a Premium User, can't request a new POI */
 		if(result.length == 0 || result[0].type_use != 'Premium'){
 			res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
 			return;
 		}
 
-
+		/* new POI data */
 		var poi_name = req.body.title;
 		var poi_description = req.body.description;
 		var poi_latitude = parseFloat(req.body.latitude);
@@ -3941,6 +4213,7 @@ app.post('/request-poi', upload_poi.single('photo'), function(req, res){
 		if(google_place_id == "None")
 			google_place_id = null;
 
+		/* ERROR MSG */
 		if(isNaN(google_rating)){
 			res.render(path.join(__dirname+'/templates/request-poi.html'), {cities: [], wasSubmitedWithSuccess: -1});
 			return;
@@ -3979,6 +4252,7 @@ app.post('/request-poi', upload_poi.single('photo'), function(req, res){
 		}
 
 
+		/* add the new POI to the DB */
 		var sql = "call submitPOI(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		var values = [poi_name, poi_description, poi_latitude, poi_longitude, poi_address, poi_type, poi_website, poi_phone_number, poi_city, user_id, google_place_id, google_rating, google_num_reviews];
 
@@ -3989,8 +4263,9 @@ app.post('/request-poi', upload_poi.single('photo'), function(req, res){
 			}
 
 			else{
-				poi_id = result[0][0].poiID;
+				poi_id = result[0][0].poiID; // poi ID
 
+				/* create a new folder to this POI and moves the picture to the new folder */
 				var newPath = path.join(__dirname, 'dist/img/poi/' + poi_id + "/" + Date.now() + Math.random().toString(36).substring(2) + path.extname(poi_photo));
 				var newPath_rel = newPath.split('dist')[1];
 
@@ -4176,23 +4451,49 @@ app.post('/reject-poi', function(req, res){
 
 
 
-
 app.get('/recover', function(req, res){
 	res.render(path.join(__dirname+'/templates/recover-password.html'),);
 });
 
 
 app.get('/about-us', function(req, res){
-	res.render(path.join(__dirname+'/templates/under-construction.html'), );
+	res.render(path.join(__dirname+'/templates/about.html'), );
 });
+
+
+app.get('/contacts', function(req, res){
+	res.render(path.join(__dirname+'/templates/contacts.html'), );
+});
+
+app.get('/destinations', function(req, res){
+
+	con.query("call getCities();", function (err, result, fields) {
+		if (err) throw err;
+
+		result = result[0];
+
+		cities = [];
+
+		for(var i=0; i < result.length; i++){
+			var city = new Object();
+			city["id"] = result[i].id;
+			city["name"] = result[i].name;
+			city["coordinates"] = result[i].latitude + ", " + result[i].longitude;
+			cities.push(city);
+		}
+
+		res.render(path.join(__dirname+'/templates/destinations.html'), {cities: cities});
+	});
+});
+
 
 app.get('/help', function(req, res){
-	res.render(path.join(__dirname+'/templates/under-construction.html'), );
+	res.render(path.join(__dirname+'/templates/help.html'), );
 });
 
 
 
-
+/*
 app.post('/review-poi', function(req, res){
 	var user_id = req.cookies['user'];
 
@@ -4287,11 +4588,10 @@ app.post('/review-poi', function(req, res){
 		}
 	});
 	
-});
+});*/
 
 
 /* edit the description of a POI */
-
 app.post('/edit-description-poi', function(req, res){
 	
 	var user_id = req.cookies['user'];
@@ -4329,6 +4629,7 @@ app.post('/edit-description-poi', function(req, res){
 });
 
 
+/* method that receives photos of a POI uploaded by the users and saves it */
 app.post('/upload-poi-photo', upload_poi.single('photo'), function(req, res){
 
 	var user_id = req.cookies['user'];
@@ -4535,7 +4836,7 @@ app.post('/update-poi-price', function(req, res){
 
 
 
-
+// DISCOVER FEATURE
 app.get('/discover', function(req, res){
 
 	var query = req.query['query'];	
@@ -4573,6 +4874,11 @@ app.get('/discover', function(req, res){
 			result = result[0];
 
 			var trips = [];
+			var expert_trips = [];
+			var nature_trips = [];
+			var culture_trips = [];
+			var history_trips = [];
+
 
 			for(var i=0; i < result.length; i++){
 				var trip = new Object();
@@ -4613,6 +4919,19 @@ app.get('/discover', function(req, res){
 				}
 
 				else{
+					if(trip.isPremium == 1)
+						expert_trips.push(trip);
+
+					if(trip.category.toUpperCase() == 'NATURE')
+						nature_trips.push(trip);
+
+					else if(trip.category.toUpperCase() == 'HISTORY')
+						history_trips.push(trip);
+
+					else if(trip.category.toUpperCase() == 'CULTURE')
+						culture_trips.push(trip);
+
+
 					trips.push(trip);
 				}
 
@@ -4620,7 +4939,7 @@ app.get('/discover', function(req, res){
 			}
 
 
-			res.render(path.join(__dirname+'/templates/discover.html'),  {trips: trips, query: query});
+			res.render(path.join(__dirname+'/templates/discover.html'),  {trips: trips, query: query, expert_trips: expert_trips, nature_trips: nature_trips, history_trips: history_trips, culture_trips: culture_trips});
 		});
 
 	}); 
@@ -4629,8 +4948,7 @@ app.get('/discover', function(req, res){
 
 
 
-
-
+/* TESTES PARA INTEGRAR OS ALGORITMOS */
 
 app.get('/teste', function(req, res){
 
@@ -4657,6 +4975,37 @@ app.get('/teste', function(req, res){
 });
 
 
+app.get('/teste2', function(req, res){
+
+	//run number -> pode ser 1
+	// vhcCap -> numero maximo de sitios a visitar 
+	//vhcFxdCst -> pode ser 0
+	//maxNumRoutes -> maximo numero de dias
+
+	var alg = edge.func({
+    source: function () {/*
+        async (dynamic input) =>
+        {
+        	var alg = new Lrp.TouristTripPlanning.Main().RunSeveralTtpMethodOnInstance(input.instancePath, input.runNumber, input.vhcCap, input.vhcFxdCst, input.maxNumRoutes)
+        	return alg;
+        }
+    */},
+    references: ["Lrp.dll", "Lrp.TouristTripPlanning.dll"]
+	});
+
+	alg({instancePath: '/xml/200', runNumber: 1, vhcCap: 0, vhcFxdCst: 0, maxNumRoutes: 1}, function (error, result) {
+	    if (error) throw error;
+	});
+
+
+	res.render(path.join(__dirname+'/templates/404page.html'));
+
+
+});
+
+
+
+
 app.get('*', function(req, res){
 	res.status(404).render(path.join(__dirname+'/templates/404page.html'), );
 });
@@ -4667,13 +5016,15 @@ app.listen(8080);
 
 
 console.log("Running at Port 8080");
-
-
+open('http://localhost:8080');
 
 
 
 /* Auxiliar Functions */
 
+// get all days of a trip from its start date and its duration 
+// Ex: start_date = 27-11-2019; number_days = 3 
+// Returns: [27-11-2019, 28-11-2019, 29-11-2019]
 function getTripDays(start_date, number_days, convert=true){
 	var days = [];
 
@@ -4720,13 +5071,10 @@ function getTripDays(start_date, number_days, convert=true){
 
 	}
 
-
-
 	if(convert)
 		days = convertToDate(days);
 
 	return days;
-
 }
 
 // convert month from number to text (ex: 01 -> January)
@@ -4749,11 +5097,12 @@ function convertToTextMonth(month){
 }
 
 
-
+// check if year is even (has 366 days)
 function isYearEven(year){
 	return year % 4 == 0 && year % 100 != 0 || (year % 100 == 0 && year % 400 == 0)
 }
 
+// check if month has 31 days
 function is31daysMonth(month){
 	var months_31days = [1,3,5,7,8,10,12];
 
@@ -4763,9 +5112,9 @@ function is31daysMonth(month){
 	}
 
 	return false;
-
 }
 
+// add the weekday to a date and convert to the format (dd-month by its name-yy)
 function convertToDate(days){
 	var month = new Array();
 	month[0] = "January";
@@ -4790,7 +5139,7 @@ function convertToDate(days){
 	return days;
 }
 
-
+// converts date that has the the full month name to the month number
 function convertToDateFormat(date){
 	var month = new Array();
 	month[0] = "January";
@@ -4813,15 +5162,14 @@ function convertToDateFormat(date){
 }
 
 
-
-
-
+// get the weekday of a date 
 function getWeekDay(date){
 	var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 	var d = new Date(date);
 	return days[d.getDay()];
 }
 
+// computes the number of days between two dates
 function diffBetweenDays(day1, day2){
 	day1 = day1.split('/');
 	day2 = day2.split('/');
@@ -4835,13 +5183,14 @@ function diffBetweenDays(day1, day2){
 	return diffDays;
 }
 
+// converts a date to the SQL TimeStamp
 function convertToSQLTimestamp(date){
 	var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
 
     return new Date(date - tzoffset).toISOString().slice(0, 19).replace('T', ' ');;
 }
 
-
+// converts a date to the review format (ex: 10 minutes ago)
 function getReviewDate(date){
 	var now = new Date();
 
@@ -4902,6 +5251,7 @@ function getReviewDate(date){
 }
 
 
+// sort a list of trips
 function sortTrips(trips, order){
 	var i,j, troca;
 	var n = trips.length;
@@ -4930,6 +5280,7 @@ function sortTrips(trips, order){
 	}
 }
 
+// get all schedules available of a day (between 9:00 until 19:00 with 00:15 differences)
 function getSchedules(){
 	var start_start_hour = 9;
 	var end_start_hour = 19;
@@ -4947,11 +5298,7 @@ function getSchedules(){
 	return times;
 }
 
-
-function isValid(){
-
-}
-
+// check if a time(hh:mm) is smaller than another time
 function isTimeSmaller(time1, time2){
 	var h1, h2, m1, m2;
 
@@ -5170,18 +5517,29 @@ function getWeatherClosestHour(visit_schedule){
 function parsePoiOpeningHours(poi_op_hours){
 	var poi_hours = {};
 
+	console.log(poi_hours);
+
 	poi_op_hours = JSON.parse(poi_op_hours);
 
 	var visits_start_time = 9 * 3600; // 9:00 in number of seconds after midnight
 	var visits_end_time = 20 * 3600; // 20:00 in number of seconds after midnight
 
+	if(poi_op_hours == null){
+		poi_hours["Monday"] = [0, visits_end_time-visits_start_time];
+		return poi_hours;
+	}
+
+
+
 	var opening_hours = poi_op_hours[0].substring(poi_op_hours[0].indexOf(':')+1);
 
 
-	if(opening_hours == 'Closed')
+	console.log(opening_hours);
+
+	if(opening_hours.includes('Closed'))
     	poi_hours["Monday"] = [0,0];
 
- 	else if(opening_hours == 'Open 24 hours')
+ 	else if(opening_hours.includes('Open 24 hours'))
 		poi_hours["Monday"] = [0, visits_end_time-visits_start_time];
 
 	else{
@@ -5212,6 +5570,8 @@ function parsePoiOpeningHours(poi_op_hours){
 
     	poi_hours["Monday"] = [start_time, end_time];
 	}
+
+	return poi_hours;
 
 	/*for(var i=0; i<poi_op_hours.length;i++){
         var weekday = poi_op_hours[i].split(':')[0];
@@ -5256,6 +5616,19 @@ function sortPOIs (pois, score){
   		return ((x < y) ? 1 : ((x > y) ? -1 : 0));
  	});
 }
+
+
+/* sort visits randomly 
+code adapted from https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array */
+function shuffleVisits(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+
+    return array;
+}
+
 
 
 

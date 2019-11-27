@@ -80,7 +80,7 @@ function createOpeningHoursTable(hours){
 }
 
 
-function getPlaceDetails(place_id){
+function getPlaceDetails(place_id, address, google_rating, num_reviews){
 
     var poi_id = /id=([^&]+)/.exec(location.search)[1];
 
@@ -103,7 +103,6 @@ function getPlaceDetails(place_id){
             if(result.result == 1){
               window.location.reload();
             }
-
           });
         }
 
@@ -196,7 +195,7 @@ function getPlaceDetails(place_id){
           });
         }
 
-        if(place.formatted_address != undefined){
+        if(place.formatted_address != undefined && place.formatted_address != address){
 
           $.post("/update-info-poi-automatically", {poi: poi_id, field: "address", value: place.formatted_address}, function(result){
             
@@ -208,9 +207,8 @@ function getPlaceDetails(place_id){
           });
         }
 
-        if(place.rating != undefined){
-
-          $.post("/update-info-poi-automatically", {poi: poi_id, field: "rating", value: place.rating}, function(result){
+        if(place.rating != undefined && place.rating.toFixed(1) != google_rating){
+          $.post("/update-info-poi-automatically", {poi: poi_id, field: "rating", value: place.rating.toFixed(1)}, function(result){
             
             // if there are changes, refresh the page
             if(result.result == 1){
@@ -220,7 +218,7 @@ function getPlaceDetails(place_id){
           });
         }
 
-        if(place.user_ratings_total != undefined){
+        if(place.user_ratings_total != undefined && place.user_ratings_total != num_reviews){
 
           $.post("/update-info-poi-automatically", {poi: poi_id, field: "num_reviews", value: place.user_ratings_total}, function(result){
             
@@ -536,66 +534,26 @@ function getPlaceDetails(place_id){
     var href = new URL(window.location.href);
     var trip_id = parseInt(href.searchParams.get('trip'));
   
-    var schedule;
-  
-    if($('#radio-choose-schedule-man').is(':checked')){
+    $('#schedule-error').css("display", "none");
 
-      if($('#visit-day option:selected').val() == "null" || $('#visit-start-hour option:selected').val() == "null"){
-        $('#schedule-error').css("display", "block");
+    $.post("/add-visit", {trip: trip_id, poi: poi_id}, function(result){
+      
+      if(result.result == 'error'){
+        if(result.msg == 'schedule error'){
+          $('#add-visit-error').css("display", "block");
+          $('#add-visit-error-msg').text("Could not find a schedule for the visit in this trip")
+        }
       }
-
+      
       else{
-        $('#schedule-error').css("display", "none");
-
-        var day = new Date ($('#visit-day option:selected').val());
-        day = day.getFullYear() + "-" + (day.getMonth()<10?'0':'') + (day.getMonth() + 1)  + "-" + (day.getDate()<10?'0':'') + day.getDate();
-        var hour = $('#visit-start-hour option:selected').val();
-        schedule = day + " " + hour;
-
-        $.post("/add-visit", {trip: trip_id, poi: poi_id, schedule: schedule}, function(result){
-        
-          if(result.result == 'error'){
-            if(result.msg == 'schedule error'){
-              $('#add-visit-error').css("display", "block");
-              $('#add-visit-error-msg').text("Could not find a schedule for the visit in this trip")
-            }
-          }
-          
-          else{
-            if(result.isManual == true)
-              window.location.href = "/trip-m?id=" + trip_id;
-            else
-              window.location.href = "/trip?id=" + trip_id;
-          
-          }
-        });
-
+        if(result.isManual == true)
+          window.location.href = "/trip-m?id=" + trip_id;
+        else
+          window.location.href = "/trip?id=" + trip_id;
+      
       }
-    }
-
-    else{
-
-      $('#schedule-error').css("display", "none");
+    });
   
-      $.post("/add-visit", {trip: trip_id, poi: poi_id}, function(result){
-        
-        if(result.result == 'error'){
-          if(result.msg == 'schedule error'){
-            $('#add-visit-error').css("display", "block");
-            $('#add-visit-error-msg').text("Could not find a schedule for the visit in this trip")
-          }
-        }
-        
-        else{
-          if(result.isManual == true)
-            window.location.href = "/trip-m?id=" + trip_id;
-          else
-            window.location.href = "/trip?id=" + trip_id;
-        
-        }
-      });
-  
-    }
   }
   
   $(function () {
