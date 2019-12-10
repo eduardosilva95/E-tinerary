@@ -104,9 +104,9 @@ var upload_city = multer({storage: city_storage});
 
 /* CREATE CONNECTION WITH THE MYSQL DB */
 var con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "password",
+  host: "e-tinerarydb.mysql.database.azure.com",
+  user: "etinerary_user@e-tinerarydb",
+  password: "Ers1995.",
   database: "placesdb"
 });
 
@@ -5014,7 +5014,7 @@ app.get('*', function(req, res){
 });
 
 	
-app.listen(8080);
+app.listen(process.env.PORT);
 
 
 
