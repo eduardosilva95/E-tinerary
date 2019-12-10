@@ -712,14 +712,14 @@ BEGIN
 END //
 
 # criar um itinerario manualmente
-CREATE PROCEDURE createManualTrip (destination VARCHAR(255), arrival DATE, departure DATE, userID INT)
+CREATE PROCEDURE createManualTrip (destination VARCHAR(255), arrival DATE, departure DATE, userID INT, numAdults INT, numChildren INT, travelMode VARCHAR(255))
 BEGIN
 	declare cityID INT;
 	declare tripID INT;
     
     SELECT id INTO cityID FROM city WHERE name = destination;
 		
-    INSERT INTO trip (start_date, end_date, user, isActive, city, isManual, expiration_time) VALUES (arrival, departure, userID, 0, cityID, 1, ADDTIME(CURRENT_TIMESTAMP, '02:00:00'));
+    INSERT INTO trip (start_date, end_date, user, isActive, city, num_adults, num_children, travel_mode, isManual, expiration_time) VALUES (arrival, departure, userID, 0, cityID, numAdults, numChildren, travelMode, 1, ADDTIME(CURRENT_TIMESTAMP, '02:00:00'));
 	SET tripID = LAST_INSERT_ID();
     SELECT tripID;
 END //

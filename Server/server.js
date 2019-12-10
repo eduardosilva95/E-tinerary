@@ -1879,8 +1879,10 @@ app.post('/create-trip-m', function(req, res){
 	var budget = req.body.budget;
 	var travel_mode = 'DRIVING'; // travel mode -> default = DRIVING
 
+
 	if(req.body.travel_mode != null)
-		travel_mode = travel_mode.toUpperCase();
+		travel_mode = req.body.travel_mode.toUpperCase();
+
 
     promise.createConnection({
 	    host: 'localhost',
@@ -1895,9 +1897,9 @@ app.post('/create-trip-m', function(req, res){
 		var values = [destination,
 	    	arrival.split('/')[2] + "-" + (arrival.split('/')[1]<10?'0':'') + arrival.split('/')[1] + "-" + (arrival.split('/')[0]<10?'0':'') + arrival.split('/')[0], 
 	    	departure.split('/')[2] + "-" + (departure.split('/')[1]<10?'0':'') + departure.split('/')[1] + "-" + (departure.split('/')[0]<10?'0':'') + departure.split('/')[0],
-	    	user_id];
+	    	user_id, num_adults, num_children, travel_mode];
 
-	    var result = connection.query("call createManualTrip(?, ?, ?, ?)", values);
+	    var result = connection.query("call createManualTrip(?, ?, ?, ?, ?, ?, ?)", values);
 
 	    return result;
 
@@ -3302,6 +3304,7 @@ app.get('/trip', function(req, res){
 
 				        			data = {trip_id: trip_id, name: name, trip: trip, hotels: hotels, start_date: start_date, end_date: end_date, city: city, city_latitude: city_latitude, city_longitude: city_longitude, days: days, days_shortname: days_shortname, suggested_visits: suggested_visits, suggested_hotels: suggested_hotels, source: source, isPublic: isPublic, isManual: 0, reviews: reviews, num_viewers: num_viewers, rating: rating, accessibility_rating: accessibility_rating, security_rating: security_rating, price_rating: price_rating, num_reviews: num_reviews, num_trips: num_trips, num_interests: num_interests, isInterested: 0, isEditable: isEditable, travel_mode: travel_mode, num_persons: num_persons, openslots: openslots};
 
+
 				        			if(view_method == "full")
 			        					res.render(path.join(__dirname+'/templates/full-trip.html'), data);
 			        				else if(view_method == "map")
@@ -4493,7 +4496,7 @@ app.get('/help', function(req, res){
 
 
 
-/*
+/* make a review of a POI */
 app.post('/review-poi', function(req, res){
 	var user_id = req.cookies['user'];
 
@@ -4588,7 +4591,7 @@ app.post('/review-poi', function(req, res){
 		}
 	});
 	
-});*/
+});
 
 
 /* edit the description of a POI */

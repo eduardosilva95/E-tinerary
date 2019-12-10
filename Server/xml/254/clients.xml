@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<Clients>
+  <Client>
+    <Number>5945</Number>
+    <Name>Edinburgh Castle</Name>
+    <Latitude>55.9485947</Latitude>
+    <Longitude>-3.1999135</Longitude>
+  </Client>
+  <Client>
+    <Number>5981</Number>
+    <Name>National Museum of Scotland</Name>
+    <Latitude>55.9471904</Latitude>
+    <Longitude>-3.1891679</Longitude>
+  </Client>
+  <Client>
+    <Number>5906</Number>
+    <Name>Princes Street Gardens</Name>
+    <Latitude>55.949555</Latitude>
+    <Longitude>-3.198699</Longitude>
+  </Client>
+  <Client>
+    <Number>5907</Number>
+    <Name>Holyrood Park</Name>
+    <Latitude>55.9460153</Latitude>
+    <Longitude>-3.1596354</Longitude>
+  </Client>
+  <Client>
+    <Number>5908</Number>
+    <Name>The Meadows</Name>
+    <Latitude>55.9413041</Latitude>
+    <Longitude>-3.1918722</Longitude>
+  </Client>
+  <Client>
+    <Number>5946</Number>
+    <Name>Craigmillar Castle</Name>
+    <Latitude>55.9256773</Latitude>
+    <Longitude>-3.1408284</Longitude>
+  </Client>
+  <Client>
+    <Number>5914</Number>
+    <Name>Pentland Hills Regional Park</Name>
+    <Latitude>55.8366245</Latitude>
+    <Longitude>-3.3270038</Longitude>
+  </Client>
+</Clients>

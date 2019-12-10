@@ -779,7 +779,7 @@ $(function () {
     $('.btn-remove-modal').on('click', function () {
         var id = parseInt($(this).attr('id').replace('place-', '').replace('-remove', ''));
 
-        $('#modal-delete-visit-name').text(place_info[id]['name']);
+        $('#modal-delete-visit-name-title').text(place_info[id]['name']);
 
         document.getElementById('confirm-remove-btn').setAttribute( "onClick", "javascript: deleteVisit("+$(this).data('poi')+");" );
 
