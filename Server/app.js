@@ -28,8 +28,8 @@ var open = require('open');
 
 /* API KEYS FOR GOOGLE AND OPEN WEATHER MAP */
 
-const GOOGLE_API_KEY = 'AIzaSyAExpmRjci35grh-wAwFxK75c0fV4OHOxw';
-const OPEN_WEATHER_API_KEY = '8271fd206ceeef12df4e7bb6063241c3';
+const GOOGLE_API_KEY = 'YOUR GOOGLE API KEY';
+const OPEN_WEATHER_API_KEY = 'YOUR OPEN WEATHER MAP API KEY';
 
 distance.key(GOOGLE_API_KEY); // set GOOGLE API KEY to Google Distance Matrix Module
 
@@ -104,10 +104,10 @@ var upload_city = multer({storage: city_storage});
 
 /* CREATE CONNECTION WITH THE MYSQL DB */
 var con = mysql.createConnection({
-  host: "e-tinerarydb.mysql.database.azure.com",
-  user: "etinerary_user@e-tinerarydb",
-  password: "Ers1995.",
-  database: "placesdb"
+  host: "database host name",
+  user: "database username",
+  password: "database password" ,
+  database: "database name"
 });
 
 app.engine('html', require('ejs').renderFile);
