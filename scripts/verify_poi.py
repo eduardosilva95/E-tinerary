@@ -1,3 +1,6 @@
+# Script to verify if all POI of a city are in a MAX_DISTANCE in kilometers of the center of the city
+
+
 import mysql.connector
 import sys
 import math
@@ -5,11 +8,11 @@ import math
 MAX_DISTANCE_KM = 20
 
 mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  passwd="password",
+  host="database host name",
+  user="database username",
+  passwd="database password",
   auth_plugin='mysql_native_password',
-  database="placesdb"
+  database="database name"
 )
 
 mycursor = mydb.cursor()

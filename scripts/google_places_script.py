@@ -1,17 +1,19 @@
+# Script to generate a database of POI
+
 import googlemaps
 import urllib, json
 import mysql.connector
 import wikipedia
 import sys
 
-API_KEY = 'AIzaSyCcM_AepOJRN1QIx96d2n0FOfOcGfZYfck'
+API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'
 
 mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  passwd="password",
+  host="database host name",
+  user="database username",
+  passwd="database password",
   auth_plugin='mysql_native_password',
-  database="placesdb"
+  database="database name"
 )
 
 mycursor = mydb.cursor()
