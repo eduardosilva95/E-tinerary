@@ -1,5 +1,7 @@
 /* 
 
+E-tinerary: server code build using Node JS and Javascript
+Developed by: Eduardo Silva eduardosilva@ua.pt
 
 */
 
